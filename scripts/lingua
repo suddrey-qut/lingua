@@ -1,0 +1,92 @@
+#!/usr/bin/env python
+
+from __future__ import print_function
+from py_trees.composites import Sequence, Selector, Parallel, Composite
+from rv_trees.trees import BehaviourTree
+from rv_trees.leaves_ros import ActionLeaf
+
+from lingua import Method, Subtree
+
+import rospy
+
+from std_msgs.msg import String
+
+Method.methods['touch(obj arg0)'] = Method(
+  name = 'touch(obj arg0)', 
+  root = {
+    'name': 'Subtree-1',
+    'type': 'sequence',
+    'children': [
+      {
+        'name': 'Hello',
+        'type': 'publisher',
+        'args': {
+          'topic_name': 'echo',
+          'topic_class': String,
+          'load_value': 'Hello'
+        }
+      },
+      {
+        'name': 'Counter',
+        'type': 'action',
+        'args': {
+          'action_namespace': 'count',
+          'load_value': 5
+        }
+      },
+      {
+        'name': 'subtree',
+        'type': 'behaviour',
+        'args': {
+          'method_name': 'tetch(obj arg0)',
+          'mapping': {},
+        }
+      }
+    ]
+  }
+)
+
+Method.methods['tetch(obj arg0)'] = Method(
+  name='tetch(obj arg0)',
+  root = {
+    'name': 'Subtree-2',
+    'type': 'sequence',
+    'children': [
+      {
+        'name': 'Sub-Counter',
+        'type': 'action',
+        'args': {
+          'action_namespace': 'count',
+          'load_value': 3
+        }
+      },
+      {
+        'name': 'Good-bye',
+        'type': 'publisher',
+        'args': {
+          'topic_name': 'echo',
+          'topic_class': String,
+          'load_value': 'Good-bye'
+        }
+      }
+    ]
+  }
+)
+
+bt = BehaviourTree(
+  'test', 
+  root=Sequence(
+    name="Main Tree", 
+    children=[
+      ActionLeaf(name="Counter0", action_namespace='count', load_value=2), 
+      Subtree(name="Subtree:touch(obj arg0)", method_name='touch(obj arg0)', mapping={}, load_value='what')
+    ]
+  )
+)
+
+def tree():
+  bt.run(hz=1)
+  
+if __name__ == '__main__':
+    rospy.init_node("test_bt")
+    tree()  
