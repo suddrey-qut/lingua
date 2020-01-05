@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
-from py_trees.composites import Sequence, Selector, Parallel, Composite
+import sys
+from py_trees import Status
 from rv_trees.trees import BehaviourTree
-from rv_trees.leaves_ros import ActionLeaf
-
 from lingua import Method, Subtree
+from lingua.parser import Parser
+from lingua.types import Object
 
 import rospy
 
@@ -23,7 +24,7 @@ Method.methods['touch(obj arg0)'] = Method(
         'args': {
           'topic_name': 'echo',
           'topic_class': String,
-          'load_value': 'Hello'
+          'load_value': '(holding arg0)'
         }
       },
       {
@@ -39,7 +40,9 @@ Method.methods['touch(obj arg0)'] = Method(
         'type': 'behaviour',
         'args': {
           'method_name': 'tetch(obj arg0)',
-          'mapping': {},
+          'mapping': {
+            'arg0': 'arg0'
+          }
         }
       }
     ]
@@ -73,20 +76,12 @@ Method.methods['tetch(obj arg0)'] = Method(
   }
 )
 
-bt = BehaviourTree(
-  'test', 
-  root=Sequence(
-    name="Main Tree", 
-    children=[
-      ActionLeaf(name="Counter0", action_namespace='count', load_value=2), 
-      Subtree(name="Subtree:touch(obj arg0)", method_name='touch(obj arg0)', mapping={}, load_value='what')
-    ]
-  )
-)
 
 def tree():
-  bt.run(hz=1)
+  bt = BehaviourTree('test', root=Method.methods['touch(obj arg0)'].instantiate({'arg0': Object('(ball ?)')}))
+  bt.run(hz=1, exit_on=Status.SUCCESS)
   
 if __name__ == '__main__':
     rospy.init_node("test_bt")
+    Parser.init()
     tree()  
