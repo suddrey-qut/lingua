@@ -95,13 +95,17 @@ class Parser:
       return result[0]
 
   @staticmethod
+  def assert_statement(statement):
+      return Parser._kb_assert(statement).result
+
+  @staticmethod
   def evaluate_condition(condition):
       if not Parser.is_conditional(condition):
           return condition
 
       terms = Parser.logical_split(condition)[1:]
 
-      if Parser._kb_assert(terms[0]):
+      if Parser.assert_statement(terms[0]):
           return parse(terms[1])
 
       if len(terms) > 2:

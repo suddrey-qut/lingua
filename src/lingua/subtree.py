@@ -8,15 +8,55 @@ from rv_trees.trees import BehaviourTree
 from rv_trees.leaves_ros import ActionLeaf, SubscriberLeaf, ServiceLeaf, PublisherLeaf
 from py_trees.composites import Sequence, Selector, Parallel, Composite
 
+from .parser import Parser
 from .types import Groundable
 
-class Condition(ServiceLeaf):
+class ConditionLeaf(ServiceLeaf):
   def __init__(self, name, condition, arguments, save=False, *args, **kwargs):
-    super(Condition, self).__init__(name, service_name='/kb/assert', save=save, *args, **kwargs)
+    super(ConditionLeaf, self).__init__(
+      name, 
+      service_name='/kb/assert', 
+      load_value=condition, 
+      save=save, 
+      load_fn=self.load_fn, 
+      eval_fn=self.eval_fn, 
+      *args, **kwargs)
+
     self.condition = condition
+    self.arguments = arguments
 
-  def _extra_update()
+  def load_fn(self):
+    data = super(ConditionLeaf, self)._default_load_fn()
+    for arg_key in self.arguments:
+      if not self.arguments[arg_key].is_grounded():
+        self.arguments[arg_key].ground()
+      data.query = re.sub(r'({})([)\s])'.format(arg_key), r'{}\2'.format(self.arguments[arg_key].get_id()), self.condition)
+    return data
 
+  def eval_fn(self, result):
+    return result.result
+
+
+class EffectLeaf(ServiceLeaf):
+  def __init__(self, name, condition, arguments, save=False, *args, **kwargs):
+    super(EffectLeaf, self).__init__(
+      name, 
+      service_name='/kb/tell', 
+      load_value=condition, 
+      load_fn=self.load_fn, 
+      save=save, 
+      *args, **kwargs)
+
+    self.condition = condition
+    self.arguments = arguments
+
+  def load_fn(self):
+    data = super(EffectLeaf, self)._default_load_fn()
+    for arg_key in self.arguments:
+      if not self.arguments[arg_key].is_grounded():
+        self.arguments[arg_key].ground()
+      data.statement = re.sub(r'({})([)\s])'.format(arg_key), r'{}\2'.format(self.arguments[arg_key].get_id()), self.condition)
+    return data
 
 class Subtree(py_trees.composites.Sequence):
   def __init__(self, name, method_name, arguments, mapping, *args, **kwargs):
@@ -104,12 +144,15 @@ class Method:
       return Sequence(branch['name'] if 'name' in branch else 'sequence', children=children)
 
     if branch['type'] == 'selector':
-      children = list([generate_branch(child, arguments) for child in branch['children']])
+      children = list([self.generate_branch(child, arguments) for child in branch['children']])
       return Selector(branch['name'] if 'name' in branch else 'selector', children=children)
 
     if branch['type'] == 'condition':
-      return ConditionLeaf(name=branch['name'])
+      return ConditionLeaf(name=branch['name'], arguments=arguments, **branch['args'])
     
+    if branch['type'] == 'effect':
+      return EffectLeaf(name=branch['name'], arguments=arguments, **branch['args'])
+        
     if branch['type'] == 'action':
       return ActionLeaf(name=branch['name'], load_fn=load_fn, **branch['args'])
 
