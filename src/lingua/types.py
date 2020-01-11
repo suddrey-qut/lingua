@@ -1,6 +1,6 @@
 import copy
-from .parser import Parser
-from .errors import AmbigiousStatement, NullStatement
+from lingua_pddl.parser import Parser
+from lingua_pddl.errors import AmbigiousStatement, NullStatement
 
 class Groundable:
     def __init__(self, descriptor):
@@ -25,6 +25,9 @@ class Groundable:
         self.descriptor = value
 
     def ground(self):
+        if self.is_grounded():
+          return
+          
         descriptor = self.descriptor
 
         for key in self.arguments:
@@ -177,12 +180,10 @@ class Object(Groundable):
         return 'anaphora:it' in self.descriptor
 
 class DummyObject(Groundable):
-    def __init__(self, type_name, descriptor = ''):
-        Groundable.__init__(self, descriptor)
-        self.type_name = type_name
-
-    def ground(self, state):
-        raise Exception('unable to ground dummy object')
+  def __init__(self, type_name, object_id, descriptor = ''):
+    Groundable.__init__(self, descriptor)
+    self.type_name = type_name
+    self.id = object_id
 
 class Query(Groundable):
     def __init__(self, predicate, descriptor):

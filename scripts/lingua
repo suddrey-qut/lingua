@@ -5,8 +5,8 @@ import sys
 from py_trees import Status
 from rv_trees.trees import BehaviourTree
 from lingua import Method, Subtree
-from lingua.parser import Parser
 from lingua.types import Object
+from lingua_pddl.parser import Parser
 
 import rospy
 
@@ -51,7 +51,7 @@ Method.methods['open(tool arg0)'] = Method(
     'children': [
       {
         'name': 'postcondition:(open arg0)',
-        'type': 'condition',
+        'type': 'postcondition',
         'args': {
           'condition': '(open arg0)'
         }
@@ -62,7 +62,7 @@ Method.methods['open(tool arg0)'] = Method(
         'children': [
           {
             'name': 'precondition:(not (open arg0))',
-            'type': 'condition',
+            'type': 'precondition',
             'args': {
               'condition': '(not (open arg0))'
             }
@@ -96,7 +96,7 @@ Method.methods['close(tool arg0)'] = Method(
     'children': [
       {
         'name': 'postcondition:(not (open arg0))',
-        'type': 'condition',
+        'type': 'postcondition',
         'args': {
           'condition': '(not (open arg0))'
         }
@@ -107,7 +107,7 @@ Method.methods['close(tool arg0)'] = Method(
         'children': [
           {
             'name': 'precondition:(open arg0)',
-            'type': 'condition',
+            'type': 'precondition',
             'args': {
               'condition': '(open arg0)'
             }
@@ -138,10 +138,12 @@ def tree():
   tell.wait_for_service()
 
   tell('(tool g0)')
+  tell('(tool g1)')
+  tell('(tool g2)')
+  # tell('(not (open g0))')
 
   bt = BehaviourTree('test', root=Method.methods['open_close(tool arg0)'].instantiate({'arg0': Object('(tool ?)')}))
-  
-  bt.run(hz=1)
+  bt.run(hz=1, exit_on=Status.SUCCESS)
   
 if __name__ == '__main__':
     rospy.init_node("test_bt")

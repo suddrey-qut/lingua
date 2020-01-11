@@ -8,8 +8,8 @@ from rv_trees.trees import BehaviourTree
 from rv_trees.leaves_ros import ActionLeaf, SubscriberLeaf, ServiceLeaf, PublisherLeaf
 from py_trees.composites import Sequence, Selector, Parallel, Composite
 
-from .parser import Parser
-from .types import Groundable
+from lingua_pddl.parser import Parser
+from .types import Groundable, DummyObject
 
 class ConditionLeaf(ServiceLeaf):
   def __init__(self, name, condition, arguments, save=False, *args, **kwargs):
@@ -92,9 +92,22 @@ class Method:
     self.effects = []
 
   def instantiate(self, arguments={}):
-    branch = self.generate_tree(arguments)
-    branch.setup(0)
-    return branch
+    for key in arguments:
+      arguments[key].ground()
+
+    is_iterable = bool([key for key in arguments if Parser.is_iterable(arguments[key].get_id())])
+    
+    if not is_iterable:
+      return self.generate_tree(arguments, setup=True)
+      
+    children = []
+
+    for args in self.zip_arguments(arguments):
+      branch = self.generate_tree(args, setup=True)
+      children.append(branch)
+
+    return Sequence(name='sequence:{}'.format(self.name), children=children)
+    
     #return InstantiatedMethod(self, state, {'arg' + str(idx): arg for idx, arg in enumerate(arguments)})
 
   def get_name(self):
@@ -108,6 +121,28 @@ class Method:
       return 1
     return sum((methods[subtask.get_name()].get_cost() for subtask in self.root))
 
+  def product_dict(self, **kwargs):
+    keys = kwargs.keys()
+    vals = kwargs.values()
+    for instance in itertools.product(*vals):
+      yield dict(zip(keys, instance))
+
+  def zip_arguments(self, arguments):
+    objects = {}
+    for key in arguments:
+      objects[key] = []
+
+      if not Parser.is_iterable(arguments[key].get_id()):
+        objects[key].append(argument[key])
+        continue
+      
+      object_ids = Parser.logical_split(arguments[key].get_id())[1:]
+      
+      for object_id in object_ids:
+        objects[key].append(DummyObject(arguments[key].get_type_name(), object_id, arguments[key].descriptor))
+    
+    return list(self.product_dict(**objects))
+    
   def __str__(self):
     output = str(self.name)
     output += '\n\tPreconditions: '
@@ -122,8 +157,11 @@ class Method:
 
     return output
 
-  def generate_tree(self, arguments={}):
-    return self.generate_branch(self.root, arguments)
+  def generate_tree(self, arguments={}, setup=False):
+    tree = self.generate_branch(self.root, arguments)
+    if setup:
+      tree.setup(0)
+    return tree
 
   def generate_branch(self, branch, arguments):
     def load_fn(leaf):
@@ -147,7 +185,7 @@ class Method:
       children = list([self.generate_branch(child, arguments) for child in branch['children']])
       return Selector(branch['name'] if 'name' in branch else 'selector', children=children)
 
-    if branch['type'] == 'condition':
+    if branch['type'] == 'precondition' or branch['type'] == 'postcondition':
       return ConditionLeaf(name=branch['name'], arguments=arguments, **branch['args'])
     
     if branch['type'] == 'effect':
