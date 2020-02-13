@@ -84,12 +84,13 @@ class Subtree(py_trees.composites.Sequence):
 class Method:
   methods = {}
 
-  def __init__(self, name, root):
+  def __init__(self, name, preconditions=None, postconditions=None, root=None):
     self.name = name
-    self.root = root
 
-    self.preconditions = []
-    self.effects = []
+    self.root = root if root else {}
+
+    self.preconditions = preconditions if preconditions else []
+    self.postconditions = postconditions if postconditions else []
 
   def instantiate(self, arguments={}):
     for key in arguments:
@@ -158,10 +159,48 @@ class Method:
     return output
 
   def generate_tree(self, arguments={}, setup=False):
-    tree = self.generate_branch(self.root, arguments)
-    if setup:
-      tree.setup(0)
-    return tree
+    postconditions = []
+    preconditions = []
+    effects = []
+
+    if self.postconditions:
+      postconditions = [
+        ConditionLeaf('postcondition:{}'.format(condition), condition=condition, arguments=arguments) for condition in self.postconditions
+      ]
+      postconditions = Sequence('postconditions', children=postconditions) if len(postconditions) > 1 else postconditions[0]
+      
+      effects = [
+        EffectLeaf('effect:{}'.format(condition), condition=condition, arguments=arguments) for condition in self.postconditions
+      ]
+      effects = Sequence('effects', children=effects) if len(effects) > 1 else effects[0]
+
+    if self.preconditions:
+      preconditions = [
+        ConditionLeaf('precondition:{}'.format(condition), condition=condition, arguments=arguments) for condition in self.preconditions
+      ]
+      preconditions = Sequence('postconditions', children=preconditions) if len(preconditions) > 1 else preconditions[0]
+      
+    root = None
+    
+    if postconditions:
+      root = Selector(self.name, children=[postconditions])
+    
+    branch = self.generate_branch(self.root, arguments)
+
+    if preconditions:
+      if root:
+        root.add_child(Sequence('do action', children=[preconditions, branch, effects]))
+      else:
+        root = Sequence(self.name, children=[preconditions, branch])
+    
+    else:
+      if root:
+        root.add_child(Sequence('do action', children=[branch, effects]))
+      else:
+        root = branch
+      
+    root.setup(0)
+    return root
 
   def generate_branch(self, branch, arguments):
     def load_fn(leaf):
