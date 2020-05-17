@@ -11,9 +11,9 @@ from py_trees.composites import Sequence, Selector, Parallel, Composite
 from lingua_pddl.parser import Parser
 from .types import Groundable, DummyObject
 
-class ConditionLeaf(ServiceLeaf):
+class KBConditionLeaf(ServiceLeaf):
   def __init__(self, name, condition, arguments, save=False, *args, **kwargs):
-    super(ConditionLeaf, self).__init__(
+    super(KBConditionLeaf, self).__init__(
       name, 
       service_name='/kb/assert', 
       load_value=condition, 
@@ -26,7 +26,7 @@ class ConditionLeaf(ServiceLeaf):
     self.arguments = arguments
 
   def load_fn(self):
-    data = super(ConditionLeaf, self)._default_load_fn()
+    data = super(KBConditionLeaf, self)._default_load_fn()
     for arg_key in self.arguments:
       if not self.arguments[arg_key].is_grounded():
         self.arguments[arg_key].ground()
@@ -37,9 +37,9 @@ class ConditionLeaf(ServiceLeaf):
     return result.result
 
 
-class EffectLeaf(ServiceLeaf):
+class KBEffectLeaf(ServiceLeaf):
   def __init__(self, name, condition, arguments, save=False, *args, **kwargs):
-    super(EffectLeaf, self).__init__(
+    super(KBEffectLeaf, self).__init__(
       name, 
       service_name='/kb/tell', 
       load_value=condition, 
@@ -51,12 +51,13 @@ class EffectLeaf(ServiceLeaf):
     self.arguments = arguments
 
   def load_fn(self):
-    data = super(EffectLeaf, self)._default_load_fn()
+    data = super(KBEffectLeaf, self)._default_load_fn()
     for arg_key in self.arguments:
       if not self.arguments[arg_key].is_grounded():
         self.arguments[arg_key].ground()
       data.statement = re.sub(r'({})([)\s])'.format(arg_key), r'{}\2'.format(self.arguments[arg_key].get_id()), self.condition)
     return data
+
 
 class Subtree(py_trees.composites.Sequence):
   def __init__(self, name, method_name, arguments, mapping, *args, **kwargs):
@@ -165,18 +166,18 @@ class Method:
 
     if self.postconditions:
       postconditions = [
-        ConditionLeaf('postcondition:{}'.format(condition), condition=condition, arguments=arguments) for condition in self.postconditions
+        KBConditionLeaf('postcondition:{}'.format(condition), condition=condition, arguments=arguments) for condition in self.postconditions
       ]
       postconditions = Sequence('postconditions', children=postconditions) if len(postconditions) > 1 else postconditions[0]
       
       effects = [
-        EffectLeaf('effect:{}'.format(condition), condition=condition, arguments=arguments) for condition in self.postconditions
+        KBEffectLeaf('effect:{}'.format(condition), condition=condition, arguments=arguments) for condition in self.postconditions
       ]
       effects = Sequence('effects', children=effects) if len(effects) > 1 else effects[0]
 
     if self.preconditions:
       preconditions = [
-        ConditionLeaf('precondition:{}'.format(condition), condition=condition, arguments=arguments) for condition in self.preconditions
+        KBConditionLeaf('precondition:{}'.format(condition), condition=condition, arguments=arguments) for condition in self.preconditions
       ]
       preconditions = Sequence('postconditions', children=preconditions) if len(preconditions) > 1 else preconditions[0]
       
@@ -225,10 +226,10 @@ class Method:
       return Selector(branch['name'] if 'name' in branch else 'selector', children=children)
 
     if branch['type'] == 'precondition' or branch['type'] == 'postcondition':
-      return ConditionLeaf(name=branch['name'], arguments=arguments, **branch['args'])
+      return KBConditionLeaf(name=branch['name'], arguments=arguments, **branch['args'])
     
     if branch['type'] == 'effect':
-      return EffectLeaf(name=branch['name'], arguments=arguments, **branch['args'])
+      return KBEffectLeaf(name=branch['name'], arguments=arguments, **branch['args'])
         
     if branch['type'] == 'action':
       return ActionLeaf(name=branch['name'], load_fn=load_fn, **branch['args'])
