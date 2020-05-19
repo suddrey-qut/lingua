@@ -1,0 +1,139 @@
+#!/usr/bin/env python
+
+from __future__ import print_function
+import sys
+import pprint
+from py_trees import Status
+from rv_trees.trees import BehaviourTree
+from lingua import Method, Subtree
+from lingua.types import Object
+from lingua_pddl.parser import Parser
+from lingua_pddl.ccg_reader import CCGReader
+from py_trees.composites import Sequence, Selector, Parallel, Composite
+
+import rospy
+
+from std_msgs.msg import String
+from openccg_ros.msg import Parses
+from lingua_kb.srv import Tell
+
+Method.methods['open_close(tool arg0)'] = Method(
+  name = 'open_close(tool arg0)', 
+  root = {
+    'name': 'steps',
+    'type': 'sequence',
+    'children': [
+      {
+        'name': 'open',
+        'type': 'behaviour',
+        'args': {
+          'method_name': 'open(tool arg0)',
+          'mapping': {
+            'arg0': 'arg0'
+          }
+        }
+      },
+      {
+        'name': 'close',
+        'type': 'behaviour',
+        'args': {
+          'method_name': 'close(tool arg0)',
+          'mapping': {
+            'arg0': 'arg0'
+          }
+        }
+      }
+    ]
+  }
+)
+
+Method.methods['open(tool arg0)'] = Method(
+  name='open(tool arg0)',
+  preconditions=[
+    '(not (open arg0))'
+  ],
+  postconditions=[
+    '(open arg0)'
+  ],
+  root = {
+    'name': 'open gripper',
+    'type': 'action',
+    'args': {
+      'action_namespace': 'count',
+      'load_value': 5
+    }
+  }
+)
+
+Method.methods['close(tool arg0)'] = Method(
+  name='close(tool arg0)',
+  preconditions=[
+    '(open arg0)'
+  ],
+  postconditions=[
+    '(not (open arg0))'
+  ],
+  root = {
+    'name': 'open gripper',
+    'type': 'action',
+    'args': {
+      'action_namespace': 'count',
+      'load_value': 4
+    }
+  }      
+)
+
+  # tell('(tool g0)')
+  # # tell('(not (open g0))')
+
+  # bt = BehaviourTree('test', root=Method.methods['open_close(tool arg0)'].instantiate({'arg0': Object('(tool ?)')}))
+  # bt.run(hz=1, exit_on=Status.SUCCESS)
+
+
+
+class HandleIntents(Sequence):
+  def __init__(name='Handle Intents', children=None, *args, **kwargs):
+    Super(HandleIntents, self).__init__(
+      name=name,
+      children = []
+    )
+tree = BehaviourTree('Main', root=Sequence(name='Body', children=[]))
+
+def parses_cb(msg):
+  pp = pprint.PrettyPrinter(indent=2)
+
+  frames = msg.parses
+
+  for frame in frames:
+    
+    parse = CCGReader.parse(frame)
+    
+    if not parse:
+      continue
+    pp.pprint(parse.toJSON())
+
+    #print(parse.toJSON())
+
+    # node = Method.methods[selected['task_name']].instantiate({
+    #   key: Object(selected['arguments'][key]['descriptor']) for key in selected['arguments']
+    # })
+
+    # tree.root.remove_all_children()
+    # tree.root.add_child(node)
+    
+    # tree.run(hz=1, push_to_start=False, exit_on=Status.SUCCESS)
+  # print(data)
+
+if __name__ == '__main__':
+    print('Init node')
+    rospy.init_node("test_bt")
+    print('Init parser')
+    #Parser.init()
+    # tell = rospy.ServiceProxy('/kb/tell', Tell)
+    # tell.wait_for_service()
+    
+    # tell('(gripper g0)')
+    print('Init subscriber')
+    rospy.Subscriber('/speech/parses', Parses, parses_cb)
+    print('Ready')
+    rospy.spin()
