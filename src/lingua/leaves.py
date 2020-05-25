@@ -8,8 +8,8 @@ from rv_trees.trees import BehaviourTree
 from rv_trees.leaves_ros import ActionLeaf, SubscriberLeaf, ServiceLeaf, PublisherLeaf
 from py_trees.composites import Sequence, Selector, Parallel, Composite
 
-from lingua_pddl.parser import Parser
-from .types import Groundable, DummyObject
+# from lingua_pddl.parser import Parser
+# from .types import Groundable, DummyObject
 
 class KBConditionLeaf(ServiceLeaf):
   def __init__(self, name, condition, arguments, save=False, *args, **kwargs):
@@ -94,20 +94,19 @@ class Method:
     self.postconditions = postconditions if postconditions else []
 
   def instantiate(self, arguments={}):
-    for key in arguments:
-      arguments[key].ground()
-
-    is_iterable = bool([key for key in arguments if Parser.is_iterable(arguments[key].get_id())])
+    is_iterable = bool([key for key in arguments if isinstance(arguments[key], Conjunction)])
     
     if not is_iterable:
-      return self.generate_tree(arguments, setup=True)
+      subtree = self.generate_tree(arguments, setup=True)
+      return subtree
       
     children = []
 
     for args in self.zip_arguments(arguments):
+      print(args)
       branch = self.generate_tree(args, setup=True)
       children.append(branch)
-
+    
     return Sequence(name='sequence:{}'.format(self.name), children=children)
     
     #return InstantiatedMethod(self, state, {'arg' + str(idx): arg for idx, arg in enumerate(arguments)})
@@ -246,3 +245,5 @@ class Method:
     if branch['type'] == 'behaviour':
       return Subtree(name=branch['name'], arguments=arguments, **branch['args'])
     
+
+from .types import Conjunction

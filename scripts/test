@@ -6,9 +6,7 @@ import pprint
 from py_trees import Status
 from rv_trees.trees import BehaviourTree
 from lingua import Method, Subtree
-from lingua.types import Object
-from lingua_pddl.parser import Parser
-from lingua_pddl.ccg_reader import CCGReader
+from lingua.ccg_reader import CCGReader
 from py_trees.composites import Sequence, Selector, Parallel, Composite
 
 import rospy
