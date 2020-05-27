@@ -3,6 +3,9 @@ import rospy
 import time
 
 from lingua.ccg_reader import CCGReader
+from lingua.leaves import Root, Method
+from lingua.types import *
+
 from rv_trees.trees import BehaviourTree
 
 from py_trees import Status
@@ -10,193 +13,84 @@ from py_trees.composites import Composite
 
 from std_msgs.msg import String
 from openccg_ros.srv import Parse
-from lingua.leaves import Method
 
 Method.methods['pick_up(object arg0)'] = Method(
   name='pick_up(object arg0)',
-  preconditions=[
-    # '(not (holding arg0))'
-  ],
-  postconditions=[
-    # '(open arg0)'
-  ],
   root = {
-    'name': 'steps',
+    'type': 'sequence',
+    'children': [
+      {
+        'type': 'behaviour',
+        'method_name': 'open(tool arg0)'
+      }, {
+        'type': 'behaviour',
+        'method_name': 'move_to(tool arg0, object arg1)',
+        'args': {
+          'mapping': {
+            'arg1': 'arg0'
+          }
+        }
+      },
+      {
+        'type': 'behaviour',
+        'method_name': 'close(tool arg0)'
+      }
+    ]
+  }
+)
+
+Method.methods['open(tool arg0)'] = Method(
+  name='open(tool arg0)',
+  root = {
     'type': 'sequence',
     'children': [{
       'name': 'open gripper',
-      'type': 'action',
-      'args': {
-        'action_namespace': 'count',
-        'load_value': 1
-      }
-    }, {
-      'name': 'move gripper to object',
-      'type': 'action',
-      'args': {
-        'action_namespace': 'count',
-        'load_value': 2
-      }
-    }, {
-      'name': 'close gripper',
-      'type': 'action',
-      'args': {
-        'action_namespace': 'count',
-        'load_value': 1
-      }
-    }, {
-      'name': 'move to ready pose',
-      'type': 'action',
-      'args': {
-        'action_namespace': 'count',
-        'load_value': 2
-      }
+      'type': 'class',
+      'package': 'rv_leaves.leaves.manipulation.grasping',
+      'class_name': 'ActuateGripper',
     }]
   }
 )
 
-Method.methods['put_on(object arg0, object arg1)'] = Method(
-  name='put_on(object arg0, object arg1)',
-  preconditions=[
-    # '(open arg0)'
-  ],
-  postconditions=[
-    # '(not (open arg0))'
-  ],
+Method.methods['close(tool arg0)'] = Method(
+  name='close(tool arg0)',
   root = {
-    'name': 'steps',
     'type': 'sequence',
     'children': [{
-      'name': 'move gripper over object',
-      'type': 'action',
-      'args': {
-        'action_namespace': 'count',
-        'load_value': 2
-      }
-    }, {
-      'name': 'open gripper',
-      'type': 'action',
-      'args': {
-        'action_namespace': 'count',
-        'load_value': 1
-      }
-    }, {
-      'name': 'move to ready pose',
-      'type': 'action',
-      'args': {
-        'action_namespace': 'count',
-        'load_value': 2
-      }
-    }, {
       'name': 'close gripper',
-      'type': 'action',
-      'args': {
-        'action_namespace': 'count',
-        'load_value': 1
-      }
+      'type': 'class',
+      'package': 'rv_leaves.leaves.manipulation.grasping',
+      'class_name': 'Grasp',
     }]
   }
 )
 
-class Root(Composite):
-  def __init__(self, name='Root', children=None, *args, **kwargs):
-    super(Root, self).__init__(name=name, children=children if children else [], *args, **kwargs)
-    self.current_child = None
-
-  def tick(self):
-      """
-      Run the tick behaviour for this selector. Note that the status
-      of the tick is always determined by its children, not
-      by the user customised update function.
-
-      Yields:
-          :class:`~py_trees.behaviour.Behaviour`: a reference to itself or one of its children
-      """
-      self.logger.debug("%s.tick()" % self.__class__.__name__)
-      
-      if self.status != Status.RUNNING:
-          self.initialise()
-
-      self.update()
-
-      if not self.children:
-        self.status = Status.SUCCESS
-        yield self
-        return
-
-      previous = self.current_child
-      for child in self.children:
-          for node in child.tick():
-              yield node
-              if node is child:
-                  if node.status == Status.RUNNING or node.status == Status.SUCCESS:
-                      self.current_child = child
-                      self.status = node.status
-                      if previous is None or previous != self.current_child:
-                          # we interrupted, invalidate everything at a lower priority
-                          passed = False
-                          for child in self.children:
-                              if passed:
-                                  if child.status != Status.INVALID:
-                                      child.stop(Status.INVALID)
-                              passed = True if child == self.current_child else passed
-                      
-                      if child.status == Status.SUCCESS:
-                        self.remove_child(child)
-
-                      yield self
-                      return
-
-      # for idx, child in enumerate(self.children):
-      #     print(idx)
-      #     for node in child.tick():
-      #         yield node
-      #         if node is child:
-      #             print('Sheet')
-      #             if child.status == Status.SUCCESS:
-      #               self.status = Status.SUCCESS
-      #               self.remove_child(child)
-      #               yield self
-      #               return
-      # all children failed, set failure ourselves and current child to the last bugger who failed us
-      
-      try:
-          self.current_child = self.children[-1]
-      except IndexError:
-          self.current_child = None
-      yield self
-
-  def stop(self, new_status=Status.INVALID):
-      """
-      Stopping a selector requires setting the current child to none. Note that it
-      is important to implement this here instead of terminate, so users are free
-      to subclass this easily with their own terminate and not have to remember
-      that they need to call this function manually.
-
-      Args:
-          new_status (:class:`~py_trees.common.Status`): the composite is transitioning to this new status
-      """
-      # retain information about the last running child if the new status is
-      # SUCCESS or FAILURE
-      if new_status == Status.INVALID:
-          self.current_child = None
-      Composite.stop(self, new_status)
-
-  def __repr__(self):
-      """
-      Simple string representation of the object.
-
-      Returns:
-          :obj:`str`: string representation
-      """
-      s = "Name       : %s\n" % self.name
-      s += "  Status  : %s\n" % self.status
-      s += "  Current : %s\n" % (self.current_child.name if self.current_child is not None else "none")
-      s += "  Children: %s\n" % [child.name for child in self.children]
-      return s
-
-
-  
+Method.methods['move_to(tool arg0, object arg1)'] = Method(
+  name='move_to(tool arg0, object arg1)',
+  root = {
+    'type': 'sequence',
+    'children': [
+      {
+        'type': 'class',
+        'package': 'lingua.leaves',
+        'class_name': 'GetObjectPose',
+        'args': {
+          'load_value': 'method:arg1',
+        },
+      },
+      {
+        'type': 'class',
+        'package': 'rv_leaves.leaves.generic.console',
+        'class_name': 'Print',
+      },
+      {
+        'type': 'class',
+        'package': 'rv_leaves.leaves.manipulation.motion',
+        'class_name': 'MoveGripperToPose',
+      }
+    ]
+  }
+)
 
 class LinguaROS(object):
   def __init__(self):
@@ -208,7 +102,10 @@ class LinguaROS(object):
     self.root = Root()
     self.tree = BehaviourTree('lingua', root=self.root)
     
-    self.to_add = []
+    self.input_stack = []
+
+    self.focus = None
+    self.topic = None
 
   def speech_cb(self, msg):
     # Get XML parses from CCG parser for input text
@@ -218,14 +115,21 @@ class LinguaROS(object):
     )
 
     for xml in result.parses:
-      t = CCGReader.read(xml)
-
+    
+      utterance, t = CCGReader.read(xml)
+    
       if t:
+        print(t)
+        self.input_stack.append(utterance)
+        self.handle_anaphora(t)
+
         subtree = t.to_btree()
         
         if not subtree.setup(timeout=5):
-          break
+          continue
         
+        print(str(t))
+
         self.root.add_child(subtree)
         break
         
@@ -235,6 +139,71 @@ class LinguaROS(object):
     while not rospy.is_shutdown():
       self.tree.tick()
       rospy.sleep(0.1)
+
+  def handle_anaphora(self, node):
+    replace = False
+
+    if isinstance(node, Conditional):
+      if node.is_inverted():
+        if self.handle_anaphora(node.get_body()):
+          node.set_body(self.topic[1])
+        if self.handle_anaphora(node.get_condition()):
+          node.set_condition(self.topic[1])
+      else:
+        if self.handle_anaphora(node.get_condition()):
+          node.set_condition(self.topic[1])
+        if self.handle_anaphora(node.get_body()):
+          node.set_body(self.topic[1])
+
+    if isinstance(node, Conjunction):
+      if self.handle_anaphora(node.get_left()):
+        node.set_left(self.topic[1])
+      if self.handle_anaphora(node.get_right()):
+        node.set_right(self.topic[1])
+
+    if isinstance(node, Assertion):
+      if self.handle_anaphora(node.get_body()):
+        node.set_body(self.topic[1])
+
+    if isinstance(node, Task):
+      located = False
+
+      for key in node.get_argument_keys():
+        if isinstance(node.get_argument(key), Assertion):
+          if self.handle_anaphora(node.get_argument(key).get_descriptor()):
+              node.get_argument(key).set_descriptor(self.topic[1])
+
+        elif (isinstance(node.get_argument(key), Conjunction)):
+          if self.handle_anaphora(node.get_argument(key).get_left()):
+              node.get_argument(key).set_left(self.topic[1])
+          if self.handle_anaphora(node.get_argument(key).get_right()):
+              node.get_argument(key).set_right(self.topic[1])
+
+        elif isinstance(node.get_argument(key), Anaphora):
+          if not self.topic:
+              raise Exception(self.input_stack[-1].replace(' it ', ' what ') + '?')
+
+          node.set_argument_type(key, self.topic[0])
+          node.set_argument(key, self.topic[1])
+
+          located = True
+
+      if not located:
+        for key in node.get_argument_keys():
+          self.topic = (node.get_argument_type(key), node.get_argument(key))
+          break
+
+      return False
+
+    if isinstance(node, Object):
+      if isinstance(node, Anaphora):
+        if not self.topic:
+          raise Exception(self.input_stack[-1].replace(' it ', ' what ') + '?')
+        return True
+      
+      self.topic = (node.get_type_name(), node)
+
+    return replace
 
 # task = CCGReader.read('<xml><lf><satop nom="w2:object"><prop name="ball"/><diamond mode="det"><prop name="the"/></diamond><diamond mode="num"><prop name="sg"/></diamond><diamond mode="mod"><nom name="w1:color"/><prop name="red"/></diamond></satop></lf><target>the red ball</target></xml>')
 # print(task)

@@ -3,6 +3,11 @@ import copy
 from py_trees.composites import *
 from rv_trees.leaves import *
 
+try:
+    from collections.abc import Iterable
+except ImportError:
+    from collections import Iterable
+
 class Base(object):
     def __init__(self):
         super(Base, self).__init__()
@@ -13,12 +18,31 @@ class Base(object):
     def is_valid(self):
         return False
 
+    def is_iterable(self):
+        return isinstance(self, Iterable)
+
     def __bool__(self):
         return bool(self.is_valid())
 
     def __nonzero__(self):      
         return self.__bool__()
 
+class Groundable(Base):
+    def __init__(self):
+        self.id = None
+
+    def set_id(self, idx):
+        self.id = idx
+
+    def get_id(self):
+        return self.id
+        
+    def to_query(self):
+        raise NotImplementedError()
+
+    def is_grounded(self):
+        return self.id is not None
+        
 class Task(Base):
     def __init__(self, name, arguments):
         self.method_arguments = arguments
@@ -57,7 +81,12 @@ class Task(Base):
         self.method_argument_types[key] = value
 
     def to_btree(self, name=None):
-        return Subtree(name if name else self.get_name(), self.get_name(), self.method_arguments, {key: key for key in self.get_argument_keys()})
+        return Subtree(
+            name=name if name else self.get_name(),
+            method_name=self.get_name(),
+            arguments=self.method_arguments,
+            mapping={key: key for key in self.get_argument_keys()}
+        )
 
     def is_valid(self):
         for key in self.method_arguments:
@@ -65,6 +94,10 @@ class Task(Base):
                 return False
         return True
 
+    def __iter__(self):
+        for key in self.method_arguments:
+            yield self.method_arguments[key]
+        
     def __str__(self):
         outstr = self.get_name()
         for key in self.method_arguments:
@@ -90,8 +123,6 @@ class Conjunction(Base):
         self.tag = tag
         self.left = left
         self.right = right
-
-        self.id = None
 
     def get_type_name(self):
         if isinstance(self.left, Object):
@@ -198,6 +229,9 @@ class ForLoop(Base):
     def is_valid(self):
         return self.duration and self.body
 
+    def __iter__(self):
+        yield self.body
+
     def __str__(self):
         outstr = 'for:\n duration:'
         
@@ -209,50 +243,21 @@ class ForLoop(Base):
 
         return outstr
 
-class WhileLoop(Base):
-    def __init__(self, condition, body):
-        super(WhileLoop, self).__init__()
-        
-        self.condition = condition
-        self.body = body
-
-    def get_condition(self):
-        return self.condition
-
-    def set_condition(self, condition):
-        self.condition = condition
-
-    def get_body(self):
-        return self.body
-
-    def set_body(self, body):
-        self.body = body
-
-    def to_btree(self, name=None):
-        return Selector(name if name else 'while', children=[
-            self.condition.to_btree(), self.body.to_btree()
-        ])
-
-    def is_valid(self):
-        return self.condition and self.body
-
-    def __str__(self):
-        outstr = 'while:\n condition:'
-        
-        for line in str(self.condition).split('\n'):
-            outstr += '\n  {}'.format(line)
-        outstr += '\n body:'
-        for line in str(self.body).split('\n'):
-            outstr += '\n  {}'.format(line)
-
-        return outstr
-
 class Conditional(Base):
-    def __init__(self, condition, body):
+    def __init__(self, condition, body, inverted=False):
         super(Conditional, self).__init__()
 
         self.condition = condition
         self.body = body
+
+        self.inverted = inverted
+
+    def is_inverted(self):
+        '''
+        The conditional is inverted if the condition uttered after the body
+        For example: pick the ball up if it is red
+        '''
+        return self.inverted
 
     def get_condition(self):
         return self.condition
@@ -295,9 +300,34 @@ class Conditional(Base):
             'body': self.body.toJSON()
         }
 
-class Assertion(Base):
+
+class WhileLoop(Conditional):
+    def to_btree(self, name=None):
+        return Selector(name if name else 'while', children=[
+            self.condition.to_btree(), self.body.to_btree()
+        ])
+
+    def __str__(self):
+        outstr = 'while:\n condition:'
+        
+        for line in str(self.condition).split('\n'):
+            outstr += '\n  {}'.format(line)
+        outstr += '\n body:'
+        for line in str(self.body).split('\n'):
+            outstr += '\n  {}'.format(line)
+
+        return outstr
+
+
+class Assertion(Groundable):
     def __init__(self, child):
         super(Assertion, self).__init__()
+        self.child = child
+
+    def get_body(self):
+        return self.child
+
+    def set_body(self, child):
         self.child = child
 
     def to_btree(self, name=None):
@@ -306,14 +336,19 @@ class Assertion(Base):
     def is_valid(self):
         return self.child
 
+    def to_query(self):
+        return self.child.to_query()
+
     def __str__(self):
         outstr = 'assert:'
         for line in str(self.child).split('\n'):
             outstr += '\n {}'.format(line)
         return outstr
 
-class Object(Base):
+class Object(Groundable):
     def __init__(self, type_name, name, attributes=None, relation=None, limit=None):
+        super(Object, self).__init__()
+
         self.type_name = type_name
         self.name = name
 
@@ -331,6 +366,16 @@ class Object(Base):
     def is_anaphora(self):
         return 'anaphora:it' in self.descriptor
 
+    def to_query(self):
+        query = { 'class_label': self.name }
+        
+        for attr in self.attributes:
+            if isinstance(attr, Attribute):
+                query[attr.type_name] = attr.value
+
+        return query
+
+
     def toJSON(self):
         return {
             'type': 'object',
@@ -340,6 +385,9 @@ class Object(Base):
 
     def is_valid(self):
         return self.type_name and self.name
+
+    def __iter__(self):
+        yield self.relation
 
     def __str__(self):
         outstr = '{}:{}'.format(self.type_name, self.name)
@@ -396,6 +444,9 @@ class Relation(Base):
     def __init__(self, predicate, child):
         self.predicate = predicate
         self.child = child
+
+    def __iter__(self):
+        yield self.child
 
     def __str__(self):
         return '[{}={}]'.format(self.predicate, str(self.child))

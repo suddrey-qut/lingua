@@ -1,70 +1,132 @@
+import rospy
 import copy
 import re
+import json
 import itertools
 import uuid
 import py_trees
+import importlib
 import rv_trees.data_management as dm
+
+from collections import Iterable
+
+from py_trees import Status
+
 from rv_trees.trees import BehaviourTree
 from rv_trees.leaves_ros import ActionLeaf, SubscriberLeaf, ServiceLeaf, PublisherLeaf
 from py_trees.composites import Sequence, Selector, Parallel, Composite
 
-# from lingua_pddl.parser import Parser
-# from .types import Groundable, DummyObject
+from lingua_world.srv import FindObjects
 
-class KBConditionLeaf(ServiceLeaf):
-  def __init__(self, name, condition, arguments, save=False, *args, **kwargs):
-    super(KBConditionLeaf, self).__init__(
-      name, 
-      service_name='/kb/assert', 
-      load_value=condition, 
-      save=save, 
-      load_fn=self.load_fn, 
-      eval_fn=self.eval_fn, 
-      *args, **kwargs)
+class Root(Composite):
+  def __init__(self, name='Root', children=None, *args, **kwargs):
+    super(Root, self).__init__(name=name, children=children if children else [], *args, **kwargs)
+    self.current_child = None
 
-    self.condition = condition
-    self.arguments = arguments
+  def tick(self):
+      """
+      Run the tick behaviour for this root.
+
+      Yields:
+          :class:`~py_trees.behaviour.Behaviour`: a reference to itself or one of its children
+      """
+      self.logger.debug("%s.tick()" % self.__class__.__name__)
+      
+      if self.status != Status.RUNNING:
+          self.initialise()
+
+      self.update()
+
+      if not self.children:
+        self.status = Status.SUCCESS
+        yield self
+        return
+
+      previous = self.current_child
+      for child in self.children:
+          for node in child.tick():
+              yield node
+              if node is child:
+                  if node.status == Status.RUNNING or node.status == Status.SUCCESS:
+                      self.current_child = child
+                      self.status = node.status
+                      if previous is None or previous != self.current_child:
+                          # we interrupted, invalidate everything at a lower priority
+                          passed = False
+                          for child in self.children:
+                              if passed:
+                                  if child.status != Status.INVALID:
+                                      child.stop(Status.INVALID)
+                              passed = True if child == self.current_child else passed
+                      
+                      if child.status == Status.SUCCESS:
+                        self.remove_child(child)
+
+                      yield self
+                      return
+      
+      try:
+          self.current_child = self.children[-1]
+      except IndexError:
+          self.current_child = None
+      yield self
+
+  def stop(self, new_status=Status.INVALID):
+      """
+      Stopping a root behaviour requires setting the current child to none. Note that it
+      is important to implement this here instead of terminate, so users are free
+      to subclass this easily with their own terminate and not have to remember
+      that they need to call this function manually.
+
+      Args:
+          new_status (:class:`~py_trees.common.Status`): the composite is transitioning to this new status
+      """
+      # retain information about the last running child if the new status is
+      # SUCCESS or FAILURE
+      if new_status == Status.INVALID:
+          self.current_child = None
+      Composite.stop(self, new_status)
+
+  def __repr__(self):
+      """
+      Simple string representation of the object.
+
+      Returns:
+          :obj:`str`: string representation
+      """
+      s = "Name       : %s\n" % self.name
+      s += "  Status  : %s\n" % self.status
+      s += "  Current : %s\n" % (self.current_child.name if self.current_child is not None else "none")
+      s += "  Children: %s\n" % [child.name for child in self.children]
+      return s
+
+
+class GetObjectPose(ServiceLeaf):
+  def __init__(self, name=None, *args, **kwargs):
+    super(GetObjectPose, self).__init__(
+      name=name if name else 'Get Object Pose',
+      service_name='/lingua/world/objects/get_pose',
+      load_fn=self.load_fn,
+      *args,
+      **kwargs
+    )
 
   def load_fn(self):
-    data = super(KBConditionLeaf, self)._default_load_fn()
-    for arg_key in self.arguments:
-      if not self.arguments[arg_key].is_grounded():
-        self.arguments[arg_key].ground()
-      data.query = re.sub(r'({})([)\s])'.format(arg_key), r'{}\2'.format(self.arguments[arg_key].get_id()), self.condition)
-    return data
+    value = self._default_load_fn(False)
 
-  def eval_fn(self, result):
-    return result.result
-
-
-class KBEffectLeaf(ServiceLeaf):
-  def __init__(self, name, condition, arguments, save=False, *args, **kwargs):
-    super(KBEffectLeaf, self).__init__(
-      name, 
-      service_name='/kb/tell', 
-      load_value=condition, 
-      load_fn=self.load_fn, 
-      save=save, 
-      *args, **kwargs)
-
-    self.condition = condition
-    self.arguments = arguments
-
-  def load_fn(self):
-    data = super(KBEffectLeaf, self)._default_load_fn()
-    for arg_key in self.arguments:
-      if not self.arguments[arg_key].is_grounded():
-        self.arguments[arg_key].ground()
-      data.statement = re.sub(r'({})([)\s])'.format(arg_key), r'{}\2'.format(self.arguments[arg_key].get_id()), self.condition)
-    return data
-
+    if isinstance(value, Groundable):
+      value = value.get_id()
+      
+    return value[0] if isinstance(value, Iterable) else value
 
 class Subtree(py_trees.composites.Sequence):
-  def __init__(self, name, method_name, arguments, mapping, *args, **kwargs):
+  def __init__(self, name, method_name, arguments, mapping=None, *args, **kwargs):
     super(Subtree, self).__init__(name, children=[], *args, **kwargs)
     self.method_name = method_name
-    self.mapping = mapping
+    self.mapping = mapping if mapping else {}
     self.arguments = arguments
+
+    self.search = rospy.ServiceProxy('/lingua/world/objects/search', FindObjects)
 
   def setup(self, timeout):
     super(Subtree, self).setup(timeout)
@@ -72,14 +134,23 @@ class Subtree(py_trees.composites.Sequence):
     return True
   
   def initialise(self):
+    self.remove_all_children()
+    
     args = {}
-    for t, key in self.method.get_arguments():
+
+    for type_name, key in self.method.get_arguments():
+      if key not in self.mapping:
+        continue
       args[key] = self.arguments[self.mapping[key]]
-    self.add_child(self.method.instantiate(self.arguments))
+
+      if isinstance(self.arguments[self.mapping[key]], Groundable) and not args[key].is_grounded():
+        args[key].set_id(self.search(json.dumps(self.arguments[self.mapping[key]].to_query())).ids)
+        
+    self.add_child(self.method.instantiate(args))
     super(Subtree, self).initialise()
     
-  def stop(self, new_status=py_trees.Status.INVALID):
-    super(Subtree, self).stop(new_status)
+  def terminate(self, new_status=Status.INVALID):
+    super(Subtree, self).terminate(new_status)
     self.remove_all_children()
 
 class Method:
@@ -95,7 +166,7 @@ class Method:
 
   def instantiate(self, arguments={}):
     is_iterable = bool([key for key in arguments if isinstance(arguments[key], Conjunction)])
-    
+
     if not is_iterable:
       subtree = self.generate_tree(arguments, setup=True)
       return subtree
@@ -103,14 +174,11 @@ class Method:
     children = []
 
     for args in self.zip_arguments(arguments):
-      print(args)
       branch = self.generate_tree(args, setup=True)
       children.append(branch)
     
     return Sequence(name='sequence:{}'.format(self.name), children=children)
-    
-    #return InstantiatedMethod(self, state, {'arg' + str(idx): arg for idx, arg in enumerate(arguments)})
-
+  
   def get_name(self):
     return self.name
 
@@ -130,19 +198,20 @@ class Method:
 
   def zip_arguments(self, arguments):
     objects = {}
-    for key in arguments:
-      objects[key] = []
+    # for key in arguments:
 
-      if not Parser.is_iterable(arguments[key].get_id()):
-        objects[key].append(argument[key])
-        continue
+    #   objects[key] = []
+
+    #   if not Parser.is_iterable(arguments[key].get_id()):
+    #     objects[key].append(argument[key])
+    #     continue
       
-      object_ids = Parser.logical_split(arguments[key].get_id())[1:]
+    #   object_ids = Parser.logical_split(arguments[key].get_id())[1:]
       
-      for object_id in object_ids:
-        objects[key].append(DummyObject(arguments[key].get_type_name(), object_id, arguments[key].descriptor))
+    #   for object_id in object_ids:
+    #     objects[key].append(DummyObject(arguments[key].get_type_name(), object_id, arguments[key].descriptor))
     
-    return list(self.product_dict(**objects))
+    return list(self.product_dict(**arguments))
     
   def __str__(self):
     output = str(self.name)
@@ -159,91 +228,38 @@ class Method:
     return output
 
   def generate_tree(self, arguments={}, setup=False):
-    postconditions = []
-    preconditions = []
-    effects = []
-
-    if self.postconditions:
-      postconditions = [
-        KBConditionLeaf('postcondition:{}'.format(condition), condition=condition, arguments=arguments) for condition in self.postconditions
-      ]
-      postconditions = Sequence('postconditions', children=postconditions) if len(postconditions) > 1 else postconditions[0]
-      
-      effects = [
-        KBEffectLeaf('effect:{}'.format(condition), condition=condition, arguments=arguments) for condition in self.postconditions
-      ]
-      effects = Sequence('effects', children=effects) if len(effects) > 1 else effects[0]
-
-    if self.preconditions:
-      preconditions = [
-        KBConditionLeaf('precondition:{}'.format(condition), condition=condition, arguments=arguments) for condition in self.preconditions
-      ]
-      preconditions = Sequence('postconditions', children=preconditions) if len(preconditions) > 1 else preconditions[0]
-      
-    root = None
-    
-    if postconditions:
-      root = Selector(self.name, children=[postconditions])
-    
-    branch = self.generate_branch(self.root, arguments)
-
-    if preconditions:
-      if root:
-        root.add_child(Sequence('do action', children=[preconditions, branch, effects]))
-      else:
-        root = Sequence(self.name, children=[preconditions, branch])
-    
-    else:
-      if root:
-        root.add_child(Sequence('do action', children=[branch, effects]))
-      else:
-        root = branch
-      
+    root = self.generate_branch(self.root, arguments)
     root.setup(0)
     return root
 
   def generate_branch(self, branch, arguments):
-    def load_fn(leaf):
-      value = leaf.load_value
-      if value in arguments:
-        if isinstance(arguments[value], Groundable):
-          if not arguments[value].is_grounded():
-            arguments[value].ground()
-          value = arguments[value].get_id()
-        else:
-          value = arguments[value]
-      leaf.load_value = value
-      return leaf._default_load_fn()
-
-
     if branch['type'] == 'sequence':
       children = list([self.generate_branch(child, arguments) for child in branch['children']])
-      return Sequence(branch['name'] if 'name' in branch else 'sequence', children=children)
+      return Sequence(branch['name']if 'name' in branch else None if 'name' in branch else 'sequence', children=children)
 
     if branch['type'] == 'selector':
       children = list([self.generate_branch(child, arguments) for child in branch['children']])
-      return Selector(branch['name'] if 'name' in branch else 'selector', children=children)
+      return Selector(branch['name']if 'name' in branch else None if 'name' in branch else 'selector', children=children)
 
-    if branch['type'] == 'precondition' or branch['type'] == 'postcondition':
-      return KBConditionLeaf(name=branch['name'], arguments=arguments, **branch['args'])
+    if branch['type'] == 'precondition':
+      return KBConditionLeaf(name=branch['name']if 'name' in branch else None, arguments=arguments, **branch['args'] if 'args' in branch else {})
     
-    if branch['type'] == 'effect':
-      return KBEffectLeaf(name=branch['name'], arguments=arguments, **branch['args'])
-        
-    if branch['type'] == 'action':
-      return ActionLeaf(name=branch['name'], load_fn=load_fn, **branch['args'])
-
-    if branch['type'] == 'service':
-      return ServiceLeaf(name=branch['name'], load_fn=load_fn, **branch['args'])
+    if branch['type'] == 'postcondition':
+      return KBConditionLeaf(name=branch['name']if 'name' in branch else None, arguments=arguments, **branch['args'] if 'args' in branch else {})
     
-    if branch['type'] == 'subscriber':
-      return SubscriberLeaf(name=branch['name'], load_fn=load_fn, **branch['args'])
+    if branch['type'] == 'class':
+      data = copy.deepcopy(branch)
 
-    if branch['type'] == 'publisher':
-      return PublisherLeaf(name=branch['name'], load_fn=load_fn, **branch['args'])
+      if 'args' in data and 'load_value' in data['args']:
+        if 'method:' in data['args']['load_value']:
+          data['args']['load_value'] = arguments[data['args']['load_value'].split(':')[1]]
+
+      module = importlib.import_module(data['package'])
+      class_type = module.__getattribute__(data['class_name'])
+      return class_type(name=data['name']if 'name' in data else None, **data['args'] if 'args' in data else {})
 
     if branch['type'] == 'behaviour':
-      return Subtree(name=branch['name'], arguments=arguments, **branch['args'])
-    
+      print(branch)
+      return Subtree(name=branch['name'] if 'name' in branch else branch['method_name'], method_name=branch['method_name'], arguments=arguments, **branch['args'] if 'args' in branch else {})
 
-from .types import Conjunction
+from .types import Conjunction, Groundable

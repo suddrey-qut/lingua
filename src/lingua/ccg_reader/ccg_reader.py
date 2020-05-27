@@ -6,7 +6,8 @@ from lingua.types import *
 class CCGReader:
     @staticmethod
     def read(text):
-        return XMLReader.read(ET.fromstring(text))
+        tree = ET.fromstring(text)
+        return tree.find('target').text, XMLReader.read(tree)
 
 class XMLReader: 
     @staticmethod
@@ -41,8 +42,8 @@ class XMLReader:
                 
             raise Exception("Unknown node type: {}".format(node.get('nom') if node.tag == 'satop' else node.find('nom').get('name')))
         except Exception as e:
-            print(str(e))
-        pass
+            pass
+        
 
 
         return None
@@ -208,8 +209,8 @@ class ObjectReader:
     def is_object(node):
         try:
             if node.tag == 'satop':
-                return ':object' in node.get('nom')
-            return ':object' in node.find('nom').get('name')
+                return node.get('nom').split(':')[1] in ['object', 'tool']
+            return node.find('nom').get('name').split(':')[1] in ['object', 'tool']
         except Exception as e:
             print(str(e))
         return False
@@ -271,7 +272,8 @@ class ConditionalReader:
 
         return Conditional(
             ConditionalReader.get_condition(node),
-            ConditionalReader.get_body(node)
+            ConditionalReader.get_body(node),
+            ConditionalReader.is_inverted(node)
         )
 
     @staticmethod
@@ -299,13 +301,19 @@ class ConditionalReader:
         
         return None
 
+    @staticmethod
+    def is_inverted(node):
+        children = node.findall('diamond')
+        return [child for child in children if child.get('mode') == 'inverted'][0].find('prop').get('name') == 'true'
+
 
 class WhileLoopReader:
     @staticmethod
     def read(node):
         return WhileLoop(
           ConditionalReader.get_condition(node),
-          ConditionalReader.get_body(node)
+          ConditionalReader.get_body(node),
+          ConditionalReader.is_inverted(node)
         )
       
     @staticmethod
