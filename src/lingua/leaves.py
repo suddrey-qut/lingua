@@ -116,8 +116,47 @@ class GetObjectPose(ServiceLeaf):
 
     if isinstance(value, Groundable):
       value = value.get_id()
+
+    if isinstance(value, Iterable):
+      return value[0] if value else None
       
-    return value[0] if isinstance(value, Iterable) else value
+    return value
+
+class GroundObjects(ServiceLeaf):
+  def __init__(self, name=None, *args, **kwargs):
+    super(FindObjects, self).__init__(
+      name=name if name else 'Get Object Pose',
+      service_name='/lingua/world/objects/search',
+      load_fn=self.load_fn,
+      *args,
+      **kwargs
+    )
+
+  def load_fn(self):
+    value = self._default_load_fn(False)
+    
+    if isinstance(value, Groundable):
+      return json.dumps(value.toJSON())
+
+    return value
+
+class Assert(ServiceLeaf):
+  def __init__(self, name=None, *args, **kwargs):
+    super(Assert, self).__init__(
+      name=name if name else 'Get Object Pose',
+      service_name='/lingua/world/objects/assert',
+      load_fn=self.load_fn,
+      *args,
+      **kwargs
+    )
+
+  def load_fn(self):
+    value = self._default_load_fn(False)
+    
+    if isinstance(value, Groundable):
+      return json.dumps(value.toJSON())
+
+    return value
 
 class Subtree(py_trees.composites.Sequence):
   def __init__(self, name, method_name, arguments, mapping=None, *args, **kwargs):
@@ -144,7 +183,7 @@ class Subtree(py_trees.composites.Sequence):
       args[key] = self.arguments[self.mapping[key]]
 
       if isinstance(self.arguments[self.mapping[key]], Groundable) and not args[key].is_grounded():
-        args[key].set_id(self.search(json.dumps(self.arguments[self.mapping[key]].to_query())).ids)
+        args[key].set_id(self.search(json.dumps(self.arguments[self.mapping[key]].toJSON())).ids)
         
     self.add_child(self.method.instantiate(args))
     super(Subtree, self).initialise()

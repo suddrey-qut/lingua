@@ -1,6 +1,8 @@
 import re
 import copy
+
 from py_trees.composites import *
+from py_trees.decorators import *
 from rv_trees.leaves import *
 
 try:
@@ -272,8 +274,8 @@ class Conditional(Base):
         self.body = body
 
     def to_btree(self, name=None):
-        return Sequence(name=name if name else 'if', children=[
-            self.condition.to_btree('condition'), self.body.to_btree('body')
+        return Selector(name=name if name else 'if', children=[
+            Inverter(self.condition.to_btree('condition')), self.body.to_btree('body')
         ])
 
     def is_valid(self):
@@ -331,7 +333,15 @@ class Assertion(Groundable):
         self.child = child
 
     def to_btree(self, name=None):
-        return Leaf(name if name else str(self), eval_fn=lambda l,v :True)    
+        def test(leaf, value):
+          print(value)
+          return len(value.ids) > 0
+          
+        return Assert(
+          name if name else str(self),
+          load_value=self.child,
+          eval_fn=test,
+        )    
 
     def is_valid(self):
         return self.child
@@ -363,25 +373,33 @@ class Object(Groundable):
     def set_type_name(self, value):
         self.type_name = value
 
-    def is_anaphora(self):
-        return 'anaphora:it' in self.descriptor
-
     def to_query(self):
-        query = { 'class_label': self.name }
-        
-        for attr in self.attributes:
-            if isinstance(attr, Attribute):
-                query[attr.type_name] = attr.value
+        return self.toJSON()
+        # query = { 'class_label': self.name }
+
+        # if self.attributes:
+        #   query['attributes'] = [attr.toJSON() for attr in self.attributes]
+
+        # if self.relation:
+        #   query['relation'] = str(relation.toJSON())
 
         return query
 
 
     def toJSON(self):
-        return {
+        result = {
             'type': 'object',
             'object_type': self.type_name,
-            'descriptor': self.descriptor
+            'object_name': self.name
         }
+
+        if self.attributes:
+            result['attributes'] = [attr.toJSON() for attr in self.attributes]
+
+        if self.relation:
+            result['relation'] = str(relation.toJSON())
+
+        return result
 
     def is_valid(self):
         return self.type_name and self.name
@@ -419,6 +437,13 @@ class Modifier(Base):
         self.type_name = type_name
         self.value = value
 
+    def toJSON(self):
+      return {
+        'type': 'modifier',
+        'type_name': self.type_name,
+        'value': self.value
+      }
+
     def __str__(self):
         return 'not:[{}={}]'.format(self.type_name, self.value)
 
@@ -431,9 +456,9 @@ class Attribute(Base):
         return {
             'type': 'attribute',
             'attr_type': self.type_name,
-            'value': self.descriptor
+            'value': self.value
         }
-
+    
     def __str__(self):
         return '[{}={}]'.format(self.type_name, self.value)
 
@@ -470,4 +495,4 @@ class Duration(Base):
         return '{} {}(s)'.format(self.time, self.units)
 
 from .decorators import RepeatForDuration
-from .leaves import Subtree
+from .leaves import Subtree, Assert

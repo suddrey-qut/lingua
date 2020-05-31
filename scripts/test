@@ -132,6 +132,6 @@ if __name__ == '__main__':
     
     # tell('(gripper g0)')
     print('Init subscriber')
-    rospy.Subscriber('/speech/parses', Parses, parses_cb)
+    rospy.Subscriber('/speech/in/parses', Parses, parses_cb)
     print('Ready')
     rospy.spin()

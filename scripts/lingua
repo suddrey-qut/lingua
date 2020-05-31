@@ -96,7 +96,9 @@ class LinguaROS(object):
   def __init__(self):
     super(LinguaROS, self).__init__()
 
-    self.sub_speech = rospy.Subscriber('/speech', String, self.speech_cb)
+    self.sub_speech = rospy.Subscriber('/speech/in', String, self.speech_cb)
+    self.pub_speech = rospy.Publisher('/speech/out', String, queue_size=1)
+
     self.parser = rospy.ServiceProxy('/ccg/parse', Parse)
 
     self.root = Root()
@@ -113,6 +115,8 @@ class LinguaROS(object):
       .replace(',', ' , ')
       .replace('  ', ' ')
     )
+
+    success = False
 
     for xml in result.parses:
     
@@ -131,7 +135,13 @@ class LinguaROS(object):
         print(str(t))
 
         self.root.add_child(subtree)
+        self.pub_speech.publish(String(data='Okay'))
+        
+        success = True
         break
+    
+    if not success:
+      self.pub_speech.publish(String(data='Sorry, I did not understand'))
         
   def run(self):
     self.tree.setup(0)
@@ -154,6 +164,10 @@ class LinguaROS(object):
           node.set_condition(self.topic[1])
         if self.handle_anaphora(node.get_body()):
           node.set_body(self.topic[1])
+
+    if isinstance(node, ForLoop):
+      if self.handle_anaphora(node.get_body()):
+        node.set_body(self.topic[1])
 
     if isinstance(node, Conjunction):
       if self.handle_anaphora(node.get_left()):

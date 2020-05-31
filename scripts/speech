@@ -9,42 +9,55 @@ from tkinter import scrolledtext
 from std_msgs.msg import String
 
 class Application(Tk):
-  def __init__(self, publisher):
+  def __init__(self):
     Tk.__init__(self)
+    
+    self.publisher = rospy.Publisher('/speech/in', String, queue_size=1, latch=True)
 
-    self.publisher = publisher
+    self.subscriber = rospy.Subscriber('/speech/in', String, self.user_dialog_cb, queue_size=1)
+    self.subscriber = rospy.Subscriber('/speech/out', String, self.agent_dialog_cb, queue_size=1)
 
     self.title('Lingua Speech')
     # self.resizable(False, False)
-
-    self.group0 = LabelFrame(self, text="History", padx=5, pady=5)
-    self.group0.grid(row=0, column=0, padx=10, pady=10, sticky=E+W+N+S)
-
     self.columnconfigure(0, weight=1)
+    self.columnconfigure(1, weight=1)
     self.rowconfigure(0, weight=1)
+
+    self.group0 = LabelFrame(self, text="Dialog", padx=5, pady=5)
+    self.group0.grid(row=0, column=0, padx=10, pady=10, sticky=E+W+N+S)
     
     self.group0.rowconfigure(0, weight=1)
     self.group0.columnconfigure(0, weight=1)
 
-    self.history = scrolledtext.ScrolledText(self.group0, width=40, height=10)
+    self.dialog = scrolledtext.ScrolledText(self.group0, width=40, height=10)
+    self.dialog.config(state=DISABLED)
+    self.dialog.grid(row=0, column=0, sticky=E+W+N+S)
+
+    self.group1 = LabelFrame(self, text="History", padx=5, pady=5)
+    self.group1.grid(row=0, column=1, padx=10, pady=10, sticky=E+W+N+S)
+
+    self.group1.rowconfigure(0, weight=1)
+    self.group1.columnconfigure(0, weight=1)
+
+    self.history = scrolledtext.ScrolledText(self.group1, width=40, height=10)
     self.history.tag_configure('selected', background='#e9e9e9')
     self.history.config(state=DISABLED)
     self.history.grid(row=0, column=0, sticky=E+W+N+S)
 
-    self.group1 = LabelFrame(self, text="Message", padx=5, pady=5)
-    self.group1.grid(row=1, column=0, padx=10, pady=10, sticky=E+W+S)
+    self.group2 = LabelFrame(self, text="Message", padx=5, pady=5)
+    self.group2.grid(row=1, column=0, padx=10, pady=10, columnspan=2, sticky=E+W+S)
 
     self.columnconfigure(0, weight=1)
     self.rowconfigure(1, weight=0)
     
-    self.group1.rowconfigure(0, weight=1)
-    self.group1.columnconfigure(0, weight=1)
+    self.group2.rowconfigure(0, weight=1)
+    self.group2.columnconfigure(0, weight=1)
 
-    self.txt_input = Entry(self.group1)
+    self.txt_input = Entry(self.group2)
     self.txt_input.grid(column=0, row=0, sticky=E+W+N+S)
     self.txt_input.focus()
 
-    self.submit = Button(self.group1, text='Send', command=self.onclick)
+    self.submit = Button(self.group2, text='Send', command=self.onclick)
     self.submit.grid(column=1, row=0)
 
     self.bind('<Return>', self.onclick)
@@ -89,13 +102,23 @@ class Application(Tk):
     
     self.after(interval, self._highlight_current_line)
     
+  def user_dialog_cb(self, msg):
+    self.dialog.mark_set(INSERT, END)
+    self.dialog.config(state=NORMAL)
+    self.dialog.insert(INSERT, 'User: {}\n'.format(msg.data))
+    self.dialog.config(state=DISABLED)
+  
+  def agent_dialog_cb(self, msg):
+    self.dialog.mark_set(INSERT, END)
+    self.dialog.config(state=NORMAL)
+    self.dialog.insert(INSERT, 'Lingua: {}\n'.format(msg.data))
+    self.dialog.config(state=DISABLED)
+
   def run(self):
     self.mainloop()
 
 
 if __name__ == '__main__':
   rospy.init_node('lingua_speech')
-  publisher = rospy.Publisher('/speech', String, queue_size=1, latch=True)
-
-  app = Application(publisher)
+  app = Application()
   app.run()
