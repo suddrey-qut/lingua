@@ -3,7 +3,7 @@ import rospy
 import time
 
 from lingua.ccg_reader import CCGReader
-from lingua.leaves import Root, Method
+from lingua.leaves import Root, Method, GroundObjects
 from lingua.types import *
 
 from rv_trees.trees import BehaviourTree
@@ -13,6 +13,8 @@ from py_trees.composites import Composite
 
 from std_msgs.msg import String
 from openccg_ros.srv import Parse
+
+from rv_leaves.leaves.generic.console import Print
 
 Method.methods['pick_up(object arg0)'] = Method(
   name='pick_up(object arg0)',
@@ -121,9 +123,8 @@ class LinguaROS(object):
     for xml in result.parses:
     
       utterance, t = CCGReader.read(xml)
-    
+      
       if t:
-        print(t)
         self.input_stack.append(utterance)
         self.handle_anaphora(t)
 
@@ -132,8 +133,6 @@ class LinguaROS(object):
         if not subtree.setup(timeout=5):
           continue
         
-        print(str(t))
-
         self.root.add_child(subtree)
         self.pub_speech.publish(String(data='Okay'))
         
@@ -142,13 +141,13 @@ class LinguaROS(object):
     
     if not success:
       self.pub_speech.publish(String(data='Sorry, I did not understand'))
-        
+  
   def run(self):
     self.tree.setup(0)
-    
+
     while not rospy.is_shutdown():
       self.tree.tick()
-      rospy.sleep(0.1)
+      rospy.sleep(2)
 
   def handle_anaphora(self, node):
     replace = False
@@ -219,8 +218,6 @@ class LinguaROS(object):
 
     return replace
 
-# task = CCGReader.read('<xml><lf><satop nom="w2:object"><prop name="ball"/><diamond mode="det"><prop name="the"/></diamond><diamond mode="num"><prop name="sg"/></diamond><diamond mode="mod"><nom name="w1:color"/><prop name="red"/></diamond></satop></lf><target>the red ball</target></xml>')
-# print(task)
 if __name__ == '__main__':
   rospy.init_node('lingua')
 

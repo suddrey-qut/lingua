@@ -53,7 +53,6 @@ class AttributeReader:
     def read(node):
         if node.tag == 'xml':
             return XMLReader.read(node)
-
         return Attribute(AttributeReader.get_type(node), AttributeReader.get_value(node))
 
     @staticmethod
@@ -154,29 +153,10 @@ class ObjectReader:
             ObjectReader.get_relation(node),
             ObjectReader.get_limit(node)
         )
-        # components = []
-
-        # if not ObjectReader.is_universal(node):
-        #     components.append(ObjectReader.get_object_property(node, ObjectReader.is_relation(node)))
-
-        # for arg in node.findall('diamond'):
-        #     if arg.get('mode').startswith('Compound'):
-        #         continue
-
-        #     component = ObjectReader.get_object_property(arg, ObjectReader.is_relation(arg))
-        #     if component:
-        #         components.append(component)
-        # print(components)
-        # if len(components) > 1:
-        #     result = '(intersect ' + ' '.join(components) + ')'
-        # else:
-        #     result = components[0]
-
-        # return ObjectReader.get_limit(node, result)
 
     @staticmethod
     def get_name(node):
-        return node.find('prop').get('name')
+        return node.find('prop').get('name') if not ObjectReader.is_dummy(node) else '*'
 
     @staticmethod
     def get_attributes(node):
@@ -195,6 +175,10 @@ class ObjectReader:
         return node.find('prop') is not None and node.find('prop').get('name') in ['it']
 
     @staticmethod
+    def is_dummy(node):
+        return node.find('nom').get('name').split(':')[1] == 'dummy'
+
+    @staticmethod
     def get_relation(node):
         for child in node.findall('diamond'):
             if child.get('mode') == 'relation':
@@ -209,8 +193,8 @@ class ObjectReader:
     def is_object(node):
         try:
             if node.tag == 'satop':
-                return node.get('nom').split(':')[1] in ['object', 'tool']
-            return node.find('nom').get('name').split(':')[1] in ['object', 'tool']
+                return node.get('nom').split(':')[1] in ['object', 'tool', 'dummy']
+            return node.find('nom').get('name').split(':')[1] in ['object', 'tool', 'dummy']
         except Exception as e:
             print(str(e))
         return False
@@ -416,7 +400,8 @@ class AssertionReader:
     @staticmethod
     def read(node):
         return Assertion(
-            XMLReader.read(AssertionReader.get_body(node))
+            XMLReader.read(AssertionReader.get_body(node)),
+            XMLReader.read(AssertionReader.get_attribute(node)),
         )
 
     @staticmethod
@@ -424,6 +409,11 @@ class AssertionReader:
         children = node.findall('diamond')
         return [child for child in children if child.get('mode') == 'arg0'][0]
 
+    @staticmethod
+    def get_attribute(node):
+        children = node.findall('diamond')
+        return [child for child in children if child.get('mode') == 'arg1'][0]
+        
     @staticmethod
     def is_assertion(node):
         try:

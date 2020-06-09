@@ -105,7 +105,7 @@ class GetObjectPose(ServiceLeaf):
   def __init__(self, name=None, *args, **kwargs):
     super(GetObjectPose, self).__init__(
       name=name if name else 'Get Object Pose',
-      service_name='/lingua/world/objects/get_pose',
+      service_name='/lingua/world/get_pose',
       load_fn=self.load_fn,
       *args,
       **kwargs
@@ -124,10 +124,11 @@ class GetObjectPose(ServiceLeaf):
 
 class GroundObjects(ServiceLeaf):
   def __init__(self, name=None, *args, **kwargs):
-    super(FindObjects, self).__init__(
-      name=name if name else 'Get Object Pose',
-      service_name='/lingua/world/objects/search',
+    super(GroundObjects, self).__init__(
+      name=name if name else 'Ground Objects',
+      service_name='/lingua/world/query',
       load_fn=self.load_fn,
+      result_fn=self.result_fn,
       *args,
       **kwargs
     )
@@ -135,28 +136,56 @@ class GroundObjects(ServiceLeaf):
   def load_fn(self):
     value = self._default_load_fn(False)
     
-    if isinstance(value, Groundable):
-      return json.dumps(value.toJSON())
+    if not isinstance(value, Groundable):
+      raise Exception('Expected input value to be groundable')
 
     return value
 
-class Assert(ServiceLeaf):
+  def result_fn(self):
+    obj = self.loaded_data
+    print('pre', obj.is_grounded())
+    if obj.is_grounded():
+      return obj.get_id()
+
+    result = self._default_result_fn(obj.to_query())
+
+    if not result or len(result.ids) == 0:
+      return
+
+    obj.set_id(result.ids)
+    print('post', obj.is_grounded())
+    return result.ids
+
+class Assert(GroundObjects):
   def __init__(self, name=None, *args, **kwargs):
     super(Assert, self).__init__(
-      name=name if name else 'Get Object Pose',
-      service_name='/lingua/world/objects/assert',
-      load_fn=self.load_fn,
+      name=name if name else 'Assert Object'
       *args,
       **kwargs
     )
 
+  def result_fn(self):
+    item, attribute = self.loaded_data
+
+    if not item.is_grounded():
+      item.ground(self._service_proxy)
+
+    if not attribute.is_grounded():
+      attribute.ground(self._service_proxy)
+
+    intersection = set(item.get_id()).intersection(attribute.get_id())
+    
+    return len(intersection) > 0
+    
   def load_fn(self):
     value = self._default_load_fn(False)
     
-    if isinstance(value, Groundable):
+    if isinstance(value, Groundable) and not value.is_grounded():
       return json.dumps(value.toJSON())
 
     return value
+
+  
 
 class Subtree(py_trees.composites.Sequence):
   def __init__(self, name, method_name, arguments, mapping=None, *args, **kwargs):
@@ -165,7 +194,7 @@ class Subtree(py_trees.composites.Sequence):
     self.mapping = mapping if mapping else {}
     self.arguments = arguments
 
-    self.search = rospy.ServiceProxy('/lingua/world/objects/search', FindObjects)
+    self.search = rospy.ServiceProxy('/lingua/world/query', FindObjects)
 
   def setup(self, timeout):
     super(Subtree, self).setup(timeout)
@@ -183,7 +212,7 @@ class Subtree(py_trees.composites.Sequence):
       args[key] = self.arguments[self.mapping[key]]
 
       if isinstance(self.arguments[self.mapping[key]], Groundable) and not args[key].is_grounded():
-        args[key].set_id(self.search(json.dumps(self.arguments[self.mapping[key]].toJSON())).ids)
+        args[key].ground(self.search)
         
     self.add_child(self.method.instantiate(args))
     super(Subtree, self).initialise()
@@ -204,8 +233,10 @@ class Method:
     self.postconditions = postconditions if postconditions else []
 
   def instantiate(self, arguments={}):
-    is_iterable = bool([key for key in arguments if isinstance(arguments[key], Conjunction)])
-
+    is_iterable = bool([key for key in arguments if isinstance(arguments[key], Conjunction) or
+       (isinstance(arguments[key], Groundable) and len(arguments[key].get_id()) > 0)
+    ])
+    
     if not is_iterable:
       subtree = self.generate_tree(arguments, setup=True)
       return subtree
@@ -298,7 +329,6 @@ class Method:
       return class_type(name=data['name']if 'name' in data else None, **data['args'] if 'args' in data else {})
 
     if branch['type'] == 'behaviour':
-      print(branch)
       return Subtree(name=branch['name'] if 'name' in branch else branch['method_name'], method_name=branch['method_name'], arguments=arguments, **branch['args'] if 'args' in branch else {})
 
-from .types import Conjunction, Groundable
+from .types import Conjunction, Groundable, Attribute

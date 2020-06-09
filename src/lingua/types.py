@@ -1,5 +1,6 @@
 import re
 import copy
+import json
 
 from py_trees.composites import *
 from py_trees.decorators import *
@@ -38,9 +39,15 @@ class Groundable(Base):
 
     def get_id(self):
         return self.id
-        
+
     def to_query(self):
-        raise NotImplementedError()
+      return self.id
+        
+    def ground(self, state):
+      if self.is_grounded():
+        return
+      res = state(self.to_query())
+      self.set_id(res.ids)
 
     def is_grounded(self):
         return self.id is not None
@@ -147,9 +154,14 @@ class Conjunction(Base):
         if not self.right.is_grounded():
             self.right.ground(state)
 
-        self.set_id(parse(state, '({0} {1} {2})'.format(self.tag,
-                                                        self.left.get_id(),
-                                                        self.right.get_id())))
+        if self.tag == 'and':
+          self.set_id(tuple(list(self.left.get_id()) + list(self.right.get_id())))
+        
+        if self.tag == 'or':
+          self.set_id(self.left.get_id()) #TODO fix this...
+        # self.set_id(parse(state, '({0} {1} {2})'.format(self.tag,
+        #                                                 self.left.get_id(),
+        #                                                 self.right.get_id())))
 
     def is_grounded(self):
         return self.id is not None
@@ -204,7 +216,10 @@ class Conjunction(Base):
         return outstr
 
     def toJSON(self):
-        return [item.toJSON() for item in self]
+        return {
+          'type': 'conjunction', 
+          'items': [item.toJSON() for item in self]
+        }
 
 class ForLoop(Base):
     def __init__(self, duration, body):
@@ -306,7 +321,7 @@ class Conditional(Base):
 class WhileLoop(Conditional):
     def to_btree(self, name=None):
         return Selector(name if name else 'while', children=[
-            self.condition.to_btree(), self.body.to_btree()
+            Inverter(self.condition.to_btree()), SuccessIsRunning(self.body.to_btree())
         ])
 
     def __str__(self):
@@ -322,9 +337,10 @@ class WhileLoop(Conditional):
 
 
 class Assertion(Groundable):
-    def __init__(self, child):
+    def __init__(self, child, attribute):
         super(Assertion, self).__init__()
         self.child = child
+        self.attribute = attribute
 
     def get_body(self):
         return self.child
@@ -332,27 +348,36 @@ class Assertion(Groundable):
     def set_body(self, child):
         self.child = child
 
+    def get_attribute(self):
+        return self.attribute
+
+    def set_attribute(self, attribute):
+        self.attribute = attribute
+
     def to_btree(self, name=None):
-        def test(leaf, value):
-          print(value)
-          return len(value.ids) > 0
-          
         return Assert(
           name if name else str(self),
-          load_value=self.child,
-          eval_fn=test,
+          load_value=(self.child, self.attribute),
         )    
 
     def is_valid(self):
         return self.child
 
     def to_query(self):
+        print('(intersec {} {})'.format(self.child.to_query(), self.attribute.to_query()))
         return self.child.to_query()
 
     def __str__(self):
         outstr = 'assert:'
+
+        outstr += '\n object:'
         for line in str(self.child).split('\n'):
-            outstr += '\n {}'.format(line)
+            outstr += '\n  {}'.format(line)
+            
+        outstr += '\n is:'
+        for line in str(self.attribute).split('\n'):
+            outstr += '\n  {}'.format(line)
+        
         return outstr
 
 class Object(Groundable):
@@ -373,29 +398,44 @@ class Object(Groundable):
     def set_type_name(self, value):
         self.type_name = value
 
+    def to_btree(self):
+      return GroundObjects(load_value=self.toJSON())
+
     def to_query(self):
         return self.toJSON()
-        # query = { 'class_label': self.name }
 
-        # if self.attributes:
-        #   query['attributes'] = [attr.toJSON() for attr in self.attributes]
+    def to_query(self):
+      if self.is_grounded():
+        return self.id
 
-        # if self.relation:
-        #   query['relation'] = str(relation.toJSON())
+      atoms = ['(class_label {} ?)'.format(self.name)]
 
-        return query
+      if self.attributes is not None:
+            for attr in self.attributes:
+              atoms.append(attr.to_query())
+      
+      if self.relation is not None:
+          atoms.append(self.relation.to_query())
+          
+      if len(atoms) == 1:
+        return atoms[0]
 
+      return '(intersect {})'.format(' '.join(atoms))
 
     def toJSON(self):
-        result = {
-            'type': 'object',
-            'object_type': self.type_name,
-            'object_name': self.name
-        }
+        result = { 'type': 'object', 'attributes': [] }
+
+        if self.name != '*':
+            result['attributes'].append({
+              'type': 'attribute',
+              'attr_type': 'class_label',
+              'value': self.name
+            })
 
         if self.attributes:
-            result['attributes'] = [attr.toJSON() for attr in self.attributes]
-
+            for attr in self.attributes:
+              result['attributes'].append(attr.toJSON())
+        
         if self.relation:
             result['relation'] = str(relation.toJSON())
 
@@ -447,10 +487,19 @@ class Modifier(Base):
     def __str__(self):
         return 'not:[{}={}]'.format(self.type_name, self.value)
 
-class Attribute(Base):
+class Attribute(Groundable):
     def __init__(self, type_name, value):
+        super(Attribute, self).__init__()
+
         self.type_name = type_name
         self.value = value
+
+    def ground(self, state):
+      res = state(json.dumps(Object(attributes=[self])))
+      self.set_id(res.ids)
+
+    def to_query(self):
+      return '({} {} ?)'.format(self.type_name, self.value)
 
     def toJSON(self):
         return {
@@ -469,6 +518,9 @@ class Relation(Base):
     def __init__(self, predicate, child):
         self.predicate = predicate
         self.child = child
+
+    def to_query(self):
+      return '({} {} ?)'.format(self.predicate, self.child.to_query())
 
     def __iter__(self):
         yield self.child
@@ -495,4 +547,4 @@ class Duration(Base):
         return '{} {}(s)'.format(self.time, self.units)
 
 from .decorators import RepeatForDuration
-from .leaves import Subtree, Assert
+from .leaves import Subtree, Assert, GroundObjects
