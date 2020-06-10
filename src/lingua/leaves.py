@@ -100,7 +100,6 @@ class Root(Composite):
       s += "  Children: %s\n" % [child.name for child in self.children]
       return s
 
-
 class GetObjectPose(ServiceLeaf):
   def __init__(self, name=None, *args, **kwargs):
     super(GetObjectPose, self).__init__(
@@ -185,8 +184,6 @@ class Assert(GroundObjects):
 
     return value
 
-  
-
 class Subtree(py_trees.composites.Sequence):
   def __init__(self, name, method_name, arguments, mapping=None, *args, **kwargs):
     super(Subtree, self).__init__(name, children=[], *args, **kwargs)
@@ -213,7 +210,7 @@ class Subtree(py_trees.composites.Sequence):
 
       if isinstance(self.arguments[self.mapping[key]], Groundable) and not args[key].is_grounded():
         args[key].ground(self.search)
-        
+    
     self.add_child(self.method.instantiate(args))
     super(Subtree, self).initialise()
     
@@ -232,18 +229,19 @@ class Method:
     self.preconditions = preconditions if preconditions else []
     self.postconditions = postconditions if postconditions else []
 
-  def instantiate(self, arguments={}):
-    is_iterable = bool([key for key in arguments if isinstance(arguments[key], Conjunction) or
-       (isinstance(arguments[key], Groundable) and len(arguments[key].get_id()) > 0)
-    ])
+  def instantiate(self, arguments=None):
+    is_iterable = arguments is not None and \
+      bool([key for key in arguments if (isinstance(arguments[key], Conjunction) or
+        (isinstance(arguments[key], Groundable) and len(arguments[key].get_id()) > 1))
+      ])
     
     if not is_iterable:
-      subtree = self.generate_tree(arguments, setup=True)
+      subtree = self.generate_tree(arguments if arguments is not None else {}, setup=True)
       return subtree
       
     children = []
 
-    for args in self.zip_arguments(arguments):
+    for args in self.zip_arguments(arguments if arguments is not None else {}):
       branch = self.generate_tree(args, setup=True)
       children.append(branch)
     
@@ -297,12 +295,22 @@ class Method:
 
     return output
 
-  def generate_tree(self, arguments={}, setup=False):
-    root = self.generate_branch(self.root, arguments)
+  def generate_tree(self, arguments=None, setup=False):
+    if self.postconditions:
+      root = Selector(self.get_name(), children=[
+        Sequence('Postconditions', children=[
+          self.generate_branch(postcondition, arguments if arguments is not None else {}) for postcondition in self.postconditions
+        ]),
+        self.generate_branch(self.root, arguments if arguments is not None else {})
+      ])
+    else:
+      root = self.generate_branch(self.root, arguments if arguments is not None else {})
+  
     root.setup(0)
     return root
 
   def generate_branch(self, branch, arguments):
+    print(branch)
     if branch['type'] == 'sequence':
       children = list([self.generate_branch(child, arguments) for child in branch['children']])
       return Sequence(branch['name']if 'name' in branch else None if 'name' in branch else 'sequence', children=children)
@@ -317,7 +325,7 @@ class Method:
     if branch['type'] == 'postcondition':
       return KBConditionLeaf(name=branch['name']if 'name' in branch else None, arguments=arguments, **branch['args'] if 'args' in branch else {})
     
-    if branch['type'] == 'class':
+    if branch['type'] == 'class' or branch['type'] == 'decorator':
       data = copy.deepcopy(branch)
 
       if 'args' in data and 'load_value' in data['args']:
@@ -331,4 +339,5 @@ class Method:
     if branch['type'] == 'behaviour':
       return Subtree(name=branch['name'] if 'name' in branch else branch['method_name'], method_name=branch['method_name'], arguments=arguments, **branch['args'] if 'args' in branch else {})
 
+    print(branch)
 from .types import Conjunction, Groundable, Attribute

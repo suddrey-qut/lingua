@@ -320,9 +320,9 @@ class Conditional(Base):
 
 class WhileLoop(Conditional):
     def to_btree(self, name=None):
-        return Selector(name if name else 'while', children=[
-            Inverter(self.condition.to_btree()), SuccessIsRunning(self.body.to_btree())
-        ])
+        return FailureIsSuccess(SuccessIsRunning(Sequence(name if name else 'while', children=[
+            self.condition.to_btree(), FailureIsSuccess(self.body.to_btree())
+        ])))
 
     def __str__(self):
         outstr = 'while:\n condition:'
@@ -402,9 +402,6 @@ class Object(Groundable):
       return GroundObjects(load_value=self.toJSON())
 
     def to_query(self):
-        return self.toJSON()
-
-    def to_query(self):
       if self.is_grounded():
         return self.id
 
@@ -471,6 +468,29 @@ class Anaphora(Object):
 
     def __str__(self):
         return Object.__str__(self).replace('{}:{}'.format(self.type_name, self.name), 'anaphora:it')
+
+class DummyObject(Object):
+    def __init__(self, type_name, name, attributes=None, relation=None, limit=None):
+        super(DummyObject, self).__init__(type_name, name, attributes, relation, limit)
+
+
+    def to_query(self):
+      if self.is_grounded():
+        return self.id
+
+      atoms = []
+
+      if self.attributes is not None:
+            for attr in self.attributes:
+              atoms.append(attr.to_query())
+      
+      if self.relation is not None:
+          atoms.append(self.relation.to_query())
+          
+      if len(atoms) == 1:
+        return atoms[0]
+
+      return '(intersect {})'.format(' '.join(atoms))
 
 class Modifier(Base):
     def __init__(self, type_name, value):

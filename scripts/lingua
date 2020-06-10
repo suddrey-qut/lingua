@@ -43,6 +43,20 @@ Method.methods['pick_up(object arg0)'] = Method(
 
 Method.methods['open(tool arg0)'] = Method(
   name='open(tool arg0)',
+  postconditions=[{
+    'type': 'decorator',
+    'package': 'lingua.decorators',
+    'class_name': 'Conditional',
+    'args': {
+      'child': {
+        'name': 'open gripper',
+        'type': 'class',
+        'package': 'lingua.leaves',
+        'class_name': 'IsGripperOpen'
+      },
+      'predicate': '(open arg0)'
+    }
+  }],
   root = {
     'type': 'sequence',
     'children': [{
@@ -125,12 +139,14 @@ class LinguaROS(object):
       utterance, t = CCGReader.read(xml)
       
       if t:
+        print(t)
+
         self.input_stack.append(utterance)
         self.handle_anaphora(t)
 
         subtree = t.to_btree()
         
-        if not subtree.setup(timeout=5):
+        if not subtree.setup(timeout=1):
           continue
         
         self.root.add_child(subtree)
@@ -147,7 +163,7 @@ class LinguaROS(object):
 
     while not rospy.is_shutdown():
       self.tree.tick()
-      rospy.sleep(2)
+      rospy.sleep(0.5)
 
   def handle_anaphora(self, node):
     replace = False

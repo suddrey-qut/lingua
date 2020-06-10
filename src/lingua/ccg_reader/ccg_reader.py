@@ -146,6 +146,15 @@ class ObjectReader:
                 ObjectReader.get_limit(node)
             )
 
+        if ObjectReader.is_dummy(node):
+            return DummyObject(
+                ObjectReader.get_type_name(node),
+                ObjectReader.get_name(node),
+                ObjectReader.get_attributes(node),
+                ObjectReader.get_relation(node),
+                ObjectReader.get_limit(node)
+            )
+
         return Object(
             ObjectReader.get_type_name(node),
             ObjectReader.get_name(node),
