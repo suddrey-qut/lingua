@@ -31,3 +31,5 @@ class Conditional(Decorator):
       super(Conditional, self).__init__(name=name, child=child)
       self.predicate = predicate
 
+  def update(self):
+    return self.decorated.status

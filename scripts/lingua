@@ -3,7 +3,9 @@ import rospy
 import time
 
 from lingua.ccg_reader import CCGReader
-from lingua.leaves import Root, Method, GroundObjects
+from lingua.method import Method
+from lingua.trees import Root
+from lingua.leaves import GroundObjects
 from lingua.types import *
 
 from rv_trees.trees import BehaviourTree
@@ -47,14 +49,13 @@ Method.methods['open(tool arg0)'] = Method(
     'type': 'decorator',
     'package': 'lingua.decorators',
     'class_name': 'Conditional',
-    'args': {
-      'child': {
-        'name': 'open gripper',
+    'child': {
         'type': 'class',
-        'package': 'lingua.leaves',
+        'package': 'rv_leaves.leaves.manipulation.grasping',
         'class_name': 'IsGripperOpen'
-      },
-      'predicate': '(open arg0)'
+    },
+    'args': {
+      'predicate': '(open method:arg0)'
     }
   }],
   root = {
@@ -70,6 +71,24 @@ Method.methods['open(tool arg0)'] = Method(
 
 Method.methods['close(tool arg0)'] = Method(
   name='close(tool arg0)',
+    postconditions=[{
+    'type': 'decorator',
+    'package': 'lingua.decorators',
+    'class_name': 'Conditional',
+    'child': {
+        'type': 'decorator',
+        'package': 'py_trees.decorators',
+        'class_name': 'Inverter',
+        'child': {
+          'type': 'class',
+          'package': 'rv_leaves.leaves.manipulation.grasping',
+          'class_name': 'IsGripperOpen'
+        }
+    },
+    'args': {
+      'predicate': '(not (open method:arg0))'
+    }
+  }],
   root = {
     'type': 'sequence',
     'children': [{
@@ -139,8 +158,6 @@ class LinguaROS(object):
       utterance, t = CCGReader.read(xml)
       
       if t:
-        print(t)
-
         self.input_stack.append(utterance)
         self.handle_anaphora(t)
 

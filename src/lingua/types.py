@@ -124,8 +124,6 @@ class Task(Base):
             'argument_types': self.method_argument_types,
             'arguments': { key: self.method_arguments[key].toJSON() for key in self.method_arguments }
         }
-    #def __deepcopy__(self, memodict={}):
-    #    return Task(self.task_name, {arg_id: copy.deepcopy(self.method_arguments[arg_id]) for arg_id in self.method_arguments})
 
 class Conjunction(Base):
     def __init__(self, tag, left, right):
@@ -321,7 +319,7 @@ class Conditional(Base):
 class WhileLoop(Conditional):
     def to_btree(self, name=None):
         return FailureIsSuccess(SuccessIsRunning(Sequence(name if name else 'while', children=[
-            self.condition.to_btree(), FailureIsSuccess(self.body.to_btree())
+            self.condition.to_btree(), FailureIsSuccess(self.body.to_btree(), name='body')
         ])))
 
     def __str__(self):
@@ -567,4 +565,5 @@ class Duration(Base):
         return '{} {}(s)'.format(self.time, self.units)
 
 from .decorators import RepeatForDuration
-from .leaves import Subtree, Assert, GroundObjects
+from .leaves import Assert, GroundObjects
+from .trees import Subtree
