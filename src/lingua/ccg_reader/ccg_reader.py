@@ -3,6 +3,13 @@ import re
 import xml.etree.ElementTree as ET
 from lingua.types import *
 
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
 class CCGReader:
     @staticmethod
     def read(text):
@@ -185,7 +192,10 @@ class ObjectReader:
 
     @staticmethod
     def is_dummy(node):
-        return node.find('nom').get('name').split(':')[1] == 'dummy'
+        try:
+            return node.find('nom').get('name').split(':')[1] == 'dummy'
+        except:
+            return
 
     @staticmethod
     def get_relation(node):
@@ -196,7 +206,33 @@ class ObjectReader:
 
     @staticmethod
     def get_limit(node):
-        return None
+        determiner = None
+        form = None
+        number = None
+
+
+        for child in node.findall('diamond'):
+            if child.get('mode') == 'num':
+                value = child.find('prop').get('name')
+
+                if is_number(value):
+                    number = float(value)
+                else:
+                    form = value
+
+        for child in node.findall('diamond'):
+            if child.get('mode') == 'det':
+                if 'det' == 'the':
+                    return Only()
+                determiner = child.find('prop').get('name')
+
+        if not form or form == 'pl':
+            return None
+
+        if number or determiner == 'a':
+            return Any(number if number is not None else 1)
+
+        return Only(number if number is not None else 1)
 
     @staticmethod
     def is_object(node):

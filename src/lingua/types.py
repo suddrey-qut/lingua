@@ -1,10 +1,13 @@
 import re
 import copy
 import json
+import random
 
 from py_trees.composites import *
 from py_trees.decorators import *
 from rv_trees.leaves import *
+
+from .errors import *
 
 try:
     from collections.abc import Iterable
@@ -396,6 +399,12 @@ class Object(Groundable):
     def set_type_name(self, value):
         self.type_name = value
 
+    def set_id(self, id):
+        self.id = id
+        
+        if self.limit:
+            self.limit(id)
+
     def to_btree(self):
       return GroundObjects(load_value=self.toJSON())
 
@@ -457,6 +466,13 @@ class Object(Groundable):
             
             for line in str(self.relation).split('\n'):
                 outstr += '\n  {}'.format(line)
+
+        print(self.limit)
+        if self.limit:
+            outstr += '\n limit:'
+            
+            for line in str(self.limit).split('\n'):
+                outstr += '\n  {}'.format(line)
         
         return outstr
 
@@ -492,6 +508,8 @@ class DummyObject(Object):
 
 class Modifier(Base):
     def __init__(self, type_name, value):
+        super(Modifier, self).__init__()
+
         self.type_name = type_name
         self.value = value
 
@@ -529,11 +547,10 @@ class Attribute(Groundable):
     def __str__(self):
         return '[{}={}]'.format(self.type_name, self.value)
 
-class Limit(Base):
-    pass
-
 class Relation(Base):
     def __init__(self, predicate, child):
+        super(Relation, self).__init__()
+
         self.predicate = predicate
         self.child = child
 
@@ -548,6 +565,8 @@ class Relation(Base):
 
 class Duration(Base):
     def __init__(self, units, time):
+        super(Duration, self).__init__()
+
         self.units = units
         self.time = time
 
@@ -563,6 +582,51 @@ class Duration(Base):
 
     def __str__(self):
         return '{} {}(s)'.format(self.time, self.units)
+
+class Limit(Base):
+    def __init__(self, count):
+        super(Limit, self).__init__()
+        self.count = count
+
+    def __call__(self, value):
+        raise NotImplementedError()
+
+    def __str__(self):
+        return 'Limit: {}'.format(self.count)
+
+class Any(Limit):
+    def __init__(self, count):
+        super(Any, self).__init__(count)
+
+    def is_valid(self):
+        return True
+
+    def __call__(self, value):
+        return random.sample(value, self.count)
+
+    def __str__(self):
+        return 'Any: {}'.format(self.count)
+
+class Only(Limit):
+    def __init__(self, count):
+        super(Only, self).__init__(count)
+
+    def is_valid(self):
+        return True
+
+    def __call__(self, value):
+        if len(value) > self.count:
+            raise AmbigiousStatement('Ambigious Statement')
+
+        return value
+
+    def __str__(self):
+        return 'Only: {}'.format(self.count)
+
+
+
+
+
 
 from .decorators import RepeatForDuration
 from .leaves import Assert, GroundObjects

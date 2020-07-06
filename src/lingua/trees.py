@@ -2,13 +2,18 @@ import rospy
 
 from py_trees.composites import Sequence, Composite
 from py_trees.common import Status
+from rv_trees.leaves import Leaf
+from rv_leaves.leaves.generic.console import Print
 
 from lingua_world.srv import FindObjects
+
+from .errors import *
 
 class Root(Composite):
   def __init__(self, name='Root', children=None, *args, **kwargs):
     super(Root, self).__init__(name=name, children=children if children else [], *args, **kwargs)
     self.current_child = None
+    self.listener = None
 
   def tick(self):
       """
@@ -87,6 +92,11 @@ class Root(Composite):
       s += "  Children: %s\n" % [child.name for child in self.children]
       return s
 
+  def set_listener(self, node):
+    self.listener = node
+
+  def get_listener(self):
+    return self.listener
 
 class Subtree(Sequence):
   def __init__(self, name, method_name, arguments, mapping=None, *args, **kwargs):
@@ -113,7 +123,15 @@ class Subtree(Sequence):
       args[key] = self.arguments[self.mapping[key]]
 
       if isinstance(self.arguments[self.mapping[key]], Groundable) and not args[key].is_grounded():
-        args[key].ground(self.search)
+        try:
+          args[key].ground(self.search)
+        
+        except AmbigiousStatement:
+          resolver = ResolveGroundable(groundable=args[key])
+          resolver.setup(0)
+
+          self.add_child(resolver)
+          
     
     self.add_child(self.method.instantiate(args))
     super(Subtree, self).initialise()
@@ -122,5 +140,20 @@ class Subtree(Sequence):
     super(Subtree, self).terminate(new_status)
     self.remove_all_children()  
 
+class ResolveGroundable(Sequence):
+  def __init__(self, name='Resolve Groundable', groundable=None):
+    def merge(leaf):
+      groundable.set_id(set(groundable.get_id()).intersection(leaf.loaded_data))
+      return groundable.get_id()
+
+    super(ResolveGroundable, self).__init__(name=name, children=[
+      Say(load_value='What item?'),
+      PollInput(),
+      GroundObjects(),
+      Leaf(name='Merge', result_fn=merge)
+    ])
+
+
 from .method import Method
+from .leaves import Say, PollInput, GroundObjects
 from .types import Groundable

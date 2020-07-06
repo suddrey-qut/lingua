@@ -158,17 +158,26 @@ class LinguaROS(object):
       utterance, t = CCGReader.read(xml)
       
       if t:
+        print(str(t))
+
         self.input_stack.append(utterance)
         self.handle_anaphora(t)
+
+        if self.root.get_listener():
+          print('wtf')
+          self.root.get_listener().set_input(t)
+          success = True
+          break
 
         subtree = t.to_btree()
         
         if not subtree.setup(timeout=1):
+          print('sheeeet')
           continue
         
         self.root.add_child(subtree)
         self.pub_speech.publish(String(data='Okay'))
-        
+        print('Done')
         success = True
         break
     

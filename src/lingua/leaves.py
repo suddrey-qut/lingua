@@ -1,6 +1,9 @@
 from collections import Iterable
 from py_trees import Status
-from rv_trees.leaves_ros import ServiceLeaf
+from rv_trees.leaves import Leaf
+from rv_trees.leaves_ros import PublisherLeaf, ServiceLeaf
+
+from std_msgs.msg import String
 
 class GetObjectPose(ServiceLeaf):
   def __init__(self, name=None, *args, **kwargs):
@@ -22,6 +25,45 @@ class GetObjectPose(ServiceLeaf):
       return value[0] if value else None
       
     return value
+
+class Say(PublisherLeaf):
+  def __init__(self, name='Say', topic_name='/speech/out', topic_class=String, *args, **kwargs):
+    super(Say, self).__init__(name=name, topic_name=topic_name, topic_class=topic_class, *args, **kwargs)
+
+
+class PollInput(Leaf):
+  def __init__(self, name='Poll Input', *args, **kwargs):
+    super(PollInput, self).__init__(
+      name=name,
+      save=True,
+      result_fn=self.result_fn,
+      *args,
+      **kwargs
+    )
+    
+    self.input = None
+    
+  def _extra_initialise(self):
+    self.get_root().set_listener(self)
+    
+  def _extra_terminate(self, new_status):
+    self.get_root().set_listener(None)
+
+  def _is_leaf_done(self):
+    return True if self.input is not None else False
+
+  def result_fn(self):
+    print('Result:', self.input)
+    return self.input
+    
+  def set_input(self, resp):
+    self.input = resp
+
+  def get_root(self):
+    parent = self.parent
+    while not isinstance(parent, Root):
+      parent = parent.parent
+    return parent
 
 class GroundObjects(ServiceLeaf):
   def __init__(self, name=None, *args, **kwargs):
@@ -87,3 +129,4 @@ class Assert(GroundObjects):
     return value
 
 from .types import Groundable
+from .trees import Root
