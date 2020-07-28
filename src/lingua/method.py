@@ -1,13 +1,17 @@
+import os
+import rospkg
 import itertools
 import re
 import copy
+import json
 import importlib
 from py_trees.composites import Sequence, Selector, Parallel, Composite
 
 class Method:
   methods = {}
+  _path = None
 
-  def __init__(self, name, preconditions=None, postconditions=None, root=None):
+  def __init__(self, name, root, preconditions=None, postconditions=None):
     self.name = name
 
     self.root = root if root else {}
@@ -66,6 +70,20 @@ class Method:
     #     objects[key].append(DummyObject(arguments[key].get_type_name(), object_id, arguments[key].descriptor))
     
     return list(self.product_dict(**arguments))
+
+  def toJSON(self):
+    result = {
+      'name': self.name, 
+      'root': self.root
+    }
+
+    if self.preconditions is not None:
+      result['preconditions'] = self.preconditions
+    
+    if self.postconditions is not None:
+      result['postconditions'] = self.postconditions
+
+    return result
     
   def __str__(self):
     output = str(self.name)
@@ -82,16 +100,24 @@ class Method:
     return output
 
   def generate_tree(self, arguments=None, setup=False):
+    root = self.generate_branch(self.root, arguments if arguments is not None else {})
+
+    if self.preconditions:
+      root = Sequence('Method', children=[
+        Preconditions(children=[
+          self.generate_branch(precondition, arguments if arguments is not None else {}) for precondition in self.preconditions  
+        ]),
+        root
+      ])
+
     if self.postconditions:
       root = Selector(self.get_name(), children=[
         Sequence('Postconditions', children=[
           self.generate_branch(postcondition, arguments if arguments is not None else {}) for postcondition in self.postconditions
         ]),
-        self.generate_branch(self.root, arguments if arguments is not None else {})
+        root
       ])
-    else:
-      root = self.generate_branch(self.root, arguments if arguments is not None else {})
-  
+    
     root.setup(0)
     return root
 
@@ -108,26 +134,84 @@ class Method:
       data = copy.deepcopy(branch)
 
       if 'args' in data and 'load_value' in data['args']:
-        if 'method:' in data['args']['load_value']:
-          data['args']['load_value'] = arguments[data['args']['load_value'].split(':')[1]]
+        matches = re.findall('\${([^}]*)}', data['args']['load_value'])
 
+        for match in matches:
+          data['args']['load_value'] = arguments[match]
+        
       module = importlib.import_module(data['package'])
       class_type = module.__getattribute__(data['class_name'])
       return class_type(name=data['name'] if 'name' in data else None, **data['args'] if 'args' in data else {})
 
     if branch['type'] == 'decorator':
-      module = importlib.import_module(branch['package'])
-      class_type = module.__getattribute__(branch['class_name'])
-      
-      try:
-        node_name = branch['name'] if 'name' in branch else branch['args']['predicate']
-      except KeyError:
-        node_name = branch['class_name']
+      data = copy.deepcopy(branch)
 
-      return class_type(self.generate_branch(branch['child'], arguments), name=node_name)
+      module = importlib.import_module(data['package'])
+      class_type = module.__getattribute__(data['class_name'])
+      
+      if 'args' in data and 'predicate' in data['args']:
+        matches = re.findall('\${([^}]*)}', data['args']['predicate'])
+
+        for match in matches:
+          print(arguments[match])
+          data['args']['predicate'] = data['args']['predicate'].replace('${' + match + '}', str(arguments[match].to_query()))
+        print(data['args'])
+
+      try:
+        node_name = data['name'] if 'name' in data else data['args']['predicate']
+      except KeyError:
+        node_name = data['class_name']
+
+      return class_type(self.generate_branch(data['child'], arguments), name=node_name, **data['args'] if 'args' in data else {})
 
     if branch['type'] == 'behaviour':
       return Subtree(name=branch['name'] if 'name' in branch else branch['method_name'], method_name=branch['method_name'], arguments=arguments, **branch['args'] if 'args' in branch else {})
 
-from .trees import Subtree
+  @staticmethod
+  def save():
+    to_save = {}
+
+    for key in Method.methods:
+      name = key.split('(')[0]
+
+      if name not in to_save:
+        to_save[name] = []
+      
+      to_save[name].append(Method.methods[key].toJSON())
+      
+    for name in to_save:
+      with open('{}/{}.json'.format(Method.get_path(), name), 'w') as f:
+        f.write(json.dumps(to_save[name], indent=4, sort_keys=True))
+
+  @staticmethod
+  def load(clear=False):
+    if clear:
+      Method.methods = {}
+      
+    to_load = filter(lambda f: f.endswith('.json'), os.listdir(Method.get_path()))
+
+    for filename in to_load:
+      with open('{}/{}'.format(Method.get_path(), filename)) as f:
+        methods = json.loads(f.read())
+
+        for method in methods:
+          Method.methods[method['name']] = Method(**method)
+
+  @staticmethod
+  def clear():
+    Method.methods = {}
+
+  @staticmethod
+  def get_path():
+    if Method._path:
+      return str(Method._path)
+
+    rospack = rospkg.RosPack()
+    return str('{}/data/methods'.format(rospack.get_path('lingua')))
+
+  @staticmethod
+  def set_path(path=None):
+    Method._path = path  
+    
+from .trees import Subtree, Preconditions
 from .types import Conjunction, Groundable, Attribute

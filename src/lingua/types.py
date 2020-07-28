@@ -44,7 +44,7 @@ class Groundable(Base):
         return self.id
 
     def to_query(self):
-      return self.id
+      return ' '.join(self.id)
         
     def ground(self, state):
       if self.is_grounded():
@@ -406,11 +406,11 @@ class Object(Groundable):
             self.limit(id)
 
     def to_btree(self):
-      return GroundObjects(load_value=self.toJSON())
+      return GroundObjects(load_value=self)
 
     def to_query(self):
       if self.is_grounded():
-        return self.id
+        return super(Object, self).to_query()
 
       atoms = ['(class_label {} ?)'.format(self.name)]
 
@@ -490,7 +490,7 @@ class DummyObject(Object):
 
     def to_query(self):
       if self.is_grounded():
-        return self.id
+        return super(DummyObject, self).to_query()
 
       atoms = []
 

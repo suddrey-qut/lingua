@@ -27,7 +27,6 @@ class Conditional(Decorator):
                  child,
                  name=common.Name.AUTO_GENERATED,
                  predicate=''):
-      
       super(Conditional, self).__init__(name=name, child=child)
       self.predicate = predicate
 

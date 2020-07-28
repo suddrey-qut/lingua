@@ -1,0 +1,30 @@
+[
+    {
+        "name": "move_to(tool arg0, object arg1)", 
+        "postconditions": [], 
+        "preconditions": [], 
+        "root": {
+            "children": [
+                {
+                    "args": {
+                        "load_value": "${arg1}"
+                    }, 
+                    "class_name": "GetObjectPose", 
+                    "package": "lingua.leaves", 
+                    "type": "class"
+                }, 
+                {
+                    "class_name": "Print", 
+                    "package": "rv_leaves.leaves.generic.console", 
+                    "type": "class"
+                }, 
+                {
+                    "class_name": "MoveGripperToPose", 
+                    "package": "rv_leaves.leaves.manipulation.motion", 
+                    "type": "class"
+                }
+            ], 
+            "type": "sequence"
+        }
+    }
+]

@@ -68,6 +68,8 @@ class Application(Tk):
     self.bind('<Escape>', self.onescape)
     
     self._highlight_current_line()
+    
+    self.after(10, self.heartbeat)
 
   def onclick(self, *args):
     data = self.txt_input.get().strip()
@@ -113,6 +115,12 @@ class Application(Tk):
     self.dialog.config(state=NORMAL)
     self.dialog.insert(INSERT, 'Lingua: {}\n'.format(msg.data))
     self.dialog.config(state=DISABLED)
+
+  def heartbeat(self):
+    if rospy.is_shutdown():
+      self.quit()
+    else:
+      self.after(10, self.heartbeat)
 
   def run(self):
     self.mainloop()

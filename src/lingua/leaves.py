@@ -1,9 +1,27 @@
 from collections import Iterable
 from py_trees import Status
 from rv_trees.leaves import Leaf
-from rv_trees.leaves_ros import PublisherLeaf, ServiceLeaf
+from rv_trees.leaves_ros import ActionLeaf, PublisherLeaf, ServiceLeaf
 
 from std_msgs.msg import String
+
+class Resolver(ActionLeaf):
+  def __init__(self, name='Resolver', conditions=None, *args, **kwargs):
+    super(Resolver, self).__init__(
+      name=name, 
+      action_namespace='/resolver',
+      load_fn=self.load_fn,
+      *args,
+      **kwargs
+    )
+    self.conditions = conditions
+
+  def load_fn(self):
+    goal = self._default_load_fn()
+    goal.predicates = self.conditions
+    goal.path = Method.get_path()
+
+    return goal
 
 class GetObjectPose(ServiceLeaf):
   def __init__(self, name=None, *args, **kwargs):
@@ -45,6 +63,7 @@ class PollInput(Leaf):
     
   def _extra_initialise(self):
     self.get_root().set_listener(self)
+    self.input = None
     
   def _extra_terminate(self, new_status):
     self.get_root().set_listener(None)
@@ -78,7 +97,7 @@ class GroundObjects(ServiceLeaf):
 
   def load_fn(self):
     value = self._default_load_fn(False)
-    
+
     if not isinstance(value, Groundable):
       raise Exception('Expected input value to be groundable')
 
@@ -95,7 +114,10 @@ class GroundObjects(ServiceLeaf):
     if not result or len(result.ids) == 0:
       return
 
-    obj.set_id(result.ids)
+    try:
+      obj.set_id(result.ids)
+    except:
+      return False
     
     return result.ids
 
@@ -130,3 +152,4 @@ class Assert(GroundObjects):
 
 from .types import Groundable
 from .trees import Root
+from .method import Method

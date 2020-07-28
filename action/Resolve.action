@@ -1,0 +1,6 @@
+string[] predicates
+string path
+---
+string solution
+---
+int32 feedback

@@ -1,0 +1,34 @@
+#!/usr/bin/env python
+
+import rospy
+import rospkg
+import actionlib
+
+from lingua.resolver import Resolver
+from lingua_pddl.state import State
+from lingua.msg import ResolveAction, ResolveGoal
+from lingua.method import Method
+
+class ResolverServer(object):
+  def __init__(self):
+    self.server = actionlib.SimpleActionServer('/resolver', ResolveAction, self.resolve, auto_start=False)
+    self.server.start()
+
+  def resolve(self, goal):
+    Method.set_path(goal.path)
+    Method.load(True)
+
+    r = Resolver(State(), goal.predicates, Method.methods)
+    print(r.solve())
+    
+    # self.server.set_succeeded()
+
+  def run(self):
+    rospy.spin()
+
+if __name__ == '__main__':
+  rospy.init_node("lingua_resolver")
+  resolver = ResolverServer()
+
+  resolver.resolve(ResolveGoal(predicates=['(is open g1)'], path='/home/suddrey/catkin_ws/src/lingua/data/methods'))
+  # resolver.run()
