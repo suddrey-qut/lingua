@@ -3,6 +3,7 @@
   <arg name="sim" value="true" />
 
   <include file="$(find lingua_world)/launch/world.launch" />
+  <include file="$(find lingua_kb)/launch/lingua_kb.launch" />
   <include file="$(find openccg_ros)/launch/openccg.launch" />
 
   <group if="$(arg gui)">

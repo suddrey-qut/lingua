@@ -19,6 +19,40 @@ class Method:
     self.preconditions = preconditions if preconditions else []
     self.postconditions = postconditions if postconditions else []
 
+
+  def is_applicable(self, state, arguments=None):
+    keys = sorted(arguments.keys(), key=lambda x: 1 - len(x))
+    
+    try:
+      for precondition in map(lambda p: p['args']['predicate'], self.preconditions):
+        for key in keys:
+          precondition.replace('${' + key + '}', '(set {})'.format(' '.join(arguments[key].get_id())) if len(arguments[key].get_id()) > 1 else arguments[0])
+        
+        if not state.is_satisfied(precondition):
+          return False
+
+      return True
+      
+    except Exception as e:
+      print(str(e))
+      return False
+
+  def is_complete(self, state, arguments=None):
+    keys = sorted(arguments.keys(), key=lambda x: 1 - len(x))
+    
+    try:
+      for postcondition in map(lambda p: p['args']['predicate'], self.postconditions):
+        for key in keys:
+          postcondition.replace(key, arguments[key].get_id())
+        
+        if not state.is_satisfied(postcondition):
+          return False
+
+      return True
+
+    except:
+      return False
+
   def instantiate(self, arguments=None):
     is_iterable = arguments is not None and \
       bool([key for key in arguments if (isinstance(arguments[key], Conjunction) or

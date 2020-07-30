@@ -88,7 +88,7 @@ class GroundObjects(ServiceLeaf):
   def __init__(self, name=None, *args, **kwargs):
     super(GroundObjects, self).__init__(
       name=name if name else 'Ground Objects',
-      service_name='/lingua/world/query',
+      service_name='/kb/query',
       load_fn=self.load_fn,
       result_fn=self.result_fn,
       *args,

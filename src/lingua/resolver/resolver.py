@@ -20,16 +20,14 @@ class Resolver(Problem):
             groundings = list(ground(state, method.get_arguments()))
             print(groundings)
             for grounding in groundings:
-                objs = []
+                objs = {}
                 for type_name, arg_id in method.get_arguments():
                     obj = DummyObject(type_name, '')
                     obj.set_id(grounding[arg_id])
-                    objs.append(obj)
+                    objs[arg_id] = obj
 
-                instantiated = method.instantiate(state, *objs)
-
-                if instantiated.is_applicable(state) and not instantiated.is_complete(state):
-                    actions.append(instantiated)
+                if method.is_applicable(state, objs) and not method.is_complete(state, objs):
+                    actions.append(method)
 
         return actions
 
@@ -77,16 +75,23 @@ class Resolver(Problem):
 
 def ground(state, arguments):
     mapping = {}
+    explored = set()
     for type_name, arg in arguments:
-        try:
-            result = Parser.parse(state, '(class_label ' + type_name + ' ?)')
+        parent_types, child_types = state.get_hierarchy(type_name)
+        
+        for class_label in parent_types + child_types + [type_name]:
+            try:
+                print('(class_label ' + class_label + ' ?)')
+                result = state.ask('(class_label ' + class_label + ' ?)')
 
-            if is_iterable(result):
-                mapping[arg] = logical_split(result)[1:]
-            else:
-                mapping[arg] = [result]
-        except Exception as e:
-            pass
+                if not result:
+                    continue
+
+                mapping[arg] = result
+                
+            except Exception as e:
+                pass
+
     return dict_product(mapping)
 
 def dict_product(dicts):
