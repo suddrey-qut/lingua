@@ -3,10 +3,11 @@
 import rospy
 import rospkg
 import actionlib
+import json
 
 from lingua.resolver import Resolver
 from lingua_pddl.state import State
-from lingua.msg import ResolveAction, ResolveGoal
+from lingua.msg import ResolveAction, ResolveGoal, ResolveResult
 from lingua.method import Method
 
 class ResolverServer(object):
@@ -19,16 +20,20 @@ class ResolverServer(object):
     Method.load(True)
 
     r = Resolver(State(), goal.predicates, Method.methods)
-    print(r.solve())
     
-    # self.server.set_succeeded()
+    steps = []
+    for step in r.solve():
+      steps.append(step.toJSON())
+
+    self.server.set_succeeded(ResolveResult(solution=json.dumps(steps)))
 
   def run(self):
     rospy.spin()
 
 if __name__ == '__main__':
   rospy.init_node("lingua_resolver")
+  s = State()
   resolver = ResolverServer()
 
-  resolver.resolve(ResolveGoal(predicates=['(is open g1)'], path='/home/suddrey/catkin_ws/src/lingua/data/methods'))
-  # resolver.run()
+  # resolver.resolve(ResolveGoal(predicates=['(not (open g1))'], path='/home/suddrey/catkin_ws/src/lingua/data/methods'))
+  resolver.run()

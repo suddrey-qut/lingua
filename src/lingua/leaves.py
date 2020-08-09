@@ -1,3 +1,5 @@
+import json
+
 from collections import Iterable
 from py_trees import Status
 from rv_trees.leaves import Leaf
@@ -5,16 +7,18 @@ from rv_trees.leaves_ros import ActionLeaf, PublisherLeaf, ServiceLeaf
 
 from std_msgs.msg import String
 
-class Resolver(ActionLeaf):
-  def __init__(self, name='Resolver', conditions=None, *args, **kwargs):
-    super(Resolver, self).__init__(
+class Planner(ActionLeaf):
+  def __init__(self, name='Planner', conditions=None, target=None, *args, **kwargs):
+    super(Planner, self).__init__(
       name=name, 
       action_namespace='/resolver',
       load_fn=self.load_fn,
+      result_fn=self.result_fn,
       *args,
       **kwargs
     )
     self.conditions = conditions
+    self.target = target
 
   def load_fn(self):
     goal = self._default_load_fn()
@@ -22,6 +26,30 @@ class Resolver(ActionLeaf):
     goal.path = Method.get_path()
 
     return goal
+
+  def result_fn(self):
+    result = self._default_result_fn()
+    target = self.target if self.target is not None else self.parent
+
+    plan = json.loads(result.solution)
+    children = []
+
+    for step in plan:
+      arguments = {}
+      for arg_id in step['args']:
+        arguments[arg_id] = DummyObject(idx=step['args'][arg_id])
+
+      print(arguments)
+      subtree = Method.methods[step['name']] \
+        .instantiate(arguments) \
+        .to_tree()
+
+      subtree.setup(0)
+      children.append(subtree)
+    
+    target.add_children(children)
+    return children
+
 
 class GetObjectPose(ServiceLeaf):
   def __init__(self, name=None, *args, **kwargs):
@@ -150,6 +178,6 @@ class Assert(GroundObjects):
 
     return value
 
-from .types import Groundable
+from .types import Groundable, DummyObject
 from .trees import Root
 from .method import Method

@@ -38,7 +38,7 @@ class Groundable(Base):
         self.id = None
 
     def set_id(self, idx):
-        self.id = idx
+        self.id = [ idx ] if isinstance(idx, str) or isinstance(idx, unicode) else idx
 
     def get_id(self):
         return self.id
@@ -49,8 +49,8 @@ class Groundable(Base):
     def ground(self, state):
       if self.is_grounded():
         return
-      res = state(self.to_query())
-      self.set_id(res.ids)
+      res = state.ask(self.to_query())
+      self.set_id(res)
 
     def is_grounded(self):
         return self.id is not None
@@ -145,8 +145,8 @@ class Conjunction(Base):
     def get_id(self):
         return self.id
 
-    def set_id(self, id):
-        self.id = id
+    def set_id(self, idx):
+        self.id = idx
 
     def ground(self, state):
         if not self.left.is_grounded():
@@ -399,11 +399,11 @@ class Object(Groundable):
     def set_type_name(self, value):
         self.type_name = value
 
-    def set_id(self, id):
-        self.id = id
+    def set_id(self, idx):
+        super(Object, self).set_id(idx)
         
         if self.limit:
-            self.limit(id)
+            self.limit(idx)
 
     def to_btree(self):
       return GroundObjects(load_value=self)
@@ -484,9 +484,11 @@ class Anaphora(Object):
         return Object.__str__(self).replace('{}:{}'.format(self.type_name, self.name), 'anaphora:it')
 
 class DummyObject(Object):
-    def __init__(self, type_name, name, attributes=None, relation=None, limit=None):
+    def __init__(self, type_name='', name='', attributes=None, relation=None, limit=None, idx=None):
         super(DummyObject, self).__init__(type_name, name, attributes, relation, limit)
-
+        
+        if idx is not None:
+          self.set_id(idx)
 
     def to_query(self):
       if self.is_grounded():

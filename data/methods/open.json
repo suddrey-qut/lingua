@@ -5,7 +5,7 @@
         "preconditions": [
             {
                 "args": {
-                    "predicate": "(not (open ${arg0}))"
+                    "predicate": "(not (is open ${arg0}))"
                 }, 
                 "child": {
                     "child": {

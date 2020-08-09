@@ -1,0 +1,6 @@
+[
+  {
+    "pattern": "\\(is open (.*)\\)",
+    "callback": "lingua.callbacks/gripper_open"
+  }
+]

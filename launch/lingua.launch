@@ -2,9 +2,18 @@
   <arg name="gui" value="true" />
   <arg name="sim" value="true" />
 
+  <arg name="grammar" value="$(find lingua)/grammar/grammar.xml" />
+  <arg name="handlers" value="$(find lingua)/data/world/handlers.json" />
+
   <include file="$(find lingua_world)/launch/world.launch" />
-  <include file="$(find lingua_kb)/launch/lingua_kb.launch" />
-  <include file="$(find openccg_ros)/launch/openccg.launch" />
+  
+  <include file="$(find lingua_kb)/launch/lingua_kb.launch">
+    <arg name="handlers" value="$(arg handlers)" />
+  </include>
+  
+  <include file="$(find openccg_ros)/launch/openccg.launch">
+    <arg name="grammar" value="$(arg grammar)" />
+  </include>
 
   <group if="$(arg gui)">
     <node pkg="rqt_py_trees" type="rqt_py_trees" name="rqt_py_trees" />

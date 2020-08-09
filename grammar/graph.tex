@@ -1,0 +1,39 @@
+\documentclass{article}
+\usepackage[margin=0.5in]{geometry}
+\newcommand{\deriv}[2]
+{  \renewcommand{\arraystretch}{.5}
+$\begin{array}[t]{*{#1}{c}}
+     #2
+   \end{array}$ }
+\newcommand{\gf}[1]{\textsf{\textsl{#1}}}
+\newcommand{\cf}[1]{\mbox{\ensuremath{\cfont{#1}}}}
+\newcommand{\uline}[1]
+{\mc{#1}{\hrulefill} }
+\newcommand{\mc}[2]
+  {\multicolumn{#1}{c}{#2}}
+\newcommand{\cfont}{\mathsf}
+\newcommand{\bs}{\backslash}
+\newcommand{\subsa}[1]{\hspace{-0.75mm}_{_{#1}}}
+\newcommand{\subsb}[1]{\hspace{-0.10mm}_{_{#1}}}
+\newcommand{\subs}[1]{\hspace{-0.40mm}_{#1}}
+\newcommand{\subsf}[1]{\hspace{-0.75mm}_{_{#1}}}
+\newcommand{\supsa}[1]{\hspace{-1.75mm}^{^{#1}} }
+\newcommand{\supsb}[1]{\hspace{-0.80mm}^{^{#1}}  }
+\newcommand{\sups}[1]{\hspace{-0.40mm}^{#1}}
+\pagestyle{empty}
+\begin{document}
+\deriv{4}{
+\gf{the} & \gf{ball} & \gf{is} & \gf{red} \\
+\uline{1} & \uline{1} & \uline{1} & \uline{1} \\
+\cf{np/ \subsa{\diamond} n} & \cf{n} & \cf{s\bs np/ jj} & \cf{jj} \\
+ \mc{2} {\hrulefill_{>}} \\
+ \mc{2}{\cf{np}} \\
+&& \mc{2} {\hrulefill_{>}} \\
+&& \mc{2}{\cf{s\bs np}} \\
+ \mc{4} {\hrulefill_{<}} \\
+ \mc{4}{\cf{s}} \\
+}
+
+\vspace{5mm}
+
+\end{document}

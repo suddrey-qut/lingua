@@ -7,29 +7,18 @@ from rv_leaves.leaves.generic.console import Print
 
 from lingua.ccg_reader import CCGReader
 from lingua.types import *
+from lingua_pddl.state import State
 
-from lingua_world.srv import FindObjects
 from openccg_ros.srv import Parse
 from std_msgs.msg import String
 
 from .errors import *
 
-class Root(Composite):
-  def __init__(self, name='Root', children=None, *args, **kwargs):
-    super(Root, self).__init__(name=name, children=children if children else [], *args, **kwargs)
+class OneShotSequence(Composite):
+  def __init__(self, name='Oneshot Sequence', children=None, *args, **kwargs):
+    super(OneShotSequence, self).__init__(name=name, children=children if children else [], *args, **kwargs)
     self.current_child = None
-    self.listener = None
-
-    self.sub_speech = rospy.Subscriber('/speech/in', String, self.speech_cb)
-    self.pub_speech = rospy.Publisher('/speech/out', String, queue_size=1)
-
-    self.parser = rospy.ServiceProxy('/ccg/parse', Parse)
-
-    self.input_stack = []
-
-    self.focus = None
-    self.topic = None
-
+    
   def tick(self):
       """
       Run the tick behaviour for this root.
@@ -56,7 +45,8 @@ class Root(Composite):
               if node is child:
                   if node.status == Status.RUNNING or node.status == Status.SUCCESS:
                       self.current_child = child
-                      self.status = node.status
+                      self.status = Status.RUNNING
+                      
                       if previous is None or previous != self.current_child:
                           # we interrupted, invalidate everything at a lower priority
                           passed = False
@@ -93,6 +83,23 @@ class Root(Composite):
       if new_status == Status.INVALID:
           self.current_child = None
       Composite.stop(self, new_status)
+
+
+class Root(OneShotSequence):
+  def __init__(self, name='Root', children=None, *args, **kwargs):
+    super(Root, self).__init__(name=name, children=children if children else [], *args, **kwargs)
+    self.current_child = None
+    self.listener = None
+
+    self.sub_speech = rospy.Subscriber('/speech/in', String, self.speech_cb)
+    self.pub_speech = rospy.Publisher('/speech/out', String, queue_size=1)
+
+    self.parser = rospy.ServiceProxy('/ccg/parse', Parse)
+
+    self.input_stack = []
+
+    self.focus = None
+    self.topic = None
 
   def set_listener(self, node):
     self.listener = node
@@ -215,8 +222,6 @@ class Subtree(Sequence):
     self.mapping = mapping if mapping else {}
     self.arguments = arguments
 
-    self.search = rospy.ServiceProxy('/lingua/world/query', FindObjects)
-
   def setup(self, timeout):
     super(Subtree, self).setup(timeout)
     self.method = Method.methods[self.method_name]
@@ -234,7 +239,7 @@ class Subtree(Sequence):
 
       if isinstance(self.arguments[self.mapping[key]], Groundable) and not args[key].is_grounded():
         try:
-          args[key].ground(self.search)
+          args[key].ground(State())
         
         except AmbigiousStatement:
           resolver = DisambiguateGroundable(groundable=args[key])
@@ -243,7 +248,7 @@ class Subtree(Sequence):
           self.add_child(resolver)
           
     
-    self.add_child(self.method.instantiate(args))
+    self.add_child(self.method.instantiate(args).to_tree())
     super(Subtree, self).initialise()
     
   def terminate(self, new_status=Status.INVALID):
@@ -267,10 +272,12 @@ class Preconditions(Sequence):
   def __init__(self, name="Sequence", children=None, *args, **kwargs):
         super(Preconditions, self).__init__(name, children, *args, **kwargs)
         self.current_index = -1  # -1 indicates uninitialised
+        self.reset_children = False
         self.resolver = None
-
+        
   def initialise(self):
     super(Preconditions, self).initialise()
+    self.reset_children = False
     self.resolver = None
 
   def terminate(self, new_status=Status.INVALID):
@@ -287,7 +294,7 @@ class Preconditions(Sequence):
           :class:`~py_trees.behaviour.Behaviour`: a reference to itself or one of its children
       """
       self.logger.debug("%s.tick()" % self.__class__.__name__)
-      if self.status != Status.RUNNING:
+      if self.status != Status.RUNNING or self.reset_children:
           self.logger.debug("%s.tick() [!RUNNING->resetting child index]" % self.__class__.__name__)
           # sequence specific handling
           self.current_index = 0
@@ -296,7 +303,10 @@ class Preconditions(Sequence):
               if child.status != Status.INVALID:
                   child.stop(Status.INVALID)
           # subclass (user) handling
-          self.initialise()
+          if not self.reset_children:
+            self.initialise()
+          self.reset_children = False
+
       # run any work designated by a customised instance of this class
       self.update()
       for child in itertools.islice(self.children, self.current_index, None):
@@ -321,11 +331,17 @@ class Preconditions(Sequence):
     if self.resolver is not None:
       return False
 
-    resolver = Resolver(conditions=self.predicates)
+    resolver = OneShotSequence(
+      name='Resolution', children=[
+        Planner(conditions=self.predicates)
+      ]
+    )
     resolver.setup(0)
-    
+
     self.insert_child(resolver, 0)
-    self.current_index = 0
+    self.current_index += 1
+
+    self.reset_children = True
     
     self.resolver = resolver
     return self.resolver
@@ -334,11 +350,12 @@ class Preconditions(Sequence):
   def predicates(self):
     result = []
     for child in self.children:
-      print(child.predicate)
-      result.append(child.predicate)
+      if hasattr(child, 'predicate'):
+        print(child.predicate)
+        result.append(child.predicate)
     print(result)
     return result
 
 from .method import Method
-from .leaves import Say, PollInput, GroundObjects, Resolver
+from .leaves import Say, PollInput, GroundObjects, Planner
 from .types import Groundable

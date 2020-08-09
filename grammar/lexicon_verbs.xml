@@ -1,0 +1,524 @@
+<family name="is-verb" pos="VS">
+  <entry name="s\np/jj">
+    <complexcat>
+      <atomcat type="s">
+        <fs inheritsFrom="2">
+          <feat attr="index">
+            <lf>
+              <nomvar name="E" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="\" mode="&lt;" />
+      <atomcat type="np">
+        <fs id="2">
+          <feat attr="case" val="nom"/>
+          <feat attr="num">
+            <featvar name="NUM" />
+          </feat>
+          <feat attr="index">
+            <lf>
+              <nomvar name="X" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="/" mode="&gt;" />
+      <atomcat type="jj">
+        <fs id="3">
+          <feat attr="index">
+            <lf>
+              <nomvar name="M" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <lf>
+        <satop nomvar="E:assert">
+          <prop name="[*DEFAULT*]"/>
+          <diamond mode="arg0">
+            <nomvar name="X:sem-obj" />
+          </diamond>
+          <diamond mode="arg1">
+            <nomvar name="T:dummy" />
+            <diamond mode="attr">
+              <nomvar name="M:state" />
+            </diamond>
+          </diamond>
+        </satop>
+      </lf>
+    </complexcat>
+  </entry>
+  <entry name="s\np/jj/rb">
+    <complexcat>
+      <atomcat type="s">
+        <fs inheritsFrom="2">
+          <feat attr="index">
+            <lf>
+              <nomvar name="E" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="\" mode="&lt;" />
+      <atomcat type="np">
+        <fs id="2">
+          <feat attr="case" val="nom"/>
+          <feat attr="num">
+            <featvar name="NUM" />
+          </feat>
+          <feat attr="index">
+            <lf>
+              <nomvar name="X" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="/" mode="&gt;" />
+      <atomcat type="jj">
+        <fs id="3">
+          <feat attr="index">
+            <lf>
+              <nomvar name="M" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="/" mode="&gt;" />
+      <atomcat type="rb">
+        <fs id="4">
+          <feat attr="index">
+            <lf>
+              <nomvar name="R" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <lf>
+        <satop nomvar="E:assert">
+          <prop name="[*DEFAULT*]"/>
+          <diamond mode="arg0">
+            <nomvar name="X:sem-obj" />
+          </diamond>
+          <diamond mode="arg1">
+            <nomvar name="T:dummy" />
+            <diamond mode="mod">
+              <nomvar name="R" />
+              <diamond mode="attr">
+                <nomvar name="M:state" />
+              </diamond>
+            </diamond>
+          </diamond>
+        </satop>
+      </lf>
+    </complexcat>
+  </entry>
+  <entry name="s\np/(np\np)">
+    <complexcat>
+      <atomcat type="s">
+        <fs inheritsFrom="2">
+          <feat attr="index">
+            <lf>
+              <nomvar name="E" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="\" mode="&lt;" />
+      <atomcat type="np">
+        <fs id="2">
+          <feat attr="case" val="nom"/>
+          <feat attr="num">
+            <featvar name="NUM" />
+          </feat>
+          <feat attr="index">
+            <lf>
+              <nomvar name="X" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="/" mode="&gt;" />
+      <atomcat type="pp">
+        <fs id="3">
+          <feat attr="index">
+            <lf>
+              <nomvar name="Y" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <lf>
+        <satop nomvar="E:assert">
+          <prop name="[*DEFAULT*]"/>
+          <diamond mode="arg0">
+            <nomvar name="X:sem-obj" />
+            <diamond mode="relation">
+              <nomvar name="Y:sem-obj" />
+            </diamond>
+          </diamond>
+        </satop>
+      </lf>
+    </complexcat>
+  </entry>
+</family>
+
+<family name="intransative-verbs" pos="V">
+  <entry name="primary">
+    <complexcat>
+      <atomcat type="s">
+        <fs inheritsFrom="2">
+          <feat attr="index">
+            <lf>
+              <nomvar name="E" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="\" mode="&lt;" />
+      <atomcat type="np">
+        <fs id="2">
+          <feat attr="case" val="nom"/>
+          <feat attr="num">
+            <featvar name="NUM" />
+          </feat>
+          <feat attr="index">
+            <lf>
+              <nomvar name="X" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <lf>
+        <satop nomvar="E:action">
+          <prop name="[*DEFAULT*]"/>
+          <diamond mode="agent">
+            <nomvar name="X:animate-being" />
+          </diamond>
+        </satop>
+      </lf>
+    </complexcat>
+  </entry>
+</family>
+
+<family name="monotransative-verbs" pos="V">
+  <entry name="s\np/np">
+    <complexcat>
+      <atomcat type="s">
+        <fs inheritsFrom="2">
+          <feat attr="index">
+            <lf>
+              <nomvar name="E" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="\" mode="&lt;" />
+      <atomcat type="np">
+        <fs id="2">
+          <feat attr="case" val="nom"/>
+          <feat attr="num">
+            <featvar name="NUM" />
+          </feat>
+          <feat attr="index">
+            <lf>
+              <nomvar name="X" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="/" mode="&gt;" />
+      <atomcat type="np">
+        <fs id="3">
+          <feat attr="index">
+            <lf>
+              <nomvar name="Y" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <lf>
+        <satop nomvar="E:action">
+          <prop name="[*DEFAULT*]"/>
+          <diamond mode="agent">
+            <nomvar name="X:animate-being" />
+          </diamond>
+          <diamond mode="arg0">
+            <nomvar name="Y:phys-obj" />
+          </diamond>
+        </satop>
+      </lf>
+    </complexcat>
+  </entry>
+  <entry name="s\np/np/prep"> <!-- pick up the ball -->
+    <complexcat>
+      <atomcat type="s">
+        <fs inheritsFrom="2">
+          <feat attr="index">
+            <lf>
+              <nomvar name="E" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="\" mode="&lt;" />
+      <atomcat type="np">
+        <fs id="2">
+          <feat attr="case" val="nom"/>
+          <feat attr="num">
+            <featvar name="NUM" />
+          </feat>
+          <feat attr="index">
+            <lf>
+              <nomvar name="X" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="/" mode="&gt;" />
+      <atomcat type="np">
+        <fs id="3">
+          <feat attr="case" val="acc"/>
+          <feat attr="index">
+            <lf>
+              <nomvar name="Y" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="/" mode="&gt;" />
+      <atomcat type="in">
+        <fs id="4">
+          <feat attr="index">
+            <lf>
+              <nomvar name="Z" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <lf>
+        <satop nomvar="E:action">
+          <prop name="[*DEFAULT*]"/>
+          <diamond mode="agent">
+            <nomvar name="X:animate-being" />
+          </diamond>
+          <diamond mode="arg0">
+            <nomvar name="Y:phys-obj" />
+          </diamond>
+          <diamond mode="particle">
+            <nomvar name="Z" />
+          </diamond>
+        </satop>
+      </lf>
+    </complexcat>
+  </entry>
+  <entry name="s\np/prep/np"> <!-- pick the ball up -->
+    <complexcat>
+      <atomcat type="s">
+        <fs inheritsFrom="2">
+          <feat attr="index">
+            <lf>
+              <nomvar name="E" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="\" mode="&lt;" />
+      <atomcat type="np">
+        <fs id="2">
+          <feat attr="case" val="nom"/>
+          <feat attr="num">
+            <featvar name="NUM" />
+          </feat>
+          <feat attr="index">
+            <lf>
+              <nomvar name="X" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="/" mode="&gt;" />
+      <atomcat type="in">
+        <fs id="4">
+          <feat attr="index">
+            <lf>
+              <nomvar name="P" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="/" mode="&gt;" />
+      <atomcat type="np">
+        <fs id="3">
+          <feat attr="case" val="acc"/>
+          <feat attr="index">
+            <lf>
+              <nomvar name="Y" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <lf>
+        <satop nomvar="E:action">
+          <prop name="[*DEFAULT*]"/>
+          <diamond mode="agent">
+            <nomvar name="X:animate-being" />
+          </diamond>
+          <diamond mode="arg0">
+            <nomvar name="Y:phys-obj" />
+          </diamond>
+          <diamond mode="particle">
+            <nomvar name="P" />
+          </diamond>
+        </satop>
+      </lf>
+    </complexcat>
+  </entry>
+  <member stem="pick" />
+  <member stem="open" />
+  <member stem="close" />
+</family>
+
+
+<family name="ditransative-verbs" pos="V" closed="true">
+  <entry name="s\np/np/np">
+    <complexcat>
+      <atomcat type="s">
+        <fs inheritsFrom="2">
+          <feat attr="index">
+            <lf>
+              <nomvar name="E" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="\" mode="&lt;" />
+      <atomcat type="np">
+        <fs id="2">
+          <feat attr="case" val="nom"/>
+          <feat attr="num">
+            <featvar name="NUM" />
+          </feat>
+          <feat attr="index">
+            <lf>
+              <nomvar name="X" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="/" mode="&gt;" />
+      <atomcat type="np">
+        <fs id="4">
+          <feat attr="index">
+            <lf>
+              <nomvar name="Y" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="/" mode="&gt;" />
+      <atomcat type="np">
+        <fs id="3">
+          <feat attr="index">
+            <lf>
+              <nomvar name="Z" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <lf>
+        <satop nomvar="E:action">
+          <prop name="[*DEFAULT*]"/>
+          <diamond mode="agent">
+            <nomvar name="X:animate-being" />
+          </diamond>
+          <diamond mode="arg0">
+            <nomvar name="Y:phys-obj" />
+          </diamond>
+          <diamond mode="arg1">
+            <nomvar name="Z:phys-obj" />
+          </diamond>
+        </satop>
+      </lf>
+    </complexcat>
+  </entry>
+  <entry name="s\np/np/prep/np"> <!-- give the ball to me -->
+    <complexcat>
+      <atomcat type="s">
+        <fs inheritsFrom="2">
+          <feat attr="index">
+            <lf>
+              <nomvar name="E" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="\" mode="&lt;" />
+      <atomcat type="np">
+        <fs id="2">
+          <feat attr="case" val="nom"/>
+          <feat attr="num">
+            <featvar name="NUM" />
+          </feat>
+          <feat attr="index">
+            <lf>
+              <nomvar name="X" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="/" mode="&gt;" />
+      <atomcat type="np">
+        <fs id="3">
+          <feat attr="case" val="acc"/>
+          <feat attr="index">
+            <lf>
+              <nomvar name="Z" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="/" mode="&gt;" />
+      <atomcat type="in">
+        <fs id="4">
+          <feat attr="index">
+            <lf>
+              <nomvar name="P" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="/" mode="&gt;" />
+      <atomcat type="np">
+        <fs id="5">
+          <feat attr="case" val="acc"/>
+          <feat attr="index">
+            <lf>
+              <nomvar name="Y" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <lf>
+        <satop nomvar="E:action">
+          <prop name="[*DEFAULT*]"/>
+          <diamond mode="agent">
+            <nomvar name="X:animate-being" />
+          </diamond>
+          <diamond mode="arg0">
+            <nomvar name="Y:phys-obj" />
+          </diamond>
+          <diamond mode="arg1">
+            <nomvar name="Z:phys-obj" />
+          </diamond>
+          <diamond mode="particle">
+            <nomvar name="P" />
+          </diamond>
+        </satop>
+      </lf>
+    </complexcat>
+  </entry>
+  <member stem="put" />
+  <member stem="move" />
+</family>

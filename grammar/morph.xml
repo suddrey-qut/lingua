@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This file contains the morph entries.
+
+Copyright (C) 2005 David Reitter and University of Edinburgh (Michael White)
+$Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
+-->
+<morph
+  name="robot"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="../morph.xsd"
+>
+
+  <!-- ========================= Duration ========================== -->
+  <entry pos="Time" word="hour" macro="@sg"/>
+  <entry pos="Time" word="hours" stem="hour" macro="@pl"/>
+
+  <entry pos="Time" word="minute" macro="@sg"/>
+  <entry pos="Time" word="minutes" stem="minute" macro="@pl"/>
+
+  <entry pos="Time" word="second" macro="@sg"/>
+  <entry pos="Time" word="seconds" stem="second" macro="@pl"/>
+
+  <!-- ===================== Simple determiners ==================== -->
+  <entry pos="Det" word="a" macros="@sg"/>
+  <entry pos="Det" word="an" macros="@sg"/>
+  <entry pos="Det" word="the"/>
+  <entry pos="Det" word="some"/>
+  <entry pos="Det" word="this"/>
+
+  <entry pos="Pos" word="your" stem="agent" class="owner"/>
+  <entry pos="Pos" word="my" stem="speaker" class="owner"/>
+  <entry pos="Pos" word="their" stem="other" class="owner"/>
+
+
+  <!-- ===================== Conjunction ==================== -->
+  <entry pos="Conj" word="and"/>
+  <entry pos="Conj" word="or"/>
+  <entry pos="Conj" word="nor"/>
+  <entry pos="Conj" word="but"/>
+  <entry pos="Conj" word="plus"/>
+  <entry pos="Conj" word="," />
+
+  <entry pos="Conj" word="then" stem="and" />
+
+  <entry pos="Conj" word="when" macros="@persistent" />
+  <entry pos="Conj" word="whenever" stem="when" macros="@persistent" />
+
+  <!-- ======================== Negation =========================== -->
+  <entry pos="Adverb" word="not"/>
+
+  <!-- ======================== Pronouns =========================== -->
+  <entry pos="Pro" word="I" stem="pro1" class="animate-being" macros="@1st @sg @nom @sg-X"/>
+  <entry pos="Pro" word="me" stem="pro1" class="animate-being" macros="@1st @sg @acc @sg-X"/>
+  <entry pos="Pro" word="we" stem="pro1" class="animate-being" macros="@1st @pl @nom @pl-X"/>
+  <entry pos="Pro" word="us" stem="pro1" class="animate-being" macros="@1st @pl @acc @pl-X"/>
+  <entry pos="Pro" word="you" stem="pro2" class="animate-being" macros="@2nd"/>
+  <entry pos="Pro" word="she" stem="pro3f" class="animate-being" macros="@3rd @sg @nom @sg-X"/>
+  <entry pos="Pro" word="her" stem="pro3f" class="animate-being" macros="@3rd @sg @acc @sg-X"/>
+  <entry pos="Pro" word="he" stem="pro3m" class="animate-being" macros="@3rd @sg @nom @sg-X"/>
+  <entry pos="Pro" word="him" stem="pro3m" class="animate-being" macros="@3rd @sg @acc @sg-X"/>
+  <entry pos="Pro" word="they" stem="pro3n" class="animate-being" macros="@3rd @pl @nom @pl-X"/>
+  <entry pos="Pro" word="them" stem="pro3n" class="animate-being" macros="@3rd @pl @acc @pl-X"/>
+
+  <entry pos="Pro" word="it" stem="it" class="object" macros="@3rd @sg @sg-X"/>
+
+  <!-- ========================== Nouns ============================ -->
+  <entry pos="N" word="object" stem="object" class="object" macros="@sg @sg-X"/>
+  <entry pos="N" word="objects" stem="object" class="object" macros="@pl @pl-X"/>
+
+  <entry pos="N" word="ball" stem="ball" class="object" macros="@sg @sg-X"/>
+  <entry pos="N" word="balls" stem="ball" class="object" macros="@pl @pl-X"/>
+
+  <entry pos="N" word="mop" stem="mop" class="object" macros="@sg @sg-X"/>
+
+  <entry pos="N" word="box" class="storage" macros="@sg @sg-X"/>
+
+  <entry pos="N" word="table" class="object" macros="@sg @sg-X"/>
+  <entry pos="N" word="tables" stem="table" class="object" macros="@pl @pl-X"/>
+
+  <entry pos="N" word="counter" class="object" macros="@sg @sg-X"/>
+  <entry pos="N" word="counters" stem="counter" class="object" macros="@pl @pl-X"/>
+
+  <entry pos="N" word="shelf" class="object" macros="@sg @sg-X"/>
+
+  <entry pos="N" word="ground" class="object" macros="@sg @sg-X"/>
+  <entry pos="N" word="floor" stem="ground" class="object" macros="@sg @sg-X"/>
+
+  <entry pos="N" word="bin" class="object" macros="@sg @sg-X"/>
+  <entry pos="N" word="bins" stem="bin" class="object" macros="@pl @pl-X"/>
+
+  <entry pos="N" word="kitchen" class="room" macros="@sg @sg-X"/>
+  <entry pos="N" word="storage" class="room" macros="@sg @sg-X"/>
+  <entry pos="N" word="dining" class="room" macros="@sg @sg-X"/>
+
+  <entry pos="N" word="room" class="room" macros="@sg @sg-X"/>
+  <entry pos="N" word="hall" stem="room" class="room"  macros="@sg @sg-X"/>
+
+  <entry pos="N" word="tray" class="container" macros="@sg @sg-X"/>
+  <entry pos="N" word="gripper" class="tool" macros="@sg @sg-X"/>
+  <entry pos="N" word="hand" stem="gripper" class="tool" macros="@sg @sg-X"/>
+
+
+  <entry pos="NP" word="belongs" macros="@sg @sg-X"/>
+
+  <entry pos="NP" word="everything" class="object" macros="@all @all-X"/>
+
+  <!-- ======================== Adjectives ========================= -->
+  <entry pos="Adj" word="red" class="color" />
+  
+  <entry pos="Adj" word="green" class="color" />
+  <entry pos="Adj" word="blue" class="color"/>
+  <entry pos="Adj" word="yellow" class="color" />
+  <entry pos="Adj" word="scarlet" class="color"/>
+  <entry pos="Adj" word="gray" class="color" /> -->
+
+  <entry pos="Adj" word="empty" class="state"/>
+  
+  <entry pos="Adj" word="left"/>
+  <entry pos="Adj" word="right"/>
+
+  <entry pos="Adj" word="big" class="size"/>
+
+  <!-- ===================== Intensifying Adverbs ================== -->
+  <entry pos="Adv" word="very"/>
+
+  <entry pos="Conditional" word="if" />
+  <entry pos="Conditional" word="while" />
+  <entry pos="Prep" word="for" />
+
+  <!-- ======================= Prepositions ======================== -->
+
+  <entry pos="Prep" word="on" class="preposition" />
+  <entry pos="Prep" word="up" class="preposition" />
+  <entry pos="Prep" word="down" class="preposition" />
+  <entry pos="Prep" word="in" class="preposition" />
+  <entry pos="Prep" word="to" class="preposition" />
+  <entry pos="Prep" word="into" class="preposition" />
+
+  <!-- ========================== Verbs ============================ -->
+  <entry pos="VS" word="is" macros="@pres @3rd @sg"/>
+  <entry pos="VS" word="are" stem="is" macros="@pres @3rd @pl"/>
+  <entry pos="VS" word="was" macros="@past @3rd @sg"/>
+  <entry pos="VS" word="were" stem="was" macros="@past @3rd @pl"/>
+  
+  
+  <entry pos="V" word="buy" macros="@pres @1st"/>
+  <entry pos="V" word="buys" stem="buy" macros="@pres @3rd"/>
+
+  <entry pos="V" word="give" macros="@pres @1st"/>
+  <entry pos="V" word="stab" macros="@pres @1st"/>
+
+  <entry pos="V" word="move" macros="@pres @1st"/>
+  
+  <entry pos="V" word="open" macros="@pres @1st"/>
+  <entry pos="V" word="close" macros="@pres @1st"/>
+
+  <entry pos="V" word="pick" macros="@pres @1st"/>
+  <entry pos="V" word="put" macros="@pres @1st"/>
+
+  <entry pos="V" word="dance" macros="@pres @1st"/>
+
+  <entry word="[*NUM*]" class="num" pos="Num" macros="@pl"/>
+  <!-- <entry word="one" class="num" pos="Num" macros="@sg"/>
+  <entry word="1" class="num" pos="Num" macros="@sg"/>
+  <entry word="several" class="num" pos="Num" macros="@pl"/>
+  <entry word="two" class="num" pos="Num" macros="@pl"/>
+  <entry word="three" class="num" pos="Num" macros="@pl"/>
+  <entry word="four" class="num" pos="Num" macros="@pl"/>
+  <entry word="five" class="num" pos="Num" macros="@pl"/> -->
+  <!-- ========================== Macros =========================== -->
+  
+
+  <!-- ============================================================= -->
+
+  <!--
+    The macro @non-3rd supplies a syntactic number value that is
+    compatible with both @1st and @2nd, as specified in types.xml.
+  -->
+  <macro name="@1st">
+     <fs id="2" attr="pers" val="1st"/>
+  </macro>
+  <macro name="@2nd">
+     <fs id="2" attr="pers" val="2nd"/>
+  </macro>
+  <macro name="@3rd">
+     <fs id="2" attr="pers" val="3rd"/>
+  </macro>
+  <macro name="@non-3rd">
+     <fs id="2" attr="pers" val="non-3rd"/>
+  </macro>
+
+  <macro name="@nom">
+    <fs id="2" attr="case" val="nom"/>
+  </macro>
+  <macro name="@acc">
+    <fs id="2" attr="case" val="acc"/>
+  </macro>
+
+  <macro name="@sg">
+     <fs id="2">
+       <feat attr="num" val="sg"/>
+     </fs>
+  </macro>
+  <macro name="@pl">
+     <fs id="2">
+       <feat attr="num" val="pl"/>
+     </fs>
+  </macro>
+  <macro name="@all">
+     <fs id="2">
+       <feat attr="num" val="all"/>
+     </fs>
+  </macro>
+
+  <!--
+    The macros @sg-X and @pl-X add a semantic number feature on the
+    nominal head X to the LFs of nouns and pronouns
+  -->
+  <macro name="@sg-X">
+    <lf>
+      <satop nomvar="X">
+        <diamond mode="num">
+          <prop name="sg"/>
+        </diamond>
+      </satop>
+    </lf>
+  </macro>
+  <macro name="@pl-X">
+    <lf>
+      <satop nomvar="X">
+        <diamond mode="num">
+          <prop name="pl"/>
+        </diamond>
+      </satop>
+    </lf>
+  </macro>
+  <macro name="@all-X">
+    <lf>
+      <satop nomvar="X">
+        <diamond mode="num">
+          <prop name="all"/>
+        </diamond>
+      </satop>
+    </lf>
+  </macro>
+
+  <macro name="@past">
+    <lf>
+      <satop nomvar="E">
+        <diamond mode="tense">
+          <prop name="past"/>
+        </diamond>
+      </satop>
+    </lf>
+  </macro>
+
+  <macro name="@pres">
+    <lf>
+      <satop nomvar="E">
+        <diamond mode="tense">
+          <prop name="pres"/>
+        </diamond>
+      </satop>
+    </lf>
+  </macro>
+
+  <macro name="@persistent">
+    <lf>
+      <satop nomvar="E">
+        <diamond mode="persistent">
+            <prop name="true"/>
+        </diamond>
+      </satop>
+    </lf>
+  </macro>
+
+  <macro name="@nonpersistent">
+    <lf>
+      <satop nomvar="E">
+        <diamond mode="persistent">
+            <prop name="false"/>
+        </diamond>
+      </satop>
+    </lf>
+  </macro>
+
+</morph>

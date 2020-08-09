@@ -18,21 +18,25 @@ class Resolver(Problem):
         for method_name in sorted(self.methods, key=self.sort):
             method = self.methods[method_name]
             groundings = list(ground(state, method.get_arguments()))
-            print(groundings)
-            for grounding in groundings:
-                objs = {}
-                for type_name, arg_id in method.get_arguments():
-                    obj = DummyObject(type_name, '')
-                    obj.set_id(grounding[arg_id])
-                    objs[arg_id] = obj
+            
+            try:
+              for grounding in groundings:
+                  args = {}
+                  for type_name, arg_id in method.get_arguments():
+                      obj = DummyObject(type_name, '')
+                      obj.set_id(grounding[arg_id])
+                      args[arg_id] = obj
 
-                if method.is_applicable(state, objs) and not method.is_complete(state, objs):
-                    actions.append(method)
-
+                  instantiated = method.instantiate(args)
+                  if instantiated.is_applicable(state) and not instantiated.is_complete(state):
+                      actions.append(instantiated)
+            except KeyError:
+              pass
+            
         return actions
 
     def result(self, state, method):
-        return method.result(state.copy())
+        return method.result(state)
 
     def goal_test(self, state):
         for goal in self.goal:
@@ -81,7 +85,6 @@ def ground(state, arguments):
         
         for class_label in parent_types + child_types + [type_name]:
             try:
-                print('(class_label ' + class_label + ' ?)')
                 result = state.ask('(class_label ' + class_label + ' ?)')
 
                 if not result:
