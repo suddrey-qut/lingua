@@ -164,7 +164,7 @@
   </entry>
 </family>
 
-<family name="intransative-verbs" pos="V">
+<family name="intransitive-verbs" pos="V" closed="true">
   <entry name="primary">
     <complexcat>
       <atomcat type="s">
@@ -200,9 +200,58 @@
       </lf>
     </complexcat>
   </entry>
+  <entry name="s\np/prep"> <!-- pick up the ball -->
+    <complexcat>
+      <atomcat type="s">
+        <fs inheritsFrom="2">
+          <feat attr="index">
+            <lf>
+              <nomvar name="E" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="\" mode="&lt;" />
+      <atomcat type="np">
+        <fs id="2">
+          <feat attr="case" val="nom"/>
+          <feat attr="num">
+            <featvar name="NUM" />
+          </feat>
+          <feat attr="index">
+            <lf>
+              <nomvar name="X" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="/" mode="&gt;" />
+      <atomcat type="in">
+        <fs id="4">
+          <feat attr="index">
+            <lf>
+              <nomvar name="Z" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <lf>
+        <satop nomvar="E:action">
+          <prop name="[*DEFAULT*]"/>
+          <diamond mode="agent">
+            <nomvar name="X:animate-being" />
+          </diamond>
+          <diamond mode="particle">
+            <nomvar name="Z" />
+          </diamond>
+        </satop>
+      </lf>
+    </complexcat>
+  </entry>
+  &intransitive;
 </family>
 
-<family name="monotransative-verbs" pos="V">
+<family name="transitive-verbs" pos="V" closed="true">
   <entry name="s\np/np">
     <complexcat>
       <atomcat type="s">
@@ -375,13 +424,11 @@
       </lf>
     </complexcat>
   </entry>
-  <member stem="pick" />
-  <member stem="open" />
-  <member stem="close" />
+  &transitive;
 </family>
 
 
-<family name="ditransative-verbs" pos="V" closed="true">
+<family name="ditransitive-verbs" pos="V" closed="true">
   <entry name="s\np/np/np">
     <complexcat>
       <atomcat type="s">
@@ -519,6 +566,5 @@
       </lf>
     </complexcat>
   </entry>
-  <member stem="put" />
-  <member stem="move" />
+  &ditransitive;
 </family>

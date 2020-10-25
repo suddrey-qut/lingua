@@ -46,8 +46,12 @@ class XMLReader:
 
             if DurationReader.is_duration(node):
                 return DurationReader.read(node)
-                
+
+            if ExclamationReader.is_exclamation(node):
+                return ExclamationReader.read(node)
+
             raise Exception("Unknown node type: {}".format(node.get('nom') if node.tag == 'satop' else node.find('nom').get('name')))
+
         except Exception as e:
             pass
         
@@ -496,3 +500,24 @@ class QueryReader:
         except Exception as e:
             print(str(e))
         return False
+
+class ExclamationReader:
+    @staticmethod
+    def is_exclamation(node):
+        try:
+            if node.tag == 'satop':
+                return ':exclamation' in node.get('nom')
+            return ':exclamation' in node.find('nom').get('name')
+        except Exception as e:
+            print(str(e))
+        return False
+
+    @staticmethod
+    def read(node):
+        if ExclamationReader.get_value(node) == 'positive':
+          return Affirmative()
+        return Negative()
+
+    @staticmethod
+    def get_value(node):
+        return node.find('prop').get('name')

@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE doc [
+  <!ENTITY verbs SYSTEM "verbs.xml">
+]>
 <!--
 This file contains the morph entries.
 
@@ -39,8 +42,14 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
   <entry pos="Conj" word="nor"/>
   <entry pos="Conj" word="but"/>
   <entry pos="Conj" word="plus"/>
-  <entry pos="Conj" word="," />
+  <entry pos="Conj" stem="and" word="," />
 
+  <entry pos="exclamation" word="negative" />
+  <entry pos="exclamation" word="positive" />
+
+  <entry pos="exclamation" stem="negative" word="no" />
+  <entry pos="exclamation" stem="positive" word="yes" />
+  
   <entry pos="Conj" word="then" stem="and" />
 
   <entry pos="Conj" word="when" macros="@persistent" />
@@ -130,44 +139,27 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
 
   <!-- ======================= Prepositions ======================== -->
 
+  <entry pos="Prep" word="at" class="preposition" />
   <entry pos="Prep" word="on" class="preposition" />
+  <entry pos="Prep" word="off" class="preposition" />
   <entry pos="Prep" word="up" class="preposition" />
   <entry pos="Prep" word="down" class="preposition" />
   <entry pos="Prep" word="in" class="preposition" />
   <entry pos="Prep" word="to" class="preposition" />
   <entry pos="Prep" word="into" class="preposition" />
+  <entry pos="Prep" word="away" class="preposition" />
+  <entry pos="Prep" word="back" class="preposition" />
 
   <!-- ========================== Verbs ============================ -->
   <entry pos="VS" word="is" macros="@pres @3rd @sg"/>
+  <entry pos="VS" word="'s" macros="@pres @3rd @sg"/>
   <entry pos="VS" word="are" stem="is" macros="@pres @3rd @pl"/>
   <entry pos="VS" word="was" macros="@past @3rd @sg"/>
   <entry pos="VS" word="were" stem="was" macros="@past @3rd @pl"/>
   
-  
-  <entry pos="V" word="buy" macros="@pres @1st"/>
-  <entry pos="V" word="buys" stem="buy" macros="@pres @3rd"/>
-
-  <entry pos="V" word="give" macros="@pres @1st"/>
-  <entry pos="V" word="stab" macros="@pres @1st"/>
-
-  <entry pos="V" word="move" macros="@pres @1st"/>
-  
-  <entry pos="V" word="open" macros="@pres @1st"/>
-  <entry pos="V" word="close" macros="@pres @1st"/>
-
-  <entry pos="V" word="pick" macros="@pres @1st"/>
-  <entry pos="V" word="put" macros="@pres @1st"/>
-
-  <entry pos="V" word="dance" macros="@pres @1st"/>
+  &verbs;
 
   <entry word="[*NUM*]" class="num" pos="Num" macros="@pl"/>
-  <!-- <entry word="one" class="num" pos="Num" macros="@sg"/>
-  <entry word="1" class="num" pos="Num" macros="@sg"/>
-  <entry word="several" class="num" pos="Num" macros="@pl"/>
-  <entry word="two" class="num" pos="Num" macros="@pl"/>
-  <entry word="three" class="num" pos="Num" macros="@pl"/>
-  <entry word="four" class="num" pos="Num" macros="@pl"/>
-  <entry word="five" class="num" pos="Num" macros="@pl"/> -->
   <!-- ========================== Macros =========================== -->
   
 

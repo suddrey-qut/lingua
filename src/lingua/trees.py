@@ -14,9 +14,9 @@ from std_msgs.msg import String
 
 from .errors import *
 
-class OneShotSequence(Composite):
+class OneShotSelector(Composite):
   def __init__(self, name='Oneshot Sequence', children=None, *args, **kwargs):
-    super(OneShotSequence, self).__init__(name=name, children=children if children else [], *args, **kwargs)
+    super(OneShotSelector, self).__init__(name=name, children=children if children else [], *args, **kwargs)
     self.current_child = None
     
   def tick(self):
@@ -85,11 +85,14 @@ class OneShotSequence(Composite):
       Composite.stop(self, new_status)
 
 
-class Root(OneShotSequence):
-  def __init__(self, name='Root', children=None, *args, **kwargs):
-    super(Root, self).__init__(name=name, children=children if children else [], *args, **kwargs)
+class Lingua(OneShotSelector):
+  def __init__(self, name='Lingua', children=None, *args, **kwargs):
+    super(Lingua, self).__init__(name=name, children=children if children else [], *args, **kwargs)
+    
     self.current_child = None
+    
     self.listener = None
+    self.learner = None
 
     self.sub_speech = rospy.Subscriber('/speech/in', String, self.speech_cb)
     self.pub_speech = rospy.Publisher('/speech/out', String, queue_size=1)
@@ -107,8 +110,16 @@ class Root(OneShotSequence):
   def get_listener(self):
     return self.listener
 
+  def get_last_input(self):
+    return self.input_stack[-1]
+
   def speech_cb(self, msg):
     # Get XML parses from CCG parser for input text
+    if msg.data in ['done', 'finished', 'that\'s it'] and self.get_listener():
+      self.get_listener().set_input(Terminal())
+      self.pub_speech.publish(String(data='Thank you'))
+      return
+
     result = self.parser(msg.data
       .replace(',', ' , ')
       .replace('  ', ' ')
@@ -118,32 +129,30 @@ class Root(OneShotSequence):
 
     for xml in result.parses:
     
-      utterance, t = CCGReader.read(xml)
+      utterance, frame = CCGReader.read(xml)
       
-      if t:
-        print(str(t))
-
+      if frame:
         self.input_stack.append(utterance)
-        self.handle_anaphora(t)
+        self.handle_anaphora(frame)
 
         if self.get_listener():
-          self.get_listener().set_input(t)
+          self.get_listener().set_input(frame)
           success = True
           break
+        
+        subtree = frame.to_btree()
+        
+        if subtree.setup(timeout=1):
+          self.input_stack.pop()
 
-        subtree = t.to_btree()
-        
-        if not subtree.setup(timeout=1):
-          continue
-        
         self.add_child(subtree)
-        
-        self.pub_speech.publish(String(data='Okay'))
-        
+                
         success = True
         break
     
-    if not success:
+    if success:
+      self.pub_speech.publish(String(data='Okay'))
+    else:
       self.pub_speech.publish(String(data='Sorry, I did not understand'))
 
   def handle_anaphora(self, node):
@@ -191,7 +200,7 @@ class Root(OneShotSequence):
 
         elif isinstance(node.get_argument(key), Anaphora):
           if not self.topic:
-              raise Exception(self.input_stack[-1].replace(' it ', ' what ') + '?')
+              raise Exception(self.get_last_input().replace(' it ', ' what ') + '?')
 
           node.set_argument_type(key, self.topic[0])
           node.set_argument(key, self.topic[1])
@@ -208,7 +217,7 @@ class Root(OneShotSequence):
     if isinstance(node, Object):
       if isinstance(node, Anaphora):
         if not self.topic:
-          raise Exception(self.input_stack[-1].replace(' it ', ' what ') + '?')
+          raise Exception(self.get_last_input().replace(' it ', ' what ') + '?')
         return True
       
       self.topic = (node.get_type_name(), node)
@@ -224,8 +233,15 @@ class Subtree(Sequence):
 
   def setup(self, timeout):
     super(Subtree, self).setup(timeout)
-    self.method = Method.methods[self.method_name]
-    return True
+
+    try:
+      self.method = Method.methods[self.method_name]
+      return True
+
+    except:
+      rospy.loginfo('Uknown behaviour: {}'.format(self.method_name))
+      self.method = Method(self.method_name, [])
+      return False
   
   def initialise(self):
     self.remove_all_children()
@@ -255,6 +271,61 @@ class Subtree(Sequence):
     super(Subtree, self).terminate(new_status)
     self.remove_all_children()  
 
+
+class LearnMethod(Sequence):
+  def __init__(self, name='Learn Method', method=None):
+
+    self.method = method
+    self.steps = []
+
+    def add_child(leaf):
+      self.steps.append(leaf.loaded_data)
+      return self.steps
+
+    super(LearnMethod, self).__init__(
+      name='{}: {}'.format(name, method.name),
+      children=[
+        Say(load_fn=lambda leaf: 'How do I {}?'.format(leaf.parent.get_root().get_last_input())),
+        Inverter(SuccessIsRunning(Sequence(children=[
+          PollInput(),
+          Selector(children=[
+            Leaf(
+              name='Test?',
+              save=False,
+              result_fn=lambda leaf: type(leaf.loaded_data) != Terminal
+            ),
+            Sequence(children=[
+              Say(load_value='Let me try'),
+              Leaf(
+                name='Execute',
+                save=False,
+                result_fn=lambda leaf: True #type(leaf.loaded_data) != Terminal
+              ),
+              Say(load_value='Have I finished the task?'),
+              PollInput(),
+              Leaf(
+                name='Finished?',
+                save=False,
+                result_fn=lambda leaf: type(leaf.loaded_data) != Affirmative
+              ),
+            ])
+          ]),
+          Leaf(
+            name='Push',
+            save=True,
+            result_fn=add_child
+          )
+        ]))),
+        Print(load_value=self.steps)
+      ]
+    )
+
+  def get_root(self):
+    parent = self.parent
+    while not isinstance(parent, Lingua):
+      parent = parent.parent
+    return parent
+
 class DisambiguateGroundable(FailureIsRunning):
   def __init__(self, name='Disambiguate Groundable', groundable=None):
     def merge(leaf):
@@ -283,8 +354,9 @@ class Preconditions(Sequence):
   def terminate(self, new_status=Status.INVALID):
     super(Preconditions, self).terminate(new_status)
     
-    if self.resolver is not None:
+    if self.resolver is not None and self.resolver in self.children:
       self.remove_child(self.resolver)
+      self.current_index -= 1
 
   def tick(self):
       """
@@ -331,7 +403,7 @@ class Preconditions(Sequence):
     if self.resolver is not None:
       return False
 
-    resolver = OneShotSequence(
+    resolver = OneShotSelector(
       name='Resolution', children=[
         Planner(conditions=self.predicates)
       ]
@@ -358,4 +430,4 @@ class Preconditions(Sequence):
 
 from .method import Method
 from .leaves import Say, PollInput, GroundObjects, Planner
-from .types import Groundable
+from .types import Groundable, Terminal, Affirmative

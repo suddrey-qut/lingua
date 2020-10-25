@@ -26,7 +26,10 @@ class Method:
     return self.name
 
   def get_arguments(self):
-    return [tuple(arg.split()) for arg in re.findall('\(([^\)]+)', self.name)[0].split(', ')]
+    arguments = re.findall('\(([^\)]+)', self.name)
+    if arguments:
+      return [tuple(arg.split()) for arg in arguments[0].split(', ')]
+    return []
 
   def get_cost(self):
     if self.is_operator():
@@ -113,7 +116,19 @@ class Method:
 
   @staticmethod
   def set_path(path=None):
-    Method._path = path  
+    Method._path = path
+
+  @staticmethod
+  def from_tree(root):
+    typename = type(root).__name__
+
+    if typename == 'Subtree':
+      return {
+        'type': 'behaviour',
+        'method_name': root.method_name
+      }
+      
+    return ''
 
 class InstantiatedMethod(Method):
   def __init__(self, method, arguments=None):
@@ -121,10 +136,6 @@ class InstantiatedMethod(Method):
     self.arguments = arguments if arguments is not None else {}
 
   def to_tree(self):
-    for key in self.arguments:
-      # test = (isinstance(self.arguments[key], Groundable) and )
-      print(len(self.arguments[key].get_id()))
-      print('wtf')
     is_iterable = bool([key for key in self.arguments if (isinstance(self.arguments[key], Conjunction) or
       (isinstance(self.arguments[key], Groundable) and len(self.arguments[key].get_id()) > 1))
     ])
@@ -211,6 +222,11 @@ class InstantiatedMethod(Method):
     return list(self.product_dict(**arguments))
 
   def generate_tree(self, arguments, setup=False):
+    if (not self.root):
+      root = LearnMethod(method=self)
+      root.setup(0)
+      return root
+
     root = self.generate_branch(self.root, arguments)
 
     if self._preconditions:
@@ -285,5 +301,6 @@ class InstantiatedMethod(Method):
         key: self.arguments[key].get_id() for key in self.arguments
       }
     }
-from .trees import Subtree, Preconditions
+    
+from .trees import Subtree, Preconditions, LearnMethod
 from .types import Conjunction, Groundable, Attribute

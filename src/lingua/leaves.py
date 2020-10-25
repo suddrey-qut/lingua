@@ -39,7 +39,6 @@ class Planner(ActionLeaf):
       for arg_id in step['args']:
         arguments[arg_id] = DummyObject(idx=step['args'][arg_id])
 
-      print(arguments)
       subtree = Method.methods[step['name']] \
         .instantiate(arguments) \
         .to_tree()
@@ -100,7 +99,6 @@ class PollInput(Leaf):
     return True if self.input is not None else False
 
   def result_fn(self):
-    print('Result:', self.input)
     return self.input
     
   def set_input(self, resp):
@@ -108,7 +106,7 @@ class PollInput(Leaf):
 
   def get_root(self):
     parent = self.parent
-    while not isinstance(parent, Root):
+    while not isinstance(parent, Lingua):
       parent = parent.parent
     return parent
 
@@ -116,7 +114,7 @@ class GroundObjects(ServiceLeaf):
   def __init__(self, name=None, *args, **kwargs):
     super(GroundObjects, self).__init__(
       name=name if name else 'Ground Objects',
-      service_name='/kb/query',
+      service_name='/kb/ask',
       load_fn=self.load_fn,
       result_fn=self.result_fn,
       *args,
@@ -139,15 +137,15 @@ class GroundObjects(ServiceLeaf):
 
     result = self._default_result_fn(obj.to_query())
 
-    if not result or len(result.ids) == 0:
+    if not result or len(result.data) == 0:
       return
 
     try:
-      obj.set_id(result.ids)
+      obj.set_id(result.data)
     except:
       return False
     
-    return result.ids
+    return result.data
 
 class Assert(GroundObjects):
   def __init__(self, name=None, *args, **kwargs):
@@ -179,5 +177,5 @@ class Assert(GroundObjects):
     return value
 
 from .types import Groundable, DummyObject
-from .trees import Root
+from .trees import Lingua
 from .method import Method

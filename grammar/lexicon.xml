@@ -3,6 +3,9 @@
   <!ENTITY core SYSTEM "lexicon_core.xml">
   <!ENTITY verbs SYSTEM "lexicon_verbs.xml">
   <!ENTITY decorators SYSTEM "lexicon_decorators.xml">
+  <!ENTITY transitive SYSTEM "transitive.xml">
+  <!ENTITY intransitive SYSTEM "intransitive.xml">
+  <!ENTITY ditransitive SYSTEM "ditransitive.xml">
 ]>
 <!--
 This file contains the lexical families.
@@ -50,12 +53,16 @@ $Revision: 1.6 $, $Date: 2010/09/13 04:45:19 $
         </lf>
       </atomcat>
     </entry>
+    <member stem="at"/>
     <member stem="on"/>
+    <member stem="off"/>
     <member stem="up"/>
     <member stem="down"/>
     <member stem="in"/>
     <member stem="to"/>
     <member stem="into"/>
+    <member stem="away"/>
+    <member stem="back"/>
   </family>
 
   <family name="Prepositions" pos="Prep" closed="true" indexRel="preposition">
@@ -164,6 +171,7 @@ $Revision: 1.6 $, $Date: 2010/09/13 04:45:19 $
     <member stem="on"/>
     <member stem="up"/>
     <member stem="in"/>
+    <member stem="to"/>
   </family>
 
   &core;

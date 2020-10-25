@@ -21,8 +21,10 @@
 
   <group if="$(arg sim)">
     <node pkg="lingua_tests" type="manipulator" name="manipulator" output="screen" />
+    <node pkg="lingua_tests" type="world_model" name="world_model" />
   </group>
 
-  <!-- <node pkg="lingua" type="speech" name="speech" /> -->
+  <node pkg="lingua" type="resolver" name="resolver" output="screen" />
+  <node pkg="lingua" type="speech" name="speech" />
 
 </launch>

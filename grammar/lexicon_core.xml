@@ -33,6 +33,23 @@
   </entry>
 </family>
 
+<family name="exclamation" pos="exclamation">
+  <entry name="ex">
+    <atomcat type="ex">
+      <fs>
+        <feat attr="index">
+          <lf><nomvar name="X" /></lf>
+        </feat>
+      </fs>
+      <lf>
+        <satop nomvar="X:exclamation">
+          <prop name="[*DEFAULT*]" />
+        </satop>
+      </lf>
+    </atomcat>
+  </entry>
+</family>
+
 <family name="Adverb" pos="Adverb">
   <entry name="rb">
     <atomcat type="rb">

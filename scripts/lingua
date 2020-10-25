@@ -3,14 +3,15 @@ import rospy
 import time
 
 from lingua.method import Method
-from lingua.trees import Root
+from lingua.trees import Lingua, OneShotSelector
 
 from rv_trees.trees import BehaviourTree
+from rv_trees.leaves_ros import Leaf
 
 if __name__ == '__main__':
   rospy.init_node('lingua')
   
   Method.load()
   
-  bt = BehaviourTree('test', Root())
-  bt.run(push_to_start=False)
+  bt = BehaviourTree('Lingua', Lingua())
+  bt.run(push_to_start=False, hz=0.5, setup_timeout=2)
