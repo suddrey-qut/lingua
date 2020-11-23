@@ -1,6 +1,8 @@
 import rospy
+import uuid
 
 from py_trees.composites import Sequence, Selector, Composite
+from py_trees.decorators import SuccessIsRunning
 from py_trees.common import Status
 from rv_trees.leaves import Leaf
 from rv_leaves.leaves.generic.console import Print
@@ -13,6 +15,8 @@ from openccg_ros.srv import Parse
 from std_msgs.msg import String
 
 from .errors import *
+
+import yaml
 
 class OneShotSelector(Composite):
   def __init__(self, name='Oneshot Sequence', children=None, *args, **kwargs):
@@ -58,6 +62,7 @@ class OneShotSelector(Composite):
                       
                       if child.status == Status.SUCCESS:
                         self.remove_child(child)
+                        self.current_child = None
 
                       yield self
                       return
@@ -84,6 +89,16 @@ class OneShotSelector(Composite):
           self.current_child = None
       Composite.stop(self, new_status)
 
+  def tip(self):
+        """
+        Recursive function to extract the last running node of the tree.
+
+        Returns:
+            :class::`~py_trees.behaviour.Behaviour`: the tip function of the current child of this composite or None
+        """
+        return self.current_child.tip() if self.current_child is not None else self
+
+
 
 class Lingua(OneShotSelector):
   def __init__(self, name='Lingua', children=None, *args, **kwargs):
@@ -92,8 +107,7 @@ class Lingua(OneShotSelector):
     self.current_child = None
     
     self.listener = None
-    self.learner = None
-
+    
     self.sub_speech = rospy.Subscriber('/speech/in', String, self.speech_cb)
     self.pub_speech = rospy.Publisher('/speech/out', String, queue_size=1)
 
@@ -269,54 +283,96 @@ class Subtree(Sequence):
     
   def terminate(self, new_status=Status.INVALID):
     super(Subtree, self).terminate(new_status)
-    self.remove_all_children()  
-
+    self.remove_all_children() 
 
 class LearnMethod(Sequence):
   def __init__(self, name='Learn Method', method=None):
+    self.id = uuid.uuid4()
 
     self.method = method
     self.steps = []
+    self.expanded = []
 
     def add_child(leaf):
       self.steps.append(leaf.loaded_data)
       return self.steps
 
+    def expand(leaf):
+      subtree = Sequence(children=[step.to_btree() for step in self.steps])
+      subtree.setup(timeout=0)
+      
+      self.executor.add_child(subtree)
+      
+      self.expanded += self.steps
+      self.steps = []
+
+      return subtree
+
+    def learn(leaf):
+      if len(self.expanded) > 1:
+          root = {
+              'type': 'sequence',
+              'children': [ node.to_json(self.parent.arguments) for node in self.expanded ]
+          }
+      else:
+          root = self.expanded[0].to_json(self.parent.arguments)
+
+      method=Method(
+          name='gnash(tool arg0)',
+          preconditions=[],
+          postconditions=[],
+          root=root
+      )
+
+      Method.add(method)
+
+      return method
+
+    self.executor = OneShotSelector(name='executor')
+    
     super(LearnMethod, self).__init__(
       name='{}: {}'.format(name, method.name),
       children=[
         Say(load_fn=lambda leaf: 'How do I {}?'.format(leaf.parent.get_root().get_last_input())),
         Inverter(SuccessIsRunning(Sequence(children=[
-          PollInput(),
+          PollInput(save_key='{}-input'.format(self.id)),
           Selector(children=[
-            Leaf(
-              name='Test?',
-              save=False,
-              result_fn=lambda leaf: type(leaf.loaded_data) != Terminal
-            ),
-            Sequence(children=[
+            Sequence(name='Collect Instructions', children=[
+              Inverter(
+                Leaf(
+                  name='Terminal?',
+                  load_key='{}-input'.format(self.id),
+                  result_fn=lambda leaf: type(leaf.loaded_data) == Terminal
+                )
+              ),
+              Leaf(
+                name='Push',
+                load_key='{}-input'.format(self.id),
+                result_fn=add_child
+              )
+            ]),
+            Sequence(name='Execute Instructions', children=[
               Say(load_value='Let me try'),
               Leaf(
-                name='Execute',
-                save=False,
-                result_fn=lambda leaf: True #type(leaf.loaded_data) != Terminal
+                name='Expand',
+                result_fn=expand #type(leaf.loaded_data) != Terminal
               ),
+              self.executor,
               Say(load_value='Have I finished the task?'),
               PollInput(),
-              Leaf(
-                name='Finished?',
-                save=False,
-                result_fn=lambda leaf: type(leaf.loaded_data) != Affirmative
-              ),
+              Inverter(
+                Leaf(
+                  name='Finished?',
+                  result_fn=lambda leaf: type(leaf.loaded_data) == Affirmative
+                )
+              )
             ])
           ]),
-          Leaf(
-            name='Push',
-            save=True,
-            result_fn=add_child
-          )
         ]))),
-        Print(load_value=self.steps)
+        Leaf(
+          name='Learn',
+          result_fn=learn #type(leaf.loaded_data) != Terminal
+        )
       ]
     )
 

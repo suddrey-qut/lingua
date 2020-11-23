@@ -1,36 +1,50 @@
 [
     {
-        "name": "open(tool arg0)", 
-        "postconditions": [], 
+        "name": "open(tool arg0)",
+        "postconditions": [
+            {
+                "args": {
+                    "predicate": "(open ${arg0})"
+                },
+                "child": {
+                    "class_name": "IsGripperOpen",
+                    "package": "rv_leaves.leaves.manipulation.grasping",
+                    "type": "class"
+                },
+                "class_name": "Conditional",
+                "package": "lingua.decorators",
+                "type": "decorator"
+            }
+        ],
         "preconditions": [
             {
                 "args": {
                     "predicate": "(not (open ${arg0}))"
-                }, 
+                },
                 "child": {
                     "child": {
-                        "class_name": "IsGripperOpen", 
-                        "package": "rv_leaves.leaves.manipulation.grasping", 
+                        "class_name": "IsGripperOpen",
+                        "package": "rv_leaves.leaves.manipulation.grasping",
                         "type": "class"
-                    }, 
-                    "class_name": "Inverter", 
-                    "package": "py_trees.decorators", 
+                    },
+                    "class_name": "Inverter",
+                    "package": "py_trees.decorators",
                     "type": "decorator"
-                }, 
-                "class_name": "Conditional", 
-                "package": "lingua.decorators", 
+                },
+                "class_name": "Conditional",
+                "package": "lingua.decorators",
                 "type": "decorator"
             }
-        ], 
+        ],
         "root": {
             "children": [
                 {
-                    "class_name": "ActuateGripper", 
-                    "name": "open gripper", 
-                    "package": "rv_leaves.leaves.manipulation.grasping", 
+                    "class_name": "ActuateGripper",
+                    "name": "open gripper",
+                    "package": "rv_leaves.leaves.manipulation.grasping",
                     "type": "class"
                 }
-            ], 
+            ],
             "type": "sequence"
         }
     }

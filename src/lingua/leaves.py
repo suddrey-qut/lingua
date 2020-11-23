@@ -1,7 +1,7 @@
 import json
 
 from collections import Iterable
-from py_trees import Status
+from py_trees.common import Status
 from rv_trees.leaves import Leaf
 from rv_trees.leaves_ros import ActionLeaf, PublisherLeaf, ServiceLeaf
 

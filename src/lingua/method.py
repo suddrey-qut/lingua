@@ -73,6 +73,12 @@ class Method:
     return map(lambda p: p['args']['predicate'], self._postconditions)
 
   @staticmethod
+  def add(method, save=True):
+    Method.methods[method.name] = method
+    if save:
+      Method.save()
+
+  @staticmethod
   def save():
     to_save = {}
 

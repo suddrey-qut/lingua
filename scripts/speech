@@ -108,12 +108,14 @@ class Application(Tk):
     self.dialog.mark_set(INSERT, END)
     self.dialog.config(state=NORMAL)
     self.dialog.insert(INSERT, 'User: {}\n'.format(msg.data))
+    self.dialog.see(END)
     self.dialog.config(state=DISABLED)
   
   def agent_dialog_cb(self, msg):
     self.dialog.mark_set(INSERT, END)
     self.dialog.config(state=NORMAL)
     self.dialog.insert(INSERT, 'Lingua: {}\n'.format(msg.data))
+    self.dialog.see(END)
     self.dialog.config(state=DISABLED)
 
   def heartbeat(self):

@@ -1,7 +1,7 @@
 import time
 import py_trees.common as common
 
-from py_trees import Status
+from py_trees.common import Status
 from py_trees.decorators import Decorator, Timeout
 
 class RepeatForDuration(Timeout):

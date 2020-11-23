@@ -23,6 +23,9 @@ class Base(object):
 
   def to_btree(self, name=None):
     raise NotImplementedError()
+
+  def to_json(self, args=None):
+    raise NotImplementedError()
     
   def ground(self, state):
     raise NotImplementedError()
@@ -129,13 +132,15 @@ class Task(Base):
      
     return outstr
 
-  def toJSON(self):
+  def to_json(self, args):
     return {
-      'type': 'task',
-      'task_name': self.task_name,
-      'method_name': self.method_name,
-      'argument_types': self.method_argument_types,
-      'arguments': { key: self.method_arguments[key].toJSON() for key in self.method_arguments }
+      'type': 'behaviour',
+      'method_name': self.task_name,
+      'args': { 
+        'mapping': { 
+          key: self.method_arguments[key].to_json(args) for key in self.method_arguments 
+        }
+      }
     }
 
 class Conjunction(Base):
@@ -226,10 +231,10 @@ class Conjunction(Base):
       
     return outstr
 
-  def toJSON(self):
+  def to_json(self, args):
     return {
-      'type': 'conjunction', 
-      'items': [item.toJSON() for item in self]
+      'type': 'sequence',
+      'children': [item.to_json(args) for item in self]
     }
 
 class ForLoop(Base):
@@ -328,11 +333,11 @@ class Conditional(Base):
 
     return outstr
   
-  def toJSON(self):
+  def to_json(self, args):
     return {
       'type': 'condition',
-      'condition': self.condition.toJSON(),
-      'body': self.body.toJSON()
+      'condition': self.condition.to_json(args),
+      'body': self.body.to_json(args)
     }
 
 
@@ -447,7 +452,11 @@ class Object(Groundable):
 
     return '(intersect {})'.format(' '.join(atoms))
 
-  def toJSON(self):
+  def to_json(self, args):
+    for key in args:
+      if args[key].get_id() == self.get_id():
+        return key
+    
     result = { 'type': 'object', 'attributes': [] }
 
     if self.name != '*':
@@ -459,10 +468,10 @@ class Object(Groundable):
 
     if self.attributes:
       for attr in self.attributes:
-        result['attributes'].append(attr.toJSON())
+        result['attributes'].append(attr.to_json(args))
     
     if self.relation:
-      result['relation'] = str(relation.toJSON())
+      result['relation'] = str(relation.to_json(args))
 
     return result
 
@@ -536,7 +545,7 @@ class Modifier(Base):
     self.type_name = type_name
     self.value = value
 
-  def toJSON(self):
+  def to_json(self, args):
     return {
     'type': 'modifier',
     'type_name': self.type_name,
@@ -560,7 +569,7 @@ class Attribute(Groundable):
   def to_query(self):
     return '({} {} ?)'.format(self.type_name, self.value)
 
-  def toJSON(self):
+  def to_json(self, args):
     return {
       'type': 'attribute',
       'attr_type': self.type_name,

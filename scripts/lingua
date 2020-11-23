@@ -14,4 +14,4 @@ if __name__ == '__main__':
   Method.load()
   
   bt = BehaviourTree('Lingua', Lingua())
-  bt.run(push_to_start=False, hz=0.5, setup_timeout=2)
+  bt.run(push_to_start=False, hz=30, setup_timeout=2)
