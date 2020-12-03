@@ -26,10 +26,12 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
 
   <!-- ===================== Simple determiners ==================== -->
   <entry pos="Det" word="a" macros="@sg"/>
-  <entry pos="Det" word="an" macros="@sg"/>
+  <entry pos="Det" word="an" stem="a" macros="@sg"/>
   <entry pos="Det" word="the"/>
   <entry pos="Det" word="some"/>
   <entry pos="Det" word="this"/>
+  <entry pos="Det" word="that"/>
+  <entry pos="Det" word="all"/>
 
   <entry pos="Pos" word="your" stem="agent" class="owner"/>
   <entry pos="Pos" word="my" stem="speaker" class="owner"/>
@@ -110,45 +112,323 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
   <entry pos="N" word="hand" stem="gripper" class="tool" macros="@sg @sg-X"/>
 
 
+<entry pos="N" word="coffee" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="coke" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="mug" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="mugs" stem="mug" class="object" macros="@pl @pl-X"/>
+<entry pos="N" word="egg" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="eggs" stem="egg" class="object" macros="@pl @pl-X"/>
+<entry pos="N" word="syrup" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="syrups" stem="syrup" class="object" macros="@pl @pl-X"/>
+<entry pos="N" word="ice" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="cream" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="xbox" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="x-box" stem="xbox" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="wall" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="breakfast" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="radio" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="pillow" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="pillows" stem="pillow" class="object" macros="@pl @pl-X"/>
+<entry pos="N" word="television" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="tv" class="object" stem="television" macros="@sg @sg-X"/>
+<entry pos="N" word="shaker" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="bed" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="beds" stem="bed" class="object" macros="@pl @pl-X"/>
+<entry pos="N" word="book" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="books" stem="book" class="object" macros="@pl @pl-X"/>
+<entry pos="N" word="textbook" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="textbooks" stem="textbook" class="object" macros="@pl @pl-X"/>
+<entry pos="N" word="bottle" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="bottles" stem="bottle" class="object" macros="@pl @pl-X"/>
+<entry pos="N" word="clothes" class="object" macros="@pl @pl-X"/>
+<entry pos="N" word="package" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="cabinet" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="furniture" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="silverware" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="pack" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="metal" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="equipment" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="place" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="stereo" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="time" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="stack" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="chair" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="chairs" stem="chair" class="object" macros="@pl @pl-X"/>
+<entry pos="N" word="toggle" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="bookshelf" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="cereal" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="canada" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="can" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="cans" stem="can" class="object" macros="@pl @pl-X"/>
+<entry pos="N" word="noodle" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="dustbin" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="jam" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="food" class="object" macros="@pl @pl-X"/>
+<entry pos="N" word="foods" stem="food" class="object" macros="@pl @pl-X"/>
+<entry pos="N" word="soup" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="container" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="ale" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="fifteen" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="playback" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="jazz" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="cd" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="math" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="system" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="walk" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="location" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="freezer" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="cream-milk-syrup" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="garbagebag" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="beer" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="energy" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="scenario" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="stove" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="laptop" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="mix" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="refrigerator" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="game" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="silverwear" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="pizza" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="temporature" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="dish" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="dishes" class="object" macros="@pl @pl-X"/>
+<entry pos="N" word="channel" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="burner" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="vanilla" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="device" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="pc" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="tea" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="juice" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="liquid" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="music" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="tender" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="squirt" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="lamp" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="utensil" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="utensils" stem="utensil" class="object" macros="@pl @pl-X"/>
+<entry pos="N" word="cutlery" stem="utensil" class="object" macros="@pl @pl-X"/>  
+<entry pos="N" word="selection" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="press" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="chocolate" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="door" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="closer" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="popcorn" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="till" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="car" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="spoon" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="spoons" stem="spoon" class="object" macros="@pl @pl-X"/>
+<entry pos="N" word="fork" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="forks" stem="fork" class="object" macros="@pl @pl-X"/>
+<entry pos="N" word="area" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="centre" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="faucet" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="bowel" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="xobx" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="playlist" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="controller" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="controllers" stem="controller" class="object" macros="@pl @pl-X"/>
+<entry pos="N" word="medium" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="tea" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="desk" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="pump" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="power" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="potato" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="videogame" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="max" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="school" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="cd" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="tab" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="cushion" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="countertop" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="trash" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="chicken" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="cloth" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="xboxcontroller" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="process" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="threater" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="food" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="yummy" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="plenty" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="degree" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="packet" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="garbage" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="coke" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="walk" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="percent" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="player" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="dump" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="temperature" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="place" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="desktop" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="video" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="dispenser" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="seater" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="seat" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="seats" stem="seat" class="object" macros="@pl @pl-X"/>
+<entry pos="N" word="fridge" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="rest" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="tablespoon" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="glassware" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="bowls" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="contents" class="object" macros="@pl @pl-X"/>
+<entry pos="N" word="input" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="pickup" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="outlet" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="instant" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="dishwasher" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="bottom" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="death" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="couch" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="couches" stem="couch" class="object" macros="@pl @pl-X"/>
+<entry pos="N" word="kettle" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="mustard" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="front" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="bowl" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="remote" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="cockoven" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="bit" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="dry" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="napkin" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="back-left" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="icecream" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="middle" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="orange" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="everything" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="self" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="movie" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="boiler" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="need" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="volume" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="night" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="everyone" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="pantry" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="ginger" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="space" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="person" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="double-click" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="living" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="sofa" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="soda" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="website" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="sure" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="something" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="cupboard" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="coca-cola" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="comedy" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="pressig" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="ice-cream" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="dark" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="longglass" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="disk" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="anything" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="lid" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="corn" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="bunch" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="scooper" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="corner" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="dvd" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="tennis" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="xboxcontroller" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="cooking" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="sofas" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="drink" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="drinks" class="object" macros="@pl @pl-X"/>
+<entry pos="N" word="gamecd" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="respective" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="min" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="mathbook" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="etc" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="item" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="items" class="object" macros="@pl @pl-X"/>
+<entry pos="N" word="party" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="microwave" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="ramen" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="water" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="jug" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="chips" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="chip" stem="chips" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="dip" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="cup" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="cups" stem="cup" class="object" macros="@pl @pl-X"/>
+<entry pos="N" word="pot" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="pots" stem="pot" class="object" macros="@pl @pl-X"/>
+<entry pos="N" word="pan" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="pans" stem="pan" class="object" macros="@pl @pl-X"/>
+<entry pos="N" word="sink" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="bag" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="plate" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="plates" stem="plate" class="object" macros="@pl @pl-X"/>
+<entry pos="N" word="glass" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="snack" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="snacks" stem="snack" class="object" macros="@pl @pl-X"/>
+<entry pos="N" word="table" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="tables" stem="table" class="object" macros="@pl @pl-X"/>
+<entry pos="N" word="stuff" class="object" macros="@pl @pl-X"/>
+<entry pos="N" word="things" class="object" macros="@pl @pl-X"/>
+<entry pos="N" word="salt" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="milk" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="yoke" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="yokes" stem="yoke" class="object" macros="@pl @pl-X"/>
+
+
   <entry pos="NP" word="belongs" macros="@sg @sg-X"/>
 
   <entry pos="NP" word="everything" class="object" macros="@all @all-X"/>
 
   <!-- ======================== Adjectives ========================= -->
   <entry pos="Adj" word="red" class="color" />
-  
+  <entry pos="Adj" word="brown" class="color" />
   <entry pos="Adj" word="green" class="color" />
   <entry pos="Adj" word="blue" class="color"/>
   <entry pos="Adj" word="yellow" class="color" />
   <entry pos="Adj" word="scarlet" class="color"/>
-  <entry pos="Adj" word="gray" class="color" /> -->
+  <entry pos="Adj" word="gray" class="color" />
 
   <entry pos="Adj" word="empty" class="state"/>
+  <entry pos="Adj" word="solid" class="state"/>
+  <entry pos="Adj" word="broken" class="state"/>
+  <entry pos="Adj" word="boiling" class="state" />
   
   <entry pos="Adj" word="left"/>
   <entry pos="Adj" word="right"/>
 
   <entry pos="Adj" word="big" class="size"/>
+  <entry pos="Adj" word="long" class="size"/>
 
   <!-- ===================== Intensifying Adverbs ================== -->
   <entry pos="Adv" word="very"/>
 
   <entry pos="Conditional" word="if" />
   <entry pos="Conditional" word="while" />
-  <entry pos="Prep" word="for" />
-
+  <entry pos="Conditional" word="until" />
+  <entry pos="Conditional" word="when" />
+  <entry pos="Conditional" word="once" stem="when" />
+  <entry pos="Conditional" word="till" stem="until" />
+  
   <!-- ======================= Prepositions ======================== -->
 
+  <entry pos="Prep" word="for" />
+
+  <entry pos="Prep" word="of" class="preposition" />
   <entry pos="Prep" word="at" class="preposition" />
   <entry pos="Prep" word="on" class="preposition" />
+  <entry pos="Prep" word="with" class="preposition" />
   <entry pos="Prep" word="off" class="preposition" />
   <entry pos="Prep" word="up" class="preposition" />
   <entry pos="Prep" word="down" class="preposition" />
   <entry pos="Prep" word="in" class="preposition" />
+  <entry pos="Prep" word="inside" stem="in" class="preposition" />
+  <entry pos="Prep" word="out" class="preposition" />
   <entry pos="Prep" word="to" class="preposition" />
   <entry pos="Prep" word="into" class="preposition" />
   <entry pos="Prep" word="away" class="preposition" />
   <entry pos="Prep" word="back" class="preposition" />
+  <entry pos="Prep" word="from" class="preposition" />
+  <entry pos="Prep" word="ready" class="preposition" />
+  <entry pos="Prep" word="near" class="preposition" />
+  <entry pos="Prep" word="next" class="preposition" />
+  <entry pos="Prep" word="against" class="preposition" />
+  <entry pos="Prep" word="onto" stem="on" class="preposition" />
 
   <!-- ========================== Verbs ============================ -->
   <entry pos="VS" word="is" macros="@pres @3rd @sg"/>

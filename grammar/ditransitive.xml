@@ -787,6 +787,7 @@
 <member stem="bop" />
 <member stem="shift" />
 <member stem="bring-up" />
+<member stem="bring" />
 <member stem="strangulate" />
 <member stem="bow" />
 <member stem="detonate" />
@@ -1453,6 +1454,9 @@
 <member stem="caravan" />
 <member stem="impeach" />
 <member stem="put" />
+<member stem="place" />
+<member stem="wipe" />
+<member stem="mix" />
 <member stem="sanction" />
 <member stem="establish" />
 <member stem="entrap" />

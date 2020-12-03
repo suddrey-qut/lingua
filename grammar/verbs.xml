@@ -751,6 +751,7 @@
 <entry pos="V" word="show" macros="@pres @1st"/>
 <entry pos="V" word="infuriate" macros="@pres @1st"/>
 <entry pos="V" word="mince" macros="@pres @1st"/>
+<entry pos="V" word="mix" macros="@pres @1st"/>
 <entry pos="V" word="elevate" macros="@pres @1st"/>
 <entry pos="V" word="shoe" macros="@pres @1st"/>
 <entry pos="V" word="ladle" macros="@pres @1st"/>
@@ -1659,6 +1660,7 @@
 <entry pos="V" word="spill" macros="@pres @1st"/>
 <entry pos="V" word="peeve" macros="@pres @1st"/>
 <entry pos="V" word="put" macros="@pres @1st"/>
+<entry pos="V" word="place" macros="@pres @1st"/>
 <entry pos="V" word="feel_out" macros="@pres @1st"/>
 <entry pos="V" word="tack" macros="@pres @1st"/>
 <entry pos="V" word="stimulate" macros="@pres @1st"/>
@@ -1708,6 +1710,9 @@
 <entry pos="V" word="clamber" macros="@pres @1st"/>
 <entry pos="V" word="hoodwink" macros="@pres @1st"/>
 <entry pos="V" word="witness" macros="@pres @1st"/>
+<entry pos="V" word="wipe" macros="@pres @1st"/>
+<entry pos="V" word="mix" macros="@pres @1st"/>
+<entry pos="V" word="toggle" macros="@pres @1st"/>
 <entry pos="V" word="snuffle" macros="@pres @1st"/>
 <entry pos="V" word="gather" macros="@pres @1st"/>
 <entry pos="V" word="request" macros="@pres @1st"/>

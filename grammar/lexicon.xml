@@ -38,7 +38,7 @@ $Revision: 1.6 $, $Date: 2010/09/13 04:45:19 $
   -->
   
 
-  <family name="Preposition-Particle" pos="Prep" closed="true" indexRel="preposition">
+  <family name="Preposition-Particle" pos="Prep" closed="false" indexRel="preposition">
     <entry name="particle">
       <atomcat type="in">
         <fs id="2">
@@ -59,10 +59,12 @@ $Revision: 1.6 $, $Date: 2010/09/13 04:45:19 $
     <member stem="up"/>
     <member stem="down"/>
     <member stem="in"/>
+    <member stem="out"/>
     <member stem="to"/>
     <member stem="into"/>
     <member stem="away"/>
     <member stem="back"/>
+    <member stem="with"/>
   </family>
 
   <family name="Prepositions" pos="Prep" closed="true" indexRel="preposition">
@@ -172,6 +174,55 @@ $Revision: 1.6 $, $Date: 2010/09/13 04:45:19 $
     <member stem="up"/>
     <member stem="in"/>
     <member stem="to"/>
+    <member stem="down"/>
+    <member stem="with"/>
+    <member stem="from"/>
+  </family>
+
+  <family name="Preposition-Possessive" pos="Prep" closed="true" indexRel="preposition">
+    <entry name="np\np/n">
+      <complexcat>
+        <atomcat type="np">
+          <fs id="2">
+            <lf>
+                <nomvar name="Z" />
+            </lf>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="&lt;" />
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X" />
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash dir="/" mode="&gt;" />
+        <atomcat type="n">
+          <fs id="3">
+            <feat attr="case" val="acc"/>
+            <feat attr="index">
+              <lf>
+                <nomvar name="Y" />
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <lf>
+          <satop nomvar="X:sem-obj">
+            <diamond mode="contains">
+              <nomvar name="Y" />
+              <diamond mode="predicate">
+                <prop name="[*DEFAULT*]"/>
+              </diamond>
+            </diamond>
+          </satop>
+        </lf>
+      </complexcat>
+    </entry>
+    <member stem="of"/>
   </family>
 
   &core;

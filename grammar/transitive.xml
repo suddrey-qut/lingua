@@ -1056,6 +1056,7 @@
 <member stem="sour" />
 <member stem="can" />
 <member stem="dispossess" />
+<member stem="dispose" />
 <member stem="cab" />
 <member stem="plump" />
 <member stem="pickle" />
@@ -2731,6 +2732,7 @@
 <member stem="protrude" />
 <member stem="click" />
 <member stem="purge" />
+<member stem="put" />
 <member stem="twine" />
 <member stem="poke" />
 <member stem="outsmart" />
@@ -3103,6 +3105,9 @@
 <member stem="seclude" />
 <member stem="terminate" />
 <member stem="bring" />
+<member stem="wipe" />
+<member stem="toggle" />
+<member stem="mix" />
 <member stem="write_out" />
 <member stem="midwife" />
 <member stem="rouge" />
