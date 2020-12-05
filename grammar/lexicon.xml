@@ -45,6 +45,7 @@ $Revision: 1.6 $, $Date: 2010/09/13 04:45:19 $
           <feat attr="index">
             <lf><nomvar name="X" /></lf>
           </feat>
+          <feat attr="lex" val="[*DEFAULT*]"/> 
         </fs>
         <lf>
           <satop nomvar="X">
@@ -65,6 +66,60 @@ $Revision: 1.6 $, $Date: 2010/09/13 04:45:19 $
     <member stem="away"/>
     <member stem="back"/>
     <member stem="with"/>
+  </family>
+
+  <family name="ConjunctivePreposition" pos="Prep" closed="true" indexRel="preposition">
+    <entry name="primary">
+      <complexcat>
+      <atomcat type="np">
+        <fs id="2">
+          <feat attr="index">
+            <lf><nomvar name="X" /></lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="\" mode="*" />
+      <atomcat type="np">
+        <fs id="4">
+          <feat attr="index">
+            <lf><nomvar name="Z" /></lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="/" mode="*" />
+      <atomcat type="np">
+        <fs id="5">
+          <feat attr="index">
+            <lf><nomvar name="W" /></lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="/" mode="*" />
+      <atomcat type="in">
+        <fs id="3">
+          <feat attr="index">
+            <lf><nomvar name="Y" /></lf>
+          </feat>
+          <feat attr="lex" val="with"/> 
+        </fs>
+      </atomcat>
+      <lf>
+        <satop nomvar="X:conjunction">
+          <prop name="and" />
+          <diamond mode="compound">
+            <nomvar name="Y" />
+          </diamond>
+          <diamond mode="arg0">
+            <nomvar name="Z:sem-obj" />
+          </diamond>
+          <diamond mode="arg0">
+            <nomvar name="W:sem-obj" />
+          </diamond>
+        </satop>
+      </lf>
+      </complexcat>
+    </entry>
+    <member stem="along" />
   </family>
 
   <family name="Prepositions" pos="Prep" closed="true" indexRel="preposition">
@@ -177,6 +232,7 @@ $Revision: 1.6 $, $Date: 2010/09/13 04:45:19 $
     <member stem="down"/>
     <member stem="with"/>
     <member stem="from"/>
+    <member stem="near"/>
   </family>
 
   <family name="Preposition-Possessive" pos="Prep" closed="true" indexRel="preposition">

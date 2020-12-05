@@ -20,6 +20,7 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
 
   <entry pos="Time" word="minute" macro="@sg"/>
   <entry pos="Time" word="minutes" stem="minute" macro="@pl"/>
+  <entry pos="Time" word="min" stem="minutes" macro="@pl"/>
 
   <entry pos="Time" word="second" macro="@sg"/>
   <entry pos="Time" word="seconds" stem="second" macro="@pl"/>
@@ -32,6 +33,8 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
   <entry pos="Det" word="this"/>
   <entry pos="Det" word="that"/>
   <entry pos="Det" word="all"/>
+  <entry pos="Det" word="other"/>
+  <entry pos="Det" word="both"/>
 
   <entry pos="Pos" word="your" stem="agent" class="owner"/>
   <entry pos="Pos" word="my" stem="speaker" class="owner"/>
@@ -122,6 +125,7 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
 <entry pos="N" word="syrups" stem="syrup" class="object" macros="@pl @pl-X"/>
 <entry pos="N" word="ice" class="object" macros="@sg @sg-X"/>
 <entry pos="N" word="cream" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="scoop" class="object" macros="@sg @sg-X"/>
 <entry pos="N" word="xbox" class="object" macros="@sg @sg-X"/>
 <entry pos="N" word="x-box" stem="xbox" class="object" macros="@sg @sg-X"/>
 <entry pos="N" word="wall" class="object" macros="@sg @sg-X"/>
@@ -136,6 +140,11 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
 <entry pos="N" word="beds" stem="bed" class="object" macros="@pl @pl-X"/>
 <entry pos="N" word="book" class="object" macros="@sg @sg-X"/>
 <entry pos="N" word="books" stem="book" class="object" macros="@pl @pl-X"/>
+<entry pos="N" word="boot" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="boots" stem="boot" class="object" macros="@pl @pl-X"/>
+<entry pos="N" word="off" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="button" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="buttons" stem="button" class="object" macros="@pl @pl-X"/>
 <entry pos="N" word="textbook" class="object" macros="@sg @sg-X"/>
 <entry pos="N" word="textbooks" stem="textbook" class="object" macros="@pl @pl-X"/>
 <entry pos="N" word="bottle" class="object" macros="@sg @sg-X"/>
@@ -161,6 +170,7 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
 <entry pos="N" word="can" class="object" macros="@sg @sg-X"/>
 <entry pos="N" word="cans" stem="can" class="object" macros="@pl @pl-X"/>
 <entry pos="N" word="noodle" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="noodles" stem="noodle" class="object" macros="@pl @pl-X"/>
 <entry pos="N" word="dustbin" class="object" macros="@sg @sg-X"/>
 <entry pos="N" word="jam" class="object" macros="@sg @sg-X"/>
 <entry pos="N" word="food" class="object" macros="@pl @pl-X"/>
@@ -356,6 +366,7 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
 <entry pos="N" word="pans" stem="pan" class="object" macros="@pl @pl-X"/>
 <entry pos="N" word="sink" class="object" macros="@sg @sg-X"/>
 <entry pos="N" word="bag" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="bags" stem="bag" class="object" macros="@pl @pl-X"/>
 <entry pos="N" word="plate" class="object" macros="@sg @sg-X"/>
 <entry pos="N" word="plates" stem="plate" class="object" macros="@pl @pl-X"/>
 <entry pos="N" word="glass" class="object" macros="@sg @sg-X"/>
@@ -369,7 +380,9 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
 <entry pos="N" word="milk" class="object" macros="@sg @sg-X"/>
 <entry pos="N" word="yoke" class="object" macros="@sg @sg-X"/>
 <entry pos="N" word="yokes" stem="yoke" class="object" macros="@pl @pl-X"/>
-
+<entry pos="N" word="stand" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="stands" stem="stand" class="object" macros="@pl @pl-X"/>
+<entry pos="N" word="tap" class="object" macros="@sg @sg-X"/>
 
   <entry pos="NP" word="belongs" macros="@sg @sg-X"/>
 
@@ -384,19 +397,29 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
   <entry pos="Adj" word="scarlet" class="color"/>
   <entry pos="Adj" word="gray" class="color" />
 
+  <entry pos="Adj" word="running" class="state"/>
+  <entry pos="Adj" word="finished" class="state"/>
   <entry pos="Adj" word="empty" class="state"/>
+  <entry pos="Adj" word="full" class="state"/>
+  <entry pos="Adj" word="tender" class="state"/>
   <entry pos="Adj" word="solid" class="state"/>
   <entry pos="Adj" word="broken" class="state"/>
   <entry pos="Adj" word="boiling" class="state" />
   
   <entry pos="Adj" word="left"/>
   <entry pos="Adj" word="right"/>
+  <entry pos="Adj" word="center"/>
 
+  <entry pos="Adj" word="small" class="size"/>
   <entry pos="Adj" word="big" class="size"/>
-  <entry pos="Adj" word="long" class="size"/>
+  <entry pos="Adj" word="short" class="length"/>
+  <entry pos="Adj" word="long" class="length"/>
 
   <!-- ===================== Intensifying Adverbs ================== -->
   <entry pos="Adv" word="very"/>
+
+  <entry pos="Adv" word="slowly"/>
+  <entry pos="Adv" word="quickly"/>
 
   <entry pos="Conditional" word="if" />
   <entry pos="Conditional" word="while" />
@@ -425,10 +448,16 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
   <entry pos="Prep" word="back" class="preposition" />
   <entry pos="Prep" word="from" class="preposition" />
   <entry pos="Prep" word="ready" class="preposition" />
+  <entry pos="Prep" word="over" class="preposition" />
   <entry pos="Prep" word="near" class="preposition" />
   <entry pos="Prep" word="next" class="preposition" />
   <entry pos="Prep" word="against" class="preposition" />
   <entry pos="Prep" word="onto" stem="on" class="preposition" />
+  <entry pos="Prep" word="towards" class="preposition" />
+  <entry pos="Prep" word="beside" class="preposition" />
+  <entry pos="Prep" word="besides" stem="beside" class="preposition" />
+
+  <entry pos="Prep" word="along" class="preposition" />
 
   <!-- ========================== Verbs ============================ -->
   <entry pos="VS" word="is" macros="@pres @3rd @sg"/>
@@ -440,6 +469,11 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
   &verbs;
 
   <entry word="[*NUM*]" class="num" pos="Num" macros="@pl"/>
+  <entry word="one" stem="1" class="num" pos="Num" macros="@sg"/>
+  <entry word="two" stem="2" class="num" pos="Num" macros="@pl"/>
+  <entry word="three" stem="3" class="num" pos="Num" macros="@pl"/>
+  <entry word="four" stem="4" class="num" pos="Num" macros="@pl"/>
+  
   <!-- ========================== Macros =========================== -->
   
 

@@ -55,8 +55,6 @@ class XMLReader:
         except Exception as e:
             pass
         
-
-
         return None
     
 class AttributeReader:

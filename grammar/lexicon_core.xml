@@ -30,6 +30,23 @@
         </satop>
       </lf>
     </atomcat>
+    <entry name="conceptual">
+      <atomcat type="np">
+        <fs id="2">
+          <feat attr="num">
+            <featvar name="NUM"/>
+          </feat>
+          <feat attr="index">
+            <lf><nomvar name="X" /></lf>
+          </feat>
+        </fs>
+        <lf>
+          <satop nomvar="X:sem-obj">
+            <prop name="[*DEFAULT*]" />
+          </satop>
+        </lf>
+      </atomcat>
+   </entry>
   </entry>
 
   <entry name="CompoundNoun">
@@ -64,23 +81,6 @@
         </satop>
       </lf>
     </complexcat>
-  </entry>
-  <entry name="conceptual">
-    <atomcat type="np">
-      <fs id="2">
-        <feat attr="num">
-          <featvar name="NUM"/>
-        </feat>
-        <feat attr="index">
-          <lf><nomvar name="X" /></lf>
-        </feat>
-      </fs>
-      <lf>
-        <satop nomvar="X:sem-obj">
-          <prop name="[*DEFAULT*]" />
-        </satop>
-      </lf>
-    </atomcat>
   </entry>
   <entry name="conceptual-compound">
     <complexcat>
@@ -135,7 +135,7 @@
   </entry>
 </family>
 
-<family name="Adverb" pos="Adverb">
+<family name="Adverb" pos="Adv">
   <entry name="rb">
     <atomcat type="rb">
       <fs id="2">
@@ -222,6 +222,35 @@
         </lf>
       </complexcat>
     </entry>
+    <entry name="Primary">
+      <complexcat>
+        <atomcat type="np">
+          <fs inheritsFrom="2">
+            <feat attr="mod-index">
+              <lf>
+                <nomvar name="M"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash dir="/" mode="^" />
+        <atomcat type="n">
+          <fs id="2">
+            <feat attr="index">
+              <lf><nomvar name="X" /></lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <lf>
+          <satop nomvar="X:sem-obj">
+            <diamond mode="attr">
+              <nomvar name="M:state" />
+              <prop name="[*DEFAULT*]" />
+            </diamond>
+          </satop>
+        </lf>
+      </complexcat>
+    </entry>
 </family>
 
 <family name="Det" pos="Det" indexRel="det">
@@ -251,6 +280,125 @@
         <satop nomvar="X:sem-obj">
           <diamond mode="det">
             <prop name="[*DEFAULT*]"/>
+          </diamond>
+        </satop>
+      </lf>
+    </complexcat>
+  </entry>
+  <entry name="Compound">
+    <complexcat>
+      <atomcat type="np">
+        <fs id="2">
+          <feat attr="pers" val="3rd"/>
+          <feat attr="index">
+            <lf>
+              <nomvar name="Z"/>
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="/" mode="^"/>
+      <atomcat type="n">
+        <fs id="2">
+          <feat attr="index">
+            <lf>
+              <nomvar name="X"/>
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="/" mode="^"/>
+        <complexcat>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="Y"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash dir="/" mode="^"/>
+      <atomcat type="n">
+        <fs id="2">
+          <feat attr="index">
+            <lf>
+              <nomvar name="W"/>
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      </complexcat>
+      <lf>
+        <satop nomvar="X:sem-obj">
+          <diamond mode="det">
+            <prop name="[*DEFAULT*]"/>
+          </diamond>
+        </satop>
+      </lf>
+    </complexcat>
+  </entry>
+  <entry name="PrepositionalCompound">
+    <complexcat>
+      <atomcat type="np">
+        <fs id="2">
+          <feat attr="pers" val="3rd"/>
+          <feat attr="index">
+            <lf>
+              <nomvar name="Z"/>
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="/" mode="*"/>
+      <atomcat type="n">
+        <fs id="2">
+          <feat attr="index">
+            <lf>
+              <nomvar name="X"/>
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="/" mode="^"/>
+        <complexcat>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="Y"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash dir="/" mode="^"/>
+        <atomcat type="n">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="W"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+      </complexcat>
+      <slash dir="/" mode="^"/>
+      <atomcat type="in">
+        <fs id="3">
+          <feat attr="index">
+            <lf>
+              <nomvar name="U"/>
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <lf>
+        <satop nomvar="X:sem-obj">
+          <diamond mode="det">
+            <prop name="[*DEFAULT*]"/>
+          </diamond>
+          <diamond mode="misc">
+            <nomvar name="U"/>
           </diamond>
         </satop>
       </lf>

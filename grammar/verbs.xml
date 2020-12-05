@@ -851,6 +851,7 @@
 <entry pos="V" word="cauterize" macros="@pres @1st"/>
 <entry pos="V" word="deflate" macros="@pres @1st"/>
 <entry pos="V" word="decompress" macros="@pres @1st"/>
+<entry pos="V" word="press" macros="@pres @1st"/>
 <entry pos="V" word="recapture" macros="@pres @1st"/>
 <entry pos="V" word="weave" macros="@pres @1st"/>
 <entry pos="V" word="drain" macros="@pres @1st"/>
