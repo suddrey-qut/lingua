@@ -2159,6 +2159,8 @@
 <entry pos="V" word="gabble" macros="@pres @1st"/>
 <entry pos="V" word="configure" macros="@pres @1st"/>
 <entry pos="V" word="eavesdrop" macros="@pres @1st"/>
+<entry pos="V" word="eat" macros="@pres @1st"/>
+<entry pos="V" word="drink" macros="@pres @1st"/>
 <entry pos="V" word="snow" macros="@pres @1st"/>
 <entry pos="V" word="hatch" macros="@pres @1st"/>
 <entry pos="V" word="quieten" macros="@pres @1st"/>

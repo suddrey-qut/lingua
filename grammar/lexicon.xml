@@ -330,6 +330,116 @@ $Revision: 1.6 $, $Date: 2010/09/13 04:45:19 $
         </lf>
       </complexcat>
     </entry>
+    <entry name="NP\NP/NP/conj">
+      <complexcat>
+        <atomcat type="np">
+          <fs>
+            <feat attr="index">
+              <lf><nomvar name="X_0" /></lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="*" />
+        <complexcat>
+          <atomcat type="np">
+            <fs>
+              <feat attr="index">
+                <lf><nomvar name="X_1" /></lf>
+              </feat>
+            </fs>
+          </atomcat>
+          <dollar name="1"/>
+        </complexcat>
+        <slash dir="/" mode="*" />
+        <complexcat>
+          <atomcat type="np">
+            <fs>
+              <feat attr="index">
+                <lf><nomvar name="X_2" /></lf>
+              </feat>
+            </fs>
+          </atomcat>
+          <dollar name="1"/>
+        </complexcat>
+        <slash dir="/" mode="&gt;" />
+        <atomcat type="conj">
+          <fs id="5">
+            <feat attr="index">
+              <lf><nomvar name="D" /></lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <lf>
+          <satop nomvar="X_0:conjunction">
+            <prop name="[*DEFAULT*]" />
+            <diamond mode="left">
+              <nomvar name="X_1" />
+            </diamond>
+            <diamond mode="right">
+              <nomvar name="X_2" />
+            </diamond>
+            <diamond mode="misc">
+              <nomvar name="D" />
+            </diamond>
+          </satop>
+        </lf>
+      </complexcat>
+    </entry>
+    <entry name="NP\NP/NP\conj">
+      <complexcat>
+        <atomcat type="np">
+          <fs>
+            <feat attr="index">
+              <lf><nomvar name="X_0" /></lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="*" />
+        <complexcat>
+          <atomcat type="np">
+            <fs>
+              <feat attr="index">
+                <lf><nomvar name="X_1" /></lf>
+              </feat>
+            </fs>
+          </atomcat>
+          <dollar name="1"/>
+        </complexcat>
+        <slash dir="/" mode="*" />
+        <complexcat>
+          <atomcat type="np">
+            <fs>
+              <feat attr="index">
+                <lf><nomvar name="X_2" /></lf>
+              </feat>
+            </fs>
+          </atomcat>
+          <dollar name="1"/>
+        </complexcat>
+        <slash dir="\" mode="&lt;" />
+        <atomcat type="conj">
+          <fs id="5">
+            <feat attr="index">
+              <lf><nomvar name="D" /></lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <lf>
+          <satop nomvar="X_0:conjunction">
+            <prop name="[*DEFAULT*]" />
+            <diamond mode="left">
+              <nomvar name="X_1" />
+            </diamond>
+            <diamond mode="right">
+              <nomvar name="X_2" />
+            </diamond>
+            <diamond mode="misc">
+              <nomvar name="D" />
+            </diamond>
+          </satop>
+        </lf>
+      </complexcat>
+    </entry>
     <entry name="n/n\(n/n)">
       <complexcat>
         <atomcat type="n">
@@ -415,6 +525,116 @@ $Revision: 1.6 $, $Date: 2010/09/13 04:45:19 $
         </lf>
       </complexcat>
     </entry>
+    <entry name="s\s$1/s$1/conj"> <!-- pick up the red ball and pick up the blue ball -->
+      <complexcat>
+        <atomcat type="s">
+          <fs>
+            <feat attr="index">
+              <lf><nomvar name="C" /></lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="*" />
+        <complexcat>
+          <atomcat type="s">
+            <fs>
+              <feat attr="index">
+                <lf><nomvar name="Y" /></lf>
+              </feat>
+            </fs>
+          </atomcat>
+          <dollar name="1"/>
+        </complexcat>
+        <slash dir="/" mode="*" />
+        <complexcat>
+          <atomcat type="s">
+            <fs>
+              <feat attr="index">
+                <lf><nomvar name="Z" /></lf>
+              </feat>
+            </fs>
+          </atomcat>
+          <dollar name="1" />
+        </complexcat>
+        <slash dir="/" mode="&gt;" />
+        <atomcat type="conj">
+          <fs id="5">
+            <feat attr="index">
+              <lf><nomvar name="D" /></lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <lf>
+          <satop nomvar="C:conjunction">
+            <prop name="[*DEFAULT*]" />
+            <diamond mode="left">
+              <nomvar name="Y" />
+            </diamond>
+            <diamond mode="right">
+              <nomvar name="Z" />
+            </diamond>
+            <diamond mode="misc">
+              <nomvar name="D" />
+            </diamond>
+          </satop>
+        </lf>
+      </complexcat>
+    </entry>
+    <entry name="s\s$1/s$1\conj"> <!-- pick up the red ball and pick up the blue ball -->
+      <complexcat>
+        <atomcat type="s">
+          <fs>
+            <feat attr="index">
+              <lf><nomvar name="C" /></lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="*" />
+        <complexcat>
+          <atomcat type="s">
+            <fs>
+              <feat attr="index">
+                <lf><nomvar name="Y" /></lf>
+              </feat>
+            </fs>
+          </atomcat>
+          <dollar name="1"/>
+        </complexcat>
+        <slash dir="/" mode="*" />
+        <complexcat>
+          <atomcat type="s">
+            <fs>
+              <feat attr="index">
+                <lf><nomvar name="Z" /></lf>
+              </feat>
+            </fs>
+          </atomcat>
+          <dollar name="1" />
+        </complexcat>
+        <slash dir="\" mode="&lt;" />
+        <atomcat type="conj">
+          <fs id="5">
+            <feat attr="index">
+              <lf><nomvar name="D" /></lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <lf>
+          <satop nomvar="C:conjunction">
+            <prop name="[*DEFAULT*]" />
+            <diamond mode="left">
+              <nomvar name="Y" />
+            </diamond>
+            <diamond mode="right">
+              <nomvar name="Z" />
+            </diamond>
+            <diamond mode="misc">
+              <nomvar name="D" />
+            </diamond>
+          </satop>
+        </lf>
+      </complexcat>
+    </entry>
     <entry name="s\s$1/s"> <!-- pick up the red ball and pick up the blue ball -->
       <complexcat>
         <atomcat type="s">
@@ -456,5 +676,24 @@ $Revision: 1.6 $, $Date: 2010/09/13 04:45:19 $
         </lf>
       </complexcat>
     </entry>
+  </family>
+
+  <family name="conjunctive-adverb" pos="ConjAdv" closed="true">
+    <entry name="conj">
+    <atomcat type="conj">
+      <fs id="2">
+        <feat attr="index">
+          <lf><nomvar name="X" /></lf>
+        </feat>
+      </fs>
+      <lf>
+        <satop nomvar="X">
+          <prop name="[*DEFAULT*]" />
+        </satop>
+      </lf>
+    </atomcat>
+    </entry>
+    <member stem="then" />
+    <member stem=',' />
   </family>
 </ccg-lexicon>

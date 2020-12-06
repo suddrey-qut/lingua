@@ -92,7 +92,7 @@
     </lf>
     </complexcat>
   </entry>
-  <entry name="s/s/s"> <!-- if the ball is red pick it up -->
+  <entry name="s/(s\np)/s"> <!-- if the ball is red pick it up -->
     <complexcat>
     <atomcat type="s">
       <fs id="2">
@@ -134,6 +134,64 @@
         </diamond>
         <diamond mode="inverted">
           <prop name="false" />
+        </diamond>
+      </satop>
+    </lf>
+    </complexcat>
+  </entry>
+  <entry name="s/(s\np)/conj/s"> <!-- if the ball is red then pick it up -->
+    <complexcat>
+    <atomcat type="s">
+      <fs id="2">
+        <feat attr="index">
+          <lf><nomvar name="E" /></lf>
+        </feat>
+      </fs>
+    </atomcat>
+    <slash dir="/" mode="&gt;" />
+    <complexcat>
+      <atomcat type="s">
+        <fs inheritsFrom="3" />
+      </atomcat>
+      <slash dir="\" mode="&lt;" />
+      <atomcat type="np">
+        <fs id="3">
+          <feat attr="index">
+            <lf><nomvar name="X" /></lf>
+          </feat>
+        </fs>
+      </atomcat>
+    </complexcat>
+    <slash dir="/" mode="&gt;" />
+    <atomcat type="conj">
+      <fs id="5">
+        <feat attr="index">
+          <lf><nomvar name="Y" /></lf>
+        </feat>
+      </fs>
+    </atomcat>
+    <slash dir="/" mode="&gt;" />
+    <atomcat type="s">
+      <fs id="4">
+        <feat attr="index">
+          <lf><nomvar name="D" /></lf>
+        </feat>
+      </fs>
+    </atomcat>
+    <lf>
+      <satop nomvar="E:conditional">
+        <prop name="[*DEFAULT*]" />
+        <diamond mode="condition">
+          <nomvar name="D" />
+        </diamond>
+        <diamond mode="body">
+          <nomvar name="X" />
+        </diamond>
+        <diamond mode="inverted">
+          <prop name="false" />
+        </diamond>
+        <diamond mode="misc">
+          <nomvar name="Y" />
         </diamond>
       </satop>
     </lf>
