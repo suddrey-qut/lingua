@@ -2654,6 +2654,8 @@
 <entry pos="V" word="whitewash" macros="@pres @1st"/>
 <entry pos="V" word="prowl" macros="@pres @1st"/>
 <entry pos="V" word="inseminate" macros="@pres @1st"/>
+<entry pos="V" word="insert" macros="@pres @1st"/>
+<entry pos="V" word="remove" macros="@pres @1st"/>
 <entry pos="V" word="westernize" macros="@pres @1st"/>
 <entry pos="V" word="unfix" macros="@pres @1st"/>
 <entry pos="V" word="emplace" macros="@pres @1st"/>
