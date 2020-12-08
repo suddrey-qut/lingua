@@ -74,7 +74,7 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
   <entry pos="Pro" word="me" stem="pro1" class="animate-being" macros="@1st @sg @acc @sg-X"/>
   <entry pos="Pro" word="we" stem="pro1" class="animate-being" macros="@1st @pl @nom @pl-X"/>
   <entry pos="Pro" word="us" stem="pro1" class="animate-being" macros="@1st @pl @acc @pl-X"/>
-  <entry pos="Pro" word="you" stem="pro2" class="animate-being" macros="@2nd"/>
+  <entry pos="Pro" word="you" stem="pro2" class="animate-being" macros="@2nd @sg @nom @sg-X"/>
   <entry pos="Pro" word="she" stem="pro3f" class="animate-being" macros="@3rd @sg @nom @sg-X"/>
   <entry pos="Pro" word="her" stem="pro3f" class="animate-being" macros="@3rd @sg @acc @sg-X"/>
   <entry pos="Pro" word="he" stem="pro3m" class="animate-being" macros="@3rd @sg @nom @sg-X"/>
