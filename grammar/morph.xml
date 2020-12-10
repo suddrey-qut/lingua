@@ -63,9 +63,6 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
   <entry pos="ConjAdv" word="," />
   <entry pos="ConjAdv" word="also" />
 
-  <entry pos="Conj" word="when" macros="@persistent" />
-  <entry pos="Conj" word="whenever" stem="when" macros="@persistent" />
-
   <!-- ======================== Negation =========================== -->
   <entry pos="Adverb" word="not"/>
 
@@ -468,9 +465,12 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
   <entry pos="Conditional" word="if" />
   <entry pos="Conditional" word="while" />
   <entry pos="Conditional" word="until" />
+  <entry pos="Conditional" word="till" stem="until" />
+
+
   <entry pos="Conditional" word="when" />
   <entry pos="Conditional" word="once" stem="when" />
-  <entry pos="Conditional" word="till" stem="until" />
+  <entry pos="Conditional" word="whenever" stem="when" macros="@persistent" />
 
   <entry pos="Loop" word="repeatedly" />
   <entry pos="Loop" word="continuously" stem="repeatedly" />

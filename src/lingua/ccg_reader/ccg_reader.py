@@ -26,6 +26,9 @@ class XMLReader:
             if TaskReader.is_task(node):
                 return TaskReader.read(node)
 
+            if EventReader.is_event(node):
+                return EventReader.read(node)
+
             if ConditionalReader.is_conditional(node):
                 return ConditionalReader.read(node)
 
@@ -340,6 +343,27 @@ class ConditionalReader:
         children = node.findall('diamond')
         return [child for child in children if child.get('mode') == 'inverted'][0].find('prop').get('name') == 'true'
 
+class EventReader:
+    @staticmethod
+    def read(node):
+        if node.tag == 'xml':
+            return XMLReader.read(node.find('lf')[0])
+
+        return Event(
+            ConditionalReader.get_condition(node),
+            ConditionalReader.get_body(node),
+            ConditionalReader.is_inverted(node)
+        )
+
+    @staticmethod
+    def is_event(node):
+        try:
+            if node.tag == 'satop':
+                return ':conditional' in node.get('nom') and node.find('prop').get('name') == 'when'
+            return ':conditional' in node.find('nom').get('name') and node.find('prop').get('name') == 'when'
+        except Exception as e:
+            print(str(e))
+        return False
 
 class WhileLoopReader:
     @staticmethod

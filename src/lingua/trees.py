@@ -6,6 +6,7 @@ from py_trees.decorators import SuccessIsRunning
 from py_trees.common import Status
 from rv_trees.leaves import Leaf
 from rv_leaves.leaves.generic.console import Print
+from rv_leaves.leaves.generic.noop import Noop
 
 from lingua.ccg_reader import CCGReader
 from lingua.types import *
@@ -281,6 +282,10 @@ class Subtree(Sequence):
           resolver.setup(0)
 
           self.add_child(resolver)
+
+        except Exception as e:
+          self.add_child(Noop(success=False))
+          return
           
     
     self.add_child(self.method.instantiate(args).to_tree())

@@ -7,6 +7,10 @@ from rv_trees.leaves_ros import ActionLeaf, PublisherLeaf, ServiceLeaf
 
 from std_msgs.msg import String
 
+class Fail(Leaf):
+  def __init__(self, name='Say', topic_name='/speech/out', topic_class=String, *args, **kwargs):
+    super(Say, self).__init__(name=name, topic_name=topic_name, topic_class=topic_class, *args, **kwargs)
+
 class Planner(ActionLeaf):
   def __init__(self, name='Planner', conditions=None, target=None, *args, **kwargs):
     super(Planner, self).__init__(

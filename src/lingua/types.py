@@ -419,10 +419,30 @@ class Conditional(Base):
   
   def to_json(self, args):
     return {
-      'type': 'condition',
-      'condition': self.condition.to_json(args),
-      'body': self.body.to_json(args)
+      'package': 'lingua.types',
+      'class_name': self.__class__.__name__,
+      'args': {
+        'condition': self.condition.to_json(args),
+        'body': self.body.to_json(args)
+      }
     }
+
+class Event(Conditional):
+  def to_btree(self, name=None, training=False):
+    return SuccessIsRunning(Sequence(name if name else 'when', children=[
+      self.condition.to_btree(), self.body.to_btree()
+    ]))
+
+  def __str__(self):
+    outstr = 'when:\n condition:'
+    
+    for line in str(self.condition).split('\n'):
+      outstr += '\n  {}'.format(line)
+    outstr += '\n body:'
+    for line in str(self.body).split('\n'):
+      outstr += '\n  {}'.format(line)
+
+    return outstr
 
 
 class WhileLoop(Conditional):
