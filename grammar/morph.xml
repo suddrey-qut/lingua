@@ -113,6 +113,7 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
   <entry pos="N" word="kitchen" class="room" macros="@sg @sg-X"/>
   <entry pos="N" word="storage" class="room" macros="@sg @sg-X"/>
   <entry pos="N" word="dining" class="room" macros="@sg @sg-X"/>
+  <entry pos="N" word="lounge" class="room" macros="@sg @sg-X"/>
 
   <entry pos="N" word="room" class="room" macros="@sg @sg-X"/>
   <entry pos="N" word="hall" stem="room" class="room"  macros="@sg @sg-X"/>
@@ -464,7 +465,12 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
   <entry pos="Conditional" word="when" />
   <entry pos="Conditional" word="once" stem="when" />
   <entry pos="Conditional" word="till" stem="until" />
-  
+
+  <entry pos="Loop" word="repeatedly" />
+  <entry pos="Loop" word="continuously" stem="repeatedly" />
+
+  <entry pos="Stop" word="stop" />
+
   <!-- ======================= Prepositions ======================== -->
 
   <entry pos="Prep" word="for" />

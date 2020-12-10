@@ -38,6 +38,9 @@ class XMLReader:
             if ForLoopReader.is_for(node):
                 return ForLoopReader.read(node)
 
+            if InfiniteLoopReader.is_repeat(node):
+                return InfiniteLoopReader.read(node)
+
             if ObjectReader.is_object(node):    
                 return ObjectReader.read(node)
 
@@ -240,8 +243,8 @@ class ObjectReader:
     def is_object(node):
         try:
             if node.tag == 'satop':
-                return node.get('nom').split(':')[1] in ['object', 'tool', 'dummy']
-            return node.find('nom').get('name').split(':')[1] in ['object', 'tool', 'dummy']
+                return node.get('nom').split(':')[1] in ['object', 'tool', 'dummy', 'room']
+            return node.find('nom').get('name').split(':')[1] in ['object', 'tool', 'dummy', 'room']
         except Exception as e:
             print(str(e))
         return False
@@ -377,6 +380,24 @@ class ForLoopReader:
             if node.tag == 'satop':
                 return ':loop' in node.get('nom') and node.find('prop').get('name') == 'for'
             return ':loop' in node.find('nom').get('name') and node.find('prop').get('name') == 'for' 
+        except Exception as e:
+           print(str(e))
+
+        return None
+
+class InfiniteLoopReader:
+    @staticmethod
+    def read(node):
+        return InfiniteLoop(
+          ConditionalReader.get_body(node)
+        )
+
+    @staticmethod
+    def is_repeat(node):
+        try:
+            if node.tag == 'satop':
+                return ':loop' in node.get('nom') and node.find('prop').get('name') == 'repeatedly'
+            return ':loop' in node.find('nom').get('name') and node.find('prop').get('name') == 'repeatedly' 
         except Exception as e:
            print(str(e))
 
@@ -519,3 +540,14 @@ class ExclamationReader:
     @staticmethod
     def get_value(node):
         return node.find('prop').get('name')
+
+class StopReader:
+    @staticmethod
+    def is_stop(node):
+        try:
+            if node.tag == 'satop':
+                return ':stop' in node.get('nom')
+            return ':stop' in node.find('nom').get('name')
+        except Exception as e:
+            print(str(e))
+        return False

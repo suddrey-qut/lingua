@@ -491,3 +491,20 @@
     </complexcat>
   </entry>
 </family>
+
+<family name="Stop" pos="Stop">
+  <entry name="term">
+    <atomcat type="term">
+      <fs id="2">
+        <feat attr="index">
+          <lf><nomvar name="X" /></lf>
+        </feat>
+      </fs>
+      <lf>
+        <satop nomvar="X:stop">
+          <prop name="[*DEFAULT*]" />
+        </satop>
+      </lf>
+    </atomcat>
+  </entry>
+</family>

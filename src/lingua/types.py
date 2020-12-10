@@ -2,6 +2,7 @@ import re
 import copy
 import json
 import random
+import importlib
 
 from py_trees.composites import *
 from py_trees.decorators import *
@@ -21,12 +22,12 @@ class Base(object):
   def __init__(self):
     super(Base, self).__init__()
 
-  def to_btree(self, name=None):
+  def to_btree(self, name=None, training=False):
     raise NotImplementedError()
 
   def to_json(self, args=None):
     raise NotImplementedError()
-    
+
   def ground(self, state):
     raise NotImplementedError()
 
@@ -42,12 +43,39 @@ class Base(object):
   def __nonzero__(self):    
     return self.__bool__()
 
+  @staticmethod
+  def from_json(data, arguments):
+    if 'package' in data:
+      module = importlib.import_module(data['package'])
+      class_type = module.__getattribute__(data['class_name'])
+
+    else:
+      class_type = globals()['__builtins__'][data['class_name']]
+    
+    args = {}
+    
+    if 'args' in data:
+      for idx in data['args']:
+        if isinstance(data['args'][idx], dict):
+          args[idx] = Base.from_json(data['args'][idx], arguments)
+        else:
+          args[idx] = data['args'][idx]
+          try:
+            matches = re.findall(r'\${([^}]*)}', args[idx])
+
+            for match in matches:
+              args[idx] = arguments[match]
+          except:
+            pass
+
+    return class_type(**args)
+
 class Groundable(Base):
   def __init__(self):
     self.id = None
 
   def set_id(self, idx):
-    self.id = [ idx ] if isinstance(idx, str) or isinstance(idx, unicode) else idx
+    self.id = [ idx ] if isinstance(idx, str) else idx
 
   def get_id(self):
     return self.id
@@ -101,7 +129,7 @@ class Task(Base):
   def set_argument_type(self, key, value):
     self.method_argument_types[key] = value
 
-  def to_btree(self, name=None):
+  def to_btree(self, name=None, training=False):
     return Subtree(
       name=name if name else self.get_name(),
       method_name=self.get_name(),
@@ -143,7 +171,7 @@ class Task(Base):
       }
     }
 
-class Conjunction(Base):
+class Conjunction(Groundable):
   def __init__(self, tag, left, right):
     self.tag = tag
     self.left = left
@@ -158,10 +186,10 @@ class Conjunction(Base):
     return str(self)
 
   def get_id(self):
-    return self.id
-
-  def set_id(self, idx):
-    self.id = idx
+    if self.tag == 'and':
+      return self.get_left().get_id() + self.get_right().get_id()
+    else:
+      return random.choice([self.get_left().get_id(), self.get_right().get_id()])
 
   def ground(self, state):
     if not self.left.is_grounded():
@@ -170,17 +198,17 @@ class Conjunction(Base):
     if not self.right.is_grounded():
       self.right.ground(state)
 
-    if self.tag == 'and':
-      self.set_id(tuple(list(self.left.get_id()) + list(self.right.get_id())))
+    # if self.tag == 'and':
+    #   self.set_id(tuple(list(self.left.get_id()) + list(self.right.get_id())))
     
-    if self.tag == 'or':
-      self.set_id(self.left.get_id()) #TODO fix this...
+    # if self.tag == 'or':
+    #   self.set_id(self.left.get_id()) #TODO fix this...
     # self.set_id(parse(state, '({0} {1} {2})'.format(self.tag,
     #                         self.left.get_id(),
     #                         self.right.get_id())))
 
   def is_grounded(self):
-    return self.id is not None
+    return self.left.is_grounded() and self.right.is_grounded()
 
   def get_left(self):
     return self.left
@@ -197,7 +225,7 @@ class Conjunction(Base):
   def get_type(self):
     return self.tag if self.tag != ',' else self.right.get_type()
 
-  def to_btree(self, name=None):
+  def to_btree(self, name=None, training=False):
     if self.get_type() == 'and':
       return Sequence(name if name else 'and', children=[self.left.to_btree(), self.right.to_btree()])
 
@@ -233,8 +261,14 @@ class Conjunction(Base):
 
   def to_json(self, args):
     return {
-      'type': 'sequence',
-      'children': [item.to_json(args) for item in self]
+      'type': 'class',
+      'class_name': 'Conjunction',
+      'package': 'lingua.types',
+      'args': {
+        'tag': self.tag,
+        'left': self.left.to_json(args),
+        'right': self.right.to_json(args),
+      }
     }
 
 class ForLoop(Base):
@@ -256,7 +290,7 @@ class ForLoop(Base):
   def set_body(self, body):
     self.body = body
 
-  def to_btree(self, name=None):
+  def to_btree(self, name=None, training=False):
     return RepeatForDuration(name='Repeat for {}'.format(self.duration), child=self.body.to_btree(), duration=self.duration.to_seconds())
 
   def ground(self, state):
@@ -278,6 +312,56 @@ class ForLoop(Base):
       outstr += '\n  {}'.format(line)
 
     return outstr
+
+  def to_json(self, args):
+    return {
+      'type': 'decorator',
+      'package': 'lingua.decorators',
+      'class_name': 'RepeatForDuration',
+      'duration': self.duration.to_json(args),
+      'child': self.body.to_json(args)
+    }
+
+class InfiniteLoop(Base):
+  def __init__(self, body):
+    super(InfiniteLoop, self).__init__()
+    self.body = body
+
+  def get_body(self):
+    return self.body
+
+  def set_body(self, body):
+    self.body = body
+
+  def to_btree(self, name=None, training=False):
+    if training:
+      return self.body.to_btree()
+    return SuccessIsRunning(name='Repeat', child=self.body.to_btree())
+
+  def ground(self, state):
+    self.body.ground(state)
+
+  def is_valid(self):
+    return self.body
+
+  def __iter__(self):
+    yield self.body
+
+  def __str__(self):
+    outstr = 'repeat:'
+    outstr += '\n body:'
+    for line in str(self.body).split('\n'):
+      outstr += '\n  {}'.format(line)
+
+    return outstr
+
+  def to_json(self, args):
+    return {
+      'type': 'decorator',
+      'package': 'py_trees.decorators',
+      'class_name': 'SuccessIsRunning',
+      'child': self.body.to_json(args)
+    }
 
 class Conditional(Base):
   def __init__(self, condition, body, inverted=False):
@@ -307,7 +391,7 @@ class Conditional(Base):
   def set_body(self, body):
     self.body = body
 
-  def to_btree(self, name=None):
+  def to_btree(self, name=None, training=False):
     return Selector(name=name if name else 'if', children=[
       Inverter(self.condition.to_btree('condition')), self.body.to_btree('body')
     ])
@@ -342,7 +426,7 @@ class Conditional(Base):
 
 
 class WhileLoop(Conditional):
-  def to_btree(self, name=None):
+  def to_btree(self, name=None, training=False):
     return FailureIsSuccess(SuccessIsRunning(Sequence(name if name else 'while', children=[
       self.condition.to_btree(), FailureIsSuccess(self.body.to_btree(), name='body')
     ])))
@@ -377,7 +461,7 @@ class Assertion(Groundable):
   def set_attribute(self, attribute):
     self.attribute = attribute
 
-  def to_btree(self, name=None):
+  def to_btree(self, name=None, training=False):
     return Assert(
       name if name else str(self),
       load_value=(self.child, self.attribute),
@@ -457,21 +541,26 @@ class Object(Groundable):
       if args[key].get_id() == self.get_id():
         return key
     
-    result = { 'type': 'object', 'attributes': [] }
-
-    if self.name != '*':
-      result['attributes'].append({
-        'type': 'attribute',
-        'attr_type': 'class_label',
-        'value': self.name
-      })
+    result = { 
+      'type': 'class', 
+      'package': 'lingua.types', 
+      'class_name': 'Object', 
+      'args': {
+        'type_name': self.type_name,
+        'name': self.name
+      }
+    }
 
     if self.attributes:
+      result['args']['attributes'] = []
       for attr in self.attributes:
-        result['attributes'].append(attr.to_json(args))
+        result['args']['attributes'].append(attr.to_json(args))
     
     if self.relation:
-      result['relation'] = str(relation.to_json(args))
+      result['args']['relation'] = self.relation.to_json(args)
+
+    if self.limit:
+      result['args']['limit'] = self.limit.to_json(args)
 
     return result
 
@@ -569,12 +658,12 @@ class Attribute(Groundable):
   def to_query(self):
     return '({} {} ?)'.format(self.type_name, self.value)
 
-  def to_json(self, args):
-    return {
-      'type': 'attribute',
-      'attr_type': self.type_name,
-      'value': self.value
-    }
+  # def to_json(self, args):
+  #   return {
+  #     'type': 'attribute',
+  #     'attr_type': self.type_name,
+  #     'value': self.value
+  #   }
   
   def __str__(self):
     return '[{}={}]'.format(self.type_name, self.value)
@@ -615,10 +704,22 @@ class Duration(Base):
   def __str__(self):
     return '{} {}(s)'.format(self.time, self.units)
 
+  def to_json(self, args):
+    return self.to_seconds()
+
 class Limit(Base):
   def __init__(self, count):
     super(Limit, self).__init__()
     self.count = count
+
+  def to_json(self, args):
+    return {
+      'package': 'lingua.types',
+      'class_name': self.__class__.__name__,
+      'args': {
+        'count': self.count
+      }
+    }
 
   def __call__(self, value):
     raise NotImplementedError()
@@ -656,14 +757,14 @@ class Only(Limit):
     return 'Only: {}'.format(self.count)
 
 class Affirmative(Base):
-  def to_btree(self, name=None):
+  def to_btree(self, name=None, training=False):
     return Leaf(name='noop', eval_fn=lambda l, v: True)
 
   def is_valid(self):
     return True
 
 class Negative(Base):
-  def to_btree(self, name=None):
+  def to_btree(self, name=None, training=False):
     return Leaf(name='noop', eval_fn=lambda l, v: True)
 
   def is_valid(self):

@@ -129,9 +129,14 @@ class Lingua(OneShotSelector):
 
   def speech_cb(self, msg):
     # Get XML parses from CCG parser for input text
-    if msg.data in ['done', 'finished', 'that\'s it'] and self.get_listener():
+    if msg.data in ['try', 'done', 'finished', 'that\'s it'] and self.get_listener():
       self.get_listener().set_input(Terminal())
       self.pub_speech.publish(String(data='Thank you'))
+      return
+
+    if msg.data in ['stop']:
+      self.stop()
+      self.children.clear()
       return
 
     result = self.parser(msg.data
@@ -298,7 +303,7 @@ class LearnMethod(Sequence):
       return self.steps
 
     def expand(leaf):
-      subtree = Sequence(children=[step.to_btree() for step in self.steps])
+      subtree = Sequence(children=[step.to_btree(training=True) for step in self.steps])
       subtree.setup(timeout=0)
       
       self.executor.add_child(subtree)
@@ -317,16 +322,16 @@ class LearnMethod(Sequence):
       else:
           root = self.expanded[0].to_json(self.parent.arguments)
 
-      method=Method(
-          name='gnash(tool arg0)',
+      learnt=Method(
+          name=method.get_name(),
           preconditions=[],
           postconditions=[],
           root=root
       )
 
-      Method.add(method)
+      Method.add(learnt)
 
-      return method
+      return learnt
 
     self.executor = OneShotSelector(name='executor')
     
@@ -352,7 +357,7 @@ class LearnMethod(Sequence):
               )
             ]),
             Sequence(name='Execute Instructions', children=[
-              Say(load_value='Let me try'),
+              Say(load_value='Let me try once'),
               Leaf(
                 name='Expand',
                 result_fn=expand #type(leaf.loaded_data) != Terminal

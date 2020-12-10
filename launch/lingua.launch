@@ -1,9 +1,13 @@
 <launch>
   <arg name="gui" value="true" />
-  <arg name="sim" value="true" />
+
+  <arg name="method_path" default="$(find lingua)/data/methods" />
 
   <arg name="grammar" value="$(find lingua)/grammar/grammar.xml" />
   <arg name="handlers" value="$(find lingua)/data/world/handlers.json" />
+
+  <arg name="objects_file" default="" />
+  <arg name="types_file" default="" />
 
   <include file="$(find lingua_world)/launch/world.launch" />
   
@@ -19,12 +23,13 @@
     <node pkg="rqt_py_trees" type="rqt_py_trees" name="rqt_py_trees" />
   </group>
 
-  <group if="$(arg sim)">
-    <node pkg="lingua_tests" type="manipulator" name="manipulator" output="screen" />
-    <node pkg="lingua_tests" type="world_model" name="world_model" />
-  </group>
-
   <node pkg="lingua" type="resolver" name="resolver" output="screen" />
   <node pkg="lingua" type="speech" name="speech" />
+
+  <node pkg="lingua" type="lingua" name="lingua" output="screen">
+    <param name="method_path" value="$(arg method_path)" />
+    <param name="objects_file" value="$(arg objects_file)" if="$(eval len(str(arg('objects_file'))) > 0)" />
+    <param name="types_file" value="$(arg types_file)" if="$(eval len(str(arg('types_file'))) > 0)" />
+  </node>
 
 </launch>

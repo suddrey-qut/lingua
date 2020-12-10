@@ -151,7 +151,7 @@ class InstantiatedMethod(Method):
       return subtree
       
     children = []
-
+    
     for args in self.zip_arguments(self.arguments):
       branch = self.generate_tree(args, setup=True)
       children.append(branch)
@@ -255,6 +255,7 @@ class InstantiatedMethod(Method):
     return root
 
   def generate_branch(self, branch, arguments):
+    print(branch)
     if branch['type'] == 'sequence':
       children = list([self.generate_branch(child, arguments) for child in branch['children']])
       return Sequence(branch['name'] if 'name' in branch else None if 'name' in branch else 'sequence', children=children)
@@ -267,14 +268,14 @@ class InstantiatedMethod(Method):
       data = copy.deepcopy(branch)
 
       if 'args' in data and 'load_value' in data['args']:
-        matches = re.findall('\${([^}]*)}', data['args']['load_value'])
+        matches = re.findall(r'\${([^}]*)}', data['args']['load_value'])
 
         for match in matches:
           data['args']['load_value'] = arguments[match]
-        
+
       module = importlib.import_module(data['package'])
       class_type = module.__getattribute__(data['class_name'])
-      return class_type(name=data['name'] if 'name' in data else None, **data['args'] if 'args' in data else {})
+      return class_type(**data['args'] if 'args' in data else {})
 
     if branch['type'] == 'decorator':
       data = copy.deepcopy(branch)
@@ -286,10 +287,8 @@ class InstantiatedMethod(Method):
         matches = re.findall('\${([^}]*)}', data['args']['predicate'])
 
         for match in matches:
-          print(arguments[match])
           data['args']['predicate'] = data['args']['predicate'].replace('${' + match + '}', str(arguments[match].to_query()))
-        print(data['args'])
-
+        
       try:
         node_name = data['name'] if 'name' in data else data['args']['predicate']
       except KeyError:
@@ -298,6 +297,13 @@ class InstantiatedMethod(Method):
       return class_type(self.generate_branch(data['child'], arguments), name=node_name, **data['args'] if 'args' in data else {})
 
     if branch['type'] == 'behaviour':
+
+      if 'args' in branch and 'mapping' in branch['args']:
+        for idx in branch['args']['mapping']:
+          if isinstance(branch['args']['mapping'][idx], dict):
+            arguments[idx] = Base.from_json(branch['args']['mapping'][idx], arguments)
+            branch['args']['mapping'][idx] = idx
+      
       return Subtree(name=branch['name'] if 'name' in branch else branch['method_name'], method_name=branch['method_name'], arguments=arguments, **branch['args'] if 'args' in branch else {})
     
   def toJSON(self):
@@ -309,4 +315,4 @@ class InstantiatedMethod(Method):
     }
     
 from .trees import Subtree, Preconditions, LearnMethod
-from .types import Conjunction, Groundable, Attribute
+from .types import Base, Conjunction, Groundable, Attribute

@@ -198,3 +198,47 @@
     </complexcat>
   </entry>
 </family>
+
+<family class="repeat" pos="Loop" closed="true">
+  <entry name="s/(s\np)">
+    <complexcat>
+    <atomcat type="s">
+      <fs id="2">
+        <feat attr="index">
+          <lf><nomvar name="E" /></lf>
+        </feat>
+      </fs>
+    </atomcat>
+    <slash dir="/" mode="&gt;" />
+    <complexcat>
+      <atomcat type="s">
+        <fs id="3">
+          <feat attr="index">
+            <lf><nomvar name="X" /></lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="\" mode="&lt;" />
+      <atomcat type="np">
+        <fs id="5">
+          <feat attr="index">
+            <lf><nomvar name="Y" /></lf>
+          </feat>
+        </fs>
+      </atomcat>
+    </complexcat>
+    <lf>
+      <satop nomvar="E:loop">
+        <prop name="[*DEFAULT*]" />
+        <diamond mode="body">
+          <nomvar name="X" />
+        </diamond>
+        <diamond mode="infinite">
+          <nomvar name="E" />
+        </diamond>
+      </satop>
+    </lf>
+    </complexcat>
+  </entry>
+  <member stem="repeatedly" />
+</family>
