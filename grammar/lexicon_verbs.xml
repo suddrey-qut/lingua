@@ -200,7 +200,7 @@
       </lf>
     </complexcat>
   </entry>
-  <entry name="s\np/prep"> <!-- pick up the ball -->
+  <entry name="s\np/in"> <!-- pick up the ball -->
     <complexcat>
       <atomcat type="s">
         <fs inheritsFrom="2">
@@ -422,7 +422,7 @@
       </lf>
     </complexcat>
   </entry>
-  <entry name="s\np/np/prep"> <!-- pick up the ball -->
+  <entry name="s\np/np/in"> <!-- pick up the ball -->
     <complexcat>
       <atomcat type="s">
         <fs inheritsFrom="2">
@@ -484,7 +484,7 @@
       </lf>
     </complexcat>
   </entry>
-  <entry name="s\np/np/prep\rb"> <!-- quickly pick up the ball -->
+  <entry name="s\np/np/in\rb"> <!-- quickly pick up the ball -->
     <complexcat>
       <atomcat type="s">
         <fs inheritsFrom="2">
@@ -559,7 +559,7 @@
       </lf>
     </complexcat>
   </entry>
-  <entry name="s\np/prep/np"> <!-- pick the ball up -->
+  <entry name="s\np/in/np"> <!-- pick the ball up -->
     <complexcat>
       <atomcat type="s">
         <fs inheritsFrom="2">
@@ -621,7 +621,7 @@
       </lf>
     </complexcat>
   </entry>
-  <entry name="s\np/rb/prep/np"> <!-- pick the ball up -->
+  <entry name="s\np/rb/in/np"> <!-- pick the ball up -->
     <complexcat>
       <atomcat type="s">
         <fs inheritsFrom="2">
@@ -701,7 +701,7 @@
 
 
 <family name="ditransitive-verbs" pos="V" closed="true">
-  <entry name="s\np/np/np">
+  <entry name="s\np/np/np"> <!-- Give me the ball -->
     <complexcat>
       <atomcat type="s">
         <fs inheritsFrom="2">
@@ -762,7 +762,7 @@
       </lf>
     </complexcat>
   </entry>
-  <entry name="s\np/np/prep/np"> <!-- give the ball to me -->
+  <entry name="s\np/np/in/np"> <!-- give the ball to me -->
     <complexcat>
       <atomcat type="s">
         <fs inheritsFrom="2">
@@ -838,7 +838,7 @@
       </lf>
     </complexcat>
   </entry>
-  <entry name="s\np\rb/np/np">
+  <entry name="s\np\rb/np/np"> <!-- quickly give me the ball -->
     <complexcat>
       <atomcat type="s">
         <fs inheritsFrom="2">
@@ -912,96 +912,7 @@
       </lf>
     </complexcat>
   </entry>
-  <entry name="s\np\rb/np/prep/np"> <!-- give the ball to me -->
-    <complexcat>
-      <atomcat type="s">
-        <fs inheritsFrom="2">
-          <feat attr="index">
-            <lf>
-              <nomvar name="E" />
-            </lf>
-          </feat>
-        </fs>
-      </atomcat>
-      <slash dir="\" mode="&lt;" />
-      <atomcat type="np">
-        <fs id="2">
-          <feat attr="case" val="nom"/>
-          <feat attr="num">
-            <featvar name="NUM" />
-          </feat>
-          <feat attr="index">
-            <lf>
-              <nomvar name="X" />
-            </lf>
-          </feat>
-        </fs>
-      </atomcat>
-      <slash dir="\" mode="&lt;" />
-      <atomcat type="rb">
-        <fs id="6">
-          <feat attr="index">
-            <lf>
-              <nomvar name="W" />
-            </lf>
-          </feat>
-        </fs>
-      </atomcat>
-      <slash dir="/" mode="&gt;" />
-      <atomcat type="np">
-        <fs id="3">
-          <feat attr="case" val="acc"/>
-          <feat attr="index">
-            <lf>
-              <nomvar name="Z" />
-            </lf>
-          </feat>
-        </fs>
-      </atomcat>
-      <slash dir="/" mode="&gt;" />
-      <atomcat type="in">
-        <fs id="4">
-          <feat attr="index">
-            <lf>
-              <nomvar name="P" />
-            </lf>
-          </feat>
-        </fs>
-      </atomcat>
-      <slash dir="/" mode="&gt;" />
-      <atomcat type="np">
-        <fs id="5">
-          <feat attr="case" val="acc"/>
-          <feat attr="index">
-            <lf>
-              <nomvar name="Y" />
-            </lf>
-          </feat>
-        </fs>
-      </atomcat>
-      <lf>
-        <satop nomvar="E:action">
-          <prop name="[*DEFAULT*]"/>
-          <diamond mode="agent">
-            <nomvar name="X:animate-being" />
-          </diamond>
-          <diamond mode="arg0">
-            <nomvar name="Y:phys-obj" />
-          </diamond>
-          <diamond mode="arg1">
-            <nomvar name="Z:phys-obj" />
-          </diamond>
-          <diamond mode="particle">
-            <nomvar name="P" />
-          </diamond>
-          <diamond mode="mod">
-            <nomvar name="W" />
-          </diamond>
-        </satop>
-      </lf>
-    </complexcat>
-  </entry>
-  <entry name="s\np/rb/np/np">
+  <entry name="s\np/rb/np/np"> <!-- give me the ball quickly  -->
     <complexcat>
       <atomcat type="s">
         <fs inheritsFrom="2">
@@ -1075,7 +986,7 @@
       </lf>
     </complexcat>
   </entry>
-  <entry name="s\np/rb/np/prep/np"> <!-- give the ball to me -->
+  <entry name="s\np/rb/np/in/np"> <!-- give the ball to me quickly -->
     <complexcat>
       <atomcat type="s">
         <fs inheritsFrom="2">
@@ -1101,6 +1012,95 @@
         </fs>
       </atomcat>
       <slash dir="/" mode="&gt;" />
+      <atomcat type="rb">
+        <fs id="6">
+          <feat attr="index">
+            <lf>
+              <nomvar name="W" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="/" mode="&gt;" />
+      <atomcat type="np">
+        <fs id="3">
+          <feat attr="case" val="acc"/>
+          <feat attr="index">
+            <lf>
+              <nomvar name="Z" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="/" mode="&gt;" />
+      <atomcat type="in">
+        <fs id="4">
+          <feat attr="index">
+            <lf>
+              <nomvar name="P" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="/" mode="&gt;" />
+      <atomcat type="np">
+        <fs id="5">
+          <feat attr="case" val="acc"/>
+          <feat attr="index">
+            <lf>
+              <nomvar name="Y" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <lf>
+        <satop nomvar="E:action">
+          <prop name="[*DEFAULT*]"/>
+          <diamond mode="agent">
+            <nomvar name="X:animate-being" />
+          </diamond>
+          <diamond mode="arg0">
+            <nomvar name="Y:phys-obj" />
+          </diamond>
+          <diamond mode="arg1">
+            <nomvar name="Z:phys-obj" />
+          </diamond>
+          <diamond mode="particle">
+            <nomvar name="P" />
+          </diamond>
+          <diamond mode="mod">
+            <nomvar name="W" />
+          </diamond>
+        </satop>
+      </lf>
+    </complexcat>
+  </entry>
+  <entry name="s\np\rb/np/in/np"> <!-- quickly give the ball to me  -->
+    <complexcat>
+      <atomcat type="s">
+        <fs inheritsFrom="2">
+          <feat attr="index">
+            <lf>
+              <nomvar name="E" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="\" mode="&lt;" />
+      <atomcat type="np">
+        <fs id="2">
+          <feat attr="case" val="nom"/>
+          <feat attr="num">
+            <featvar name="NUM" />
+          </feat>
+          <feat attr="index">
+            <lf>
+              <nomvar name="X" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="\" mode="&lt;" />
       <atomcat type="rb">
         <fs id="6">
           <feat attr="index">

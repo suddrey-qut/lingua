@@ -61,6 +61,7 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
 
   <entry pos="ConjAdv" word="then" />
   <entry pos="ConjAdv" word="," />
+  <entry pos="ConjAdv" word="also" />
 
   <entry pos="Conj" word="when" macros="@persistent" />
   <entry pos="Conj" word="whenever" stem="when" macros="@persistent" />
@@ -73,7 +74,7 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
   <entry pos="Pro" word="me" stem="pro1" class="animate-being" macros="@1st @sg @acc @sg-X"/>
   <entry pos="Pro" word="we" stem="pro1" class="animate-being" macros="@1st @pl @nom @pl-X"/>
   <entry pos="Pro" word="us" stem="pro1" class="animate-being" macros="@1st @pl @acc @pl-X"/>
-  <entry pos="Pro" word="you" stem="pro2" class="animate-being" macros="@2nd"/>
+  <entry pos="Pro" word="you" stem="pro2" class="animate-being" macros="@2nd @sg @nom @sg-X"/>
   <entry pos="Pro" word="she" stem="pro3f" class="animate-being" macros="@3rd @sg @nom @sg-X"/>
   <entry pos="Pro" word="her" stem="pro3f" class="animate-being" macros="@3rd @sg @acc @sg-X"/>
   <entry pos="Pro" word="he" stem="pro3m" class="animate-being" macros="@3rd @sg @nom @sg-X"/>
@@ -115,13 +116,12 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
   <entry pos="N" word="dining" class="room" macros="@sg @sg-X"/>
   <entry pos="N" word="lounge" class="room" macros="@sg @sg-X"/>
 
-  <entry pos="N" word="room" class="room" macros="@sg @sg-X"/>
-  <entry pos="N" word="hall" stem="room" class="room"  macros="@sg @sg-X"/>
+  <entry pos="N" word="room" class="location" macros="@sg @sg-X"/>
+  <entry pos="N" word="hall" stem="room" class="location"  macros="@sg @sg-X"/>
 
   <entry pos="N" word="tray" class="container" macros="@sg @sg-X"/>
   <entry pos="N" word="gripper" class="tool" macros="@sg @sg-X"/>
   <entry pos="N" word="hand" stem="gripper" class="tool" macros="@sg @sg-X"/>
-
 
 <entry pos="N" word="coffee" class="object" macros="@sg @sg-X"/>
 <entry pos="N" word="coke" class="object" macros="@sg @sg-X"/>
@@ -136,6 +136,7 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
 <entry pos="N" word="scoop" class="object" macros="@sg @sg-X"/>
 <entry pos="N" word="xbox" class="object" macros="@sg @sg-X"/>
 <entry pos="N" word="x-box" stem="xbox" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="console" class="object" macros="@sg @sg-X"/>
 <entry pos="N" word="wall" class="object" macros="@sg @sg-X"/>
 <entry pos="N" word="breakfast" class="object" macros="@sg @sg-X"/>
 <entry pos="N" word="radio" class="object" macros="@sg @sg-X"/>
@@ -161,6 +162,7 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
 <entry pos="N" word="clothes" class="object" macros="@pl @pl-X"/>
 <entry pos="N" word="package" class="object" macros="@sg @sg-X"/>
 <entry pos="N" word="cabinet" class="object" macros="@sg @sg-X"/>
+<entry pos="N" word="cabinets" stem="cabinet" class="object" macros="@pl @pl-X"/>
 <entry pos="N" word="furniture" class="object" macros="@sg @sg-X"/>
 <entry pos="N" word="silverware" class="object" macros="@sg @sg-X"/>
 <entry pos="N" word="pack" class="object" macros="@sg @sg-X"/>
@@ -427,10 +429,13 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
   <entry pos="Adj" word="gray" class="color" />
   <entry pos="Adj" word="white" class="color" />
 
+  <entry pos="Adj" word="available" class="state"/>
+  <entry pos="Adj" word="unavailable" class="state"/>
   <entry pos="Adj" word="running" class="state"/>
   <entry pos="Adj" word="finished" class="state"/>
   <entry pos="Adj" word="empty" class="state"/>
   <entry pos="Adj" word="full" class="state"/>
+  <entry pos="Adj" word="filled" stem="full" class="state"/>
   <entry pos="Adj" word="tender" class="state"/>
   <entry pos="Adj" word="solid" class="state"/>
   <entry pos="Adj" word="broken" class="state"/>
@@ -449,7 +454,8 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
   <entry pos="Adj" word="center"/>
 
   <entry pos="Adj" word="small" class="size"/>
-  <entry pos="Adj" word="big" class="size"/>
+  <entry pos="Adj" word="large" class="size"/>
+  <entry pos="Adj" word="big" stem="large" class="size"/>
   <entry pos="Adj" word="short" class="length"/>
   <entry pos="Adj" word="long" class="length"/>
 
@@ -483,15 +489,19 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
   <entry pos="Prep" word="up" class="preposition" />
   <entry pos="Prep" word="down" class="preposition" />
   <entry pos="Prep" word="in" class="preposition" />
-  <entry pos="Prep" word="inside" stem="in" class="preposition" />
+  <entry pos="Prep" word="inside" class="preposition" />
+  <entry pos="Prep" word="outside" class="preposition" />
   <entry pos="Prep" word="out" class="preposition" />
   <entry pos="Prep" word="to" class="preposition" />
   <entry pos="Prep" word="into" class="preposition" />
   <entry pos="Prep" word="away" class="preposition" />
   <entry pos="Prep" word="back" class="preposition" />
   <entry pos="Prep" word="from" class="preposition" />
+  <entry pos="Prep" word="through" class="preposition" />
   <entry pos="Prep" word="ready" class="preposition" />
   <entry pos="Prep" word="over" class="preposition" />
+  <entry pos="Prep" word="under" stem="underneath" class="preposition" />
+  <entry pos="Prep" word="underneath" class="preposition" />
   <entry pos="Prep" word="near" class="preposition" />
   <entry pos="Prep" word="next" class="preposition" />
   <entry pos="Prep" word="against" class="preposition" />

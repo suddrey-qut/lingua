@@ -38,7 +38,7 @@ $Revision: 1.6 $, $Date: 2010/09/13 04:45:19 $
   -->
   
 
-  <family name="Preposition-Particle" pos="Prep" closed="false" indexRel="preposition">
+  <family name="Preposition-Particle" pos="Prep">
     <entry name="particle">
       <atomcat type="in">
         <fs id="2">
@@ -66,10 +66,11 @@ $Revision: 1.6 $, $Date: 2010/09/13 04:45:19 $
     <member stem="away"/>
     <member stem="back"/>
     <member stem="with"/>
+    <member stem="underneath"/>
   </family>
 
   <family name="ConjunctivePreposition" pos="Prep" closed="true" indexRel="preposition">
-    <entry name="primary">
+    <entry name="np\np/np/in">
       <complexcat>
       <atomcat type="np">
         <fs id="2">
@@ -122,7 +123,7 @@ $Revision: 1.6 $, $Date: 2010/09/13 04:45:19 $
     <member stem="along" />
   </family>
 
-  <family name="Prepositions" pos="Prep" closed="true" indexRel="preposition">
+  <family name="Prepositions" pos="Prep" indexRel="preposition">
     <entry name="s\np/np">
       <complexcat>
         <atomcat type="np">
@@ -228,7 +229,6 @@ $Revision: 1.6 $, $Date: 2010/09/13 04:45:19 $
     <member stem="on"/>
     <member stem="up"/>
     <member stem="in"/>
-    <member stem="to"/>
     <member stem="down"/>
     <member stem="with"/>
     <member stem="from"/>
@@ -678,7 +678,7 @@ $Revision: 1.6 $, $Date: 2010/09/13 04:45:19 $
     </entry>
   </family>
 
-  <family name="conjunctive-adverb" pos="ConjAdv" closed="true">
+  <family name="conjunctive-adverb" pos="ConjAdv">
     <entry name="conj">
     <atomcat type="conj">
       <fs id="2">
@@ -693,7 +693,5 @@ $Revision: 1.6 $, $Date: 2010/09/13 04:45:19 $
       </lf>
     </atomcat>
     </entry>
-    <member stem="then" />
-    <member stem=',' />
   </family>
 </ccg-lexicon>
