@@ -112,9 +112,9 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
   <entry pos="N" word="storage" class="room" macros="@sg @sg-X"/>
   <entry pos="N" word="dining" class="room" macros="@sg @sg-X"/>
   <entry pos="N" word="lounge" class="room" macros="@sg @sg-X"/>
-
-  <entry pos="N" word="room" class="location" macros="@sg @sg-X"/>
-  <entry pos="N" word="hall" stem="room" class="location"  macros="@sg @sg-X"/>
+  <entry pos="N" word="hall" class="room"  macros="@sg @sg-X"/>
+  <entry pos="N" word="room" class="room" macros="@sg @sg-X"/>
+  
 
   <entry pos="N" word="tray" class="container" macros="@sg @sg-X"/>
   <entry pos="N" word="gripper" class="tool" macros="@sg @sg-X"/>

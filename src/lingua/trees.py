@@ -273,19 +273,20 @@ class Subtree(Sequence):
         continue
       args[key] = self.arguments[self.mapping[key]]
 
-      if isinstance(self.arguments[self.mapping[key]], Groundable) and not args[key].is_grounded():
-        try:
-          args[key].ground(State())
-        
-        except AmbigiousStatement:
-          resolver = DisambiguateGroundable(groundable=args[key])
-          resolver.setup(0)
+      if self.method.ground: 
+        if isinstance(self.arguments[self.mapping[key]], Groundable) and not args[key].is_grounded():
+          try:
+            args[key].ground(State())
+          
+          except AmbigiousStatement:
+            resolver = DisambiguateGroundable(groundable=args[key])
+            resolver.setup(0)
 
-          self.add_child(resolver)
+            self.add_child(resolver)
 
-        except Exception as e:
-          self.add_child(Noop(success=False))
-          return
+          except Exception as e:
+            self.add_child(Noop(success=False))
+            return
           
     
     self.add_child(self.method.instantiate(args).to_tree())

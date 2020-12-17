@@ -11,13 +11,15 @@ class Method:
   methods = {}
   _path = None
 
-  def __init__(self, name, root, preconditions=None, postconditions=None):
+  def __init__(self, name, root, preconditions=None, postconditions=None, ground=True):
     self.name = name
 
     self.root = root if root else {}
 
     self._preconditions = preconditions if preconditions else []
     self._postconditions = postconditions if postconditions else []
+
+    self.ground = ground
 
   def instantiate(self, arguments=None):
     return InstantiatedMethod(self, arguments)
@@ -142,7 +144,7 @@ class InstantiatedMethod(Method):
     self.arguments = arguments if arguments is not None else {}
 
   def to_tree(self):
-    is_iterable = bool([key for key in self.arguments if (isinstance(self.arguments[key], Conjunction) or
+    is_iterable = self.ground and bool([key for key in self.arguments if (isinstance(self.arguments[key], Conjunction) or
       (isinstance(self.arguments[key], Groundable) and len(self.arguments[key].get_id()) > 1))
     ])
     

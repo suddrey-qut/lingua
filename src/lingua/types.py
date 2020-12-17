@@ -10,6 +10,8 @@ from rv_trees.leaves import *
 
 from .errors import *
 
+from lingua_pddl.parser import Parser
+
 try:
   from collections.abc import Iterable
 except ImportError:
@@ -87,6 +89,8 @@ class Groundable(Base):
     if self.is_grounded():
       return
     res = state.ask(self.to_query())
+    if Parser.is_iterable(res):
+      res = Parser.logical_split(res)[1:]
     self.set_id(res)
 
   def is_grounded(self):
@@ -535,6 +539,10 @@ class Object(Groundable):
     if self.limit:
       self.limit(self.get_id())
 
+  def get_id(self):
+    idx = super(Object, self).get_id()
+    return self.limit(idx)
+
   def to_btree(self):
     return GroundObjects(load_value=self)
 
@@ -606,7 +614,6 @@ class Object(Groundable):
       for line in str(self.relation).split('\n'):
         outstr += '\n  {}'.format(line)
 
-    print(self.limit)
     if self.limit:
       outstr += '\n limit:'
       
