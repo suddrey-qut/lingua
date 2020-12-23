@@ -1,0 +1,75 @@
+\documentclass{article}
+\usepackage[margin=0.5in]{geometry}
+\newcommand{\deriv}[2]
+{  \renewcommand{\arraystretch}{.5}
+$\begin{array}[t]{*{#1}{c}}
+     #2
+   \end{array}$ }
+\newcommand{\gf}[1]{\textsf{\textsl{#1}}}
+\newcommand{\cf}[1]{\mbox{\ensuremath{\cfont{#1}}}}
+\newcommand{\uline}[1]
+{\mc{#1}{\hrulefill} }
+\newcommand{\mc}[2]
+  {\multicolumn{#1}{c}{#2}}
+\newcommand{\cfont}{\mathsf}
+\newcommand{\bs}{\backslash}
+\newcommand{\subsa}[1]{\hspace{-0.75mm}_{_{#1}}}
+\newcommand{\subsb}[1]{\hspace{-0.10mm}_{_{#1}}}
+\newcommand{\subs}[1]{\hspace{-0.40mm}_{#1}}
+\newcommand{\subsf}[1]{\hspace{-0.75mm}_{_{#1}}}
+\newcommand{\supsa}[1]{\hspace{-1.75mm}^{^{#1}} }
+\newcommand{\supsb}[1]{\hspace{-0.80mm}^{^{#1}}  }
+\newcommand{\sups}[1]{\hspace{-0.40mm}^{#1}}
+\pagestyle{empty}
+\begin{document}
+\deriv{2}{
+\gf{I} & \gf{see} \\
+\uline{1} & \uline{1} \\
+\cf{s \subsf{ < 24 > } / \supsb{+} \hspace{-1.45mm} \subsa{i} (s \subsf{ < 24 > } \bs \supsa{+} \hspace{-0.50mm} \subsb{i} np \subsf{   < 1 >  nom ,  X \_ 0:animate-being ,  sg ,  1st } )} & \cf{s \subsf{  nom ,  E \_ 1:action ,  NUM ,  non-3rd } \bs np \subsf{   < 2 >  nom ,  X \_ 1:animate-being ,  NUM ,  non-3rd } / in \subsf{   < 3 >  P \_ 1 } / np \subsf{   < 4 >  acc ,  Y \_ 1:phys-obj } } \\
+ \mc{2} {\hrulefill_{>\mathbf{B}}}\\
+ \mc{2}{\cf{s \subsf{   < 24 >  nom ,  E \_ 1:action ,  sg ,  non-3rd } / in \subsf{   < 3 >  P \_ 1 } / np \subsf{   < 4 >  acc ,  Y \_ 1:phys-obj } }} \\
+}
+
+\vspace{5mm}
+
+\deriv{2}{
+\gf{I} & \gf{see} \\
+\uline{1} & \uline{1} \\
+\cf{s \subsf{ < 24 > } / \supsb{+} \hspace{-1.45mm} \subsa{i} (s \subsf{ < 24 > } \bs \supsa{+} \hspace{-0.50mm} \subsb{i} np \subsf{   < 1 >  nom ,  X \_ 0:animate-being ,  sg ,  1st } )} & \cf{s \subsf{  nom ,  E \_ 2:action ,  NUM ,  non-3rd } \bs np \subsf{   < 5 >  nom ,  X \_ 2:animate-being ,  NUM ,  non-3rd } / np \subsf{   < 6 >  Y \_ 2:phys-obj } } \\
+ \mc{2} {\hrulefill_{>\mathbf{B}}}\\
+ \mc{2}{\cf{s \subsf{   < 24 >  nom ,  E \_ 2:action ,  sg ,  non-3rd } / np \subsf{   < 6 >  Y \_ 2:phys-obj } }} \\
+}
+
+\vspace{5mm}
+
+\deriv{2}{
+\gf{I} & \gf{see} \\
+\uline{1} & \uline{1} \\
+\cf{s \subsf{ < 24 > } / \supsb{+} \hspace{-1.45mm} \subsa{i} (s \subsf{ < 24 > } \bs \supsa{+} \hspace{-0.50mm} \subsb{i} np \subsf{   < 1 >  nom ,  X \_ 0:animate-being ,  sg ,  1st } )} & \cf{s \subsf{  nom ,  E \_ 3:action ,  NUM ,  non-3rd } \bs np \subsf{   < 7 >  nom ,  X \_ 3:animate-being ,  NUM ,  non-3rd } / np \subsf{   < 8 >  acc ,  Y \_ 3:phys-obj } / in \subsf{   < 9 >  Z \_ 3 } } \\
+ \mc{2} {\hrulefill_{>\mathbf{B}}}\\
+ \mc{2}{\cf{s \subsf{   < 24 >  nom ,  E \_ 3:action ,  sg ,  non-3rd } / np \subsf{   < 8 >  acc ,  Y \_ 3:phys-obj } / in \subsf{   < 9 >  Z \_ 3 } }} \\
+}
+
+\vspace{5mm}
+
+\deriv{2}{
+\gf{I} & \gf{see} \\
+\uline{1} & \uline{1} \\
+\cf{s \subsf{ < 24 > } / \supsb{+} \hspace{-1.45mm} \subsa{i} (s \subsf{ < 24 > } \bs \supsa{+} \hspace{-0.50mm} \subsb{i} np \subsf{   < 1 >  nom ,  X \_ 0:animate-being ,  sg ,  1st } )} & \cf{s \subsf{  nom ,  E \_ 6:action ,  NUM ,  non-3rd } \bs np \subsf{   < 17 >  nom ,  X \_ 6:animate-being ,  NUM ,  non-3rd } / rb \subsf{   < 18 >  W \_ 6 } / in \subsf{   < 19 >  P \_ 6 } / np \subsf{   < 20 >  acc ,  Y \_ 6:phys-obj } } \\
+ \mc{2} {\hrulefill_{>\mathbf{B}}}\\
+ \mc{2}{\cf{s \subsf{   < 24 >  nom ,  E \_ 6:action ,  sg ,  non-3rd } / rb \subsf{   < 18 >  W \_ 6 } / in \subsf{   < 19 >  P \_ 6 } / np \subsf{   < 20 >  acc ,  Y \_ 6:phys-obj } }} \\
+}
+
+\vspace{5mm}
+
+\deriv{2}{
+\gf{I} & \gf{see} \\
+\uline{1} & \uline{1} \\
+\cf{s \subsf{ < 24 > } / \supsb{+} \hspace{-1.45mm} \subsa{i} (s \subsf{ < 24 > } \bs \supsa{+} \hspace{-0.50mm} \subsb{i} np \subsf{   < 1 >  nom ,  X \_ 0:animate-being ,  sg ,  1st } )} & \cf{s \subsf{  nom ,  E \_ 7:action ,  NUM ,  non-3rd } \bs np \subsf{   < 21 >  nom ,  X \_ 7:animate-being ,  NUM ,  non-3rd } / rb \subsf{   < 22 >  Z \_ 7 } / np \subsf{   < 23 >  Y \_ 7:phys-obj } } \\
+ \mc{2} {\hrulefill_{>\mathbf{B}}}\\
+ \mc{2}{\cf{s \subsf{   < 24 >  nom ,  E \_ 7:action ,  sg ,  non-3rd } / rb \subsf{   < 22 >  Z \_ 7 } / np \subsf{   < 23 >  Y \_ 7:phys-obj } }} \\
+}
+
+\vspace{5mm}
+
+\end{document}

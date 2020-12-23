@@ -119,6 +119,16 @@ class Lingua(OneShotSelector):
     self.focus = None
     self.topic = None
 
+  def tick(self):
+    try:
+      for child in super(Lingua, self).tick():
+        yield child
+      yield self
+      return
+    except NullStatement:
+      self.remove_child(self.current_child)
+      yield self
+
   def set_listener(self, node):
     self.listener = node
 
@@ -135,10 +145,11 @@ class Lingua(OneShotSelector):
       self.pub_speech.publish(String(data='Thank you'))
       return
 
-    if msg.data in ['stop']:
-      self.stop()
-      self.children.clear()
-      return
+    # if msg.data in ['stop']:
+    #   for child in self.children:
+    #     child.stop(new_status=Status.SUCCESS)
+    #   self.stop(new_status=Status.SUCCESS)
+    #   return
 
     result = self.parser(msg.data
       .replace(',', ' , ')
@@ -155,6 +166,12 @@ class Lingua(OneShotSelector):
         self.input_stack.append(utterance)
         self.handle_anaphora(frame)
 
+        try:
+          frame.ground(State())
+        except Exception as e:
+          print(e)
+          continue
+
         if self.get_listener():
           self.get_listener().set_input(frame)
           success = True
@@ -165,7 +182,8 @@ class Lingua(OneShotSelector):
         if subtree.setup(timeout=1):
           self.input_stack.pop()
 
-        self.add_child(subtree)
+        self.prepend_child(subtree)
+        self.current_index = 0
                 
         success = True
         break
@@ -250,6 +268,7 @@ class Subtree(Sequence):
     self.method_name = method_name
     self.mapping = mapping if mapping else {}
     self.arguments = arguments
+    self.own = []
 
   def setup(self, timeout):
     super(Subtree, self).setup(timeout)
@@ -265,6 +284,10 @@ class Subtree(Sequence):
   
   def initialise(self):
     self.remove_all_children()
+
+    # Unset arguments grounded in previous run
+    for arg in self.own:
+      arg.unset()
     
     args = {}
 
@@ -277,6 +300,7 @@ class Subtree(Sequence):
         if isinstance(self.arguments[self.mapping[key]], Groundable) and not args[key].is_grounded():
           try:
             args[key].ground(State())
+            self.own.append(args[key])
           
           except AmbigiousStatement:
             resolver = DisambiguateGroundable(groundable=args[key])
@@ -294,7 +318,7 @@ class Subtree(Sequence):
     
   def terminate(self, new_status=Status.INVALID):
     super(Subtree, self).terminate(new_status)
-    self.remove_all_children() 
+    self.remove_all_children()
 
 class LearnMethod(Sequence):
   def __init__(self, name='Learn Method', method=None):

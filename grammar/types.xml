@@ -33,7 +33,8 @@ $Revision: 1.1 $, $Date: 2005/01/22 12:53:35 $
     
     <type name="conjunction" parents="phys-obj"/>
       <type name="spatial-obj" parents="phys-obj"/>
-        <type name="room" parents="spatial-obj"/>
+        <type name="location" parents="spatial-obj"/>
+          <type name="room" parents="location"/>
       <type name="animate-being" parents="phys-obj"/>
         <type name="person" parents="animate-being"/>
       <type name="object" parents="phys-obj"/>

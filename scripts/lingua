@@ -7,8 +7,11 @@ from lingua.trees import Lingua, OneShotSelector
 
 from rv_trees.trees import BehaviourTree
 from rv_trees.leaves_ros import Leaf
+from py_trees.composites import Selector
 
 from lingua_kb.srv import Clear, Load
+
+from watchdog import *
 
 if __name__ == '__main__':
   rospy.init_node('lingua')
@@ -29,6 +32,6 @@ if __name__ == '__main__':
     Method.set_path(rospy.get_param('~method_path'))
 
   Method.load()
-  
-  bt = BehaviourTree('Lingua', Lingua())
+  #Watchdog(), 
+  bt = BehaviourTree('Lingua', Selector(children=[Lingua()]))
   bt.run(push_to_start=False, hz=30, setup_timeout=2)

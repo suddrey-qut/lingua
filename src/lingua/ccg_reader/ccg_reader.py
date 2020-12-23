@@ -246,8 +246,8 @@ class ObjectReader:
     def is_object(node):
         try:
             if node.tag == 'satop':
-                return node.get('nom').split(':')[1] in ['object', 'tool', 'dummy', 'room']
-            return node.find('nom').get('name').split(':')[1] in ['object', 'tool', 'dummy', 'room']
+                return node.get('nom').split(':')[1] in ['object', 'tool', 'dummy', 'room', 'location']
+            return node.find('nom').get('name').split(':')[1] in ['object', 'tool', 'dummy', 'room', 'location']
         except Exception as e:
             print(str(e))
         return False

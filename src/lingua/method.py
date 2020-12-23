@@ -145,7 +145,7 @@ class InstantiatedMethod(Method):
 
   def to_tree(self):
     is_iterable = self.ground and bool([key for key in self.arguments if (isinstance(self.arguments[key], Conjunction) or
-      (isinstance(self.arguments[key], Groundable) and len(self.arguments[key].get_id()) > 1))
+      (isinstance(self.arguments[key], Groundable) and self.arguments[key].count() > 1))
     ])
     
     if not is_iterable:
@@ -235,12 +235,16 @@ class InstantiatedMethod(Method):
       root.setup(0)
       return root
 
-    root = self.generate_branch(self.root, arguments)
+    root = Base.from_json(self.root, arguments)
+
+    if isinstance(root, Base):
+      root = root.to_btree()
+    #root = self.generate_branch(self.root, arguments)
 
     if self._preconditions:
       root = Sequence('Method', children=[
         Preconditions(children=[
-          self.generate_branch(precondition, arguments) for precondition in self._preconditions  
+          Base.from_json(precondition, arguments) for precondition in self._preconditions  
         ]),
         root
       ])
@@ -248,7 +252,7 @@ class InstantiatedMethod(Method):
     if self._postconditions:
       root = Selector(self.get_name(), children=[
         Sequence('Postconditions', children=[
-          self.generate_branch(postcondition, arguments) for postcondition in self._postconditions
+          Base.from_json(postcondition, arguments) for postcondition in self._postconditions
         ]),
         root
       ])
@@ -257,7 +261,9 @@ class InstantiatedMethod(Method):
     return root
 
   def generate_branch(self, branch, arguments):
-    print(branch)
+    if not isinstance(branch, dict):
+      return branch
+      
     if branch['type'] == 'sequence':
       children = list([self.generate_branch(child, arguments) for child in branch['children']])
       return Sequence(branch['name'] if 'name' in branch else None if 'name' in branch else 'sequence', children=children)
@@ -277,6 +283,7 @@ class InstantiatedMethod(Method):
 
       module = importlib.import_module(data['package'])
       class_type = module.__getattribute__(data['class_name'])
+              
       return class_type(**data['args'] if 'args' in data else {})
 
     if branch['type'] == 'decorator':
@@ -299,14 +306,15 @@ class InstantiatedMethod(Method):
       return class_type(self.generate_branch(data['child'], arguments), name=node_name, **data['args'] if 'args' in data else {})
 
     if branch['type'] == 'behaviour':
+      local_arguments = copy.deepcopy(arguments)
 
       if 'args' in branch and 'mapping' in branch['args']:
         for idx in branch['args']['mapping']:
           if isinstance(branch['args']['mapping'][idx], dict):
-            arguments[idx] = Base.from_json(branch['args']['mapping'][idx], arguments)
+            local_arguments[idx] = Base.from_json(branch['args']['mapping'][idx], local_arguments)
             branch['args']['mapping'][idx] = idx
       
-      return Subtree(name=branch['name'] if 'name' in branch else branch['method_name'], method_name=branch['method_name'], arguments=arguments, **branch['args'] if 'args' in branch else {})
+      return Subtree(name=branch['name'] if 'name' in branch else branch['method_name'], method_name=branch['method_name'], arguments=local_arguments, **branch['args'] if 'args' in branch else {})
     
   def toJSON(self):
     return {

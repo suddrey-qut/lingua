@@ -3,6 +3,7 @@ import copy
 import json
 import random
 import importlib
+import math
 
 from py_trees.composites import *
 from py_trees.decorators import *
@@ -60,6 +61,8 @@ class Base(object):
       for idx in data['args']:
         if isinstance(data['args'][idx], dict):
           args[idx] = Base.from_json(data['args'][idx], arguments)
+        elif isinstance(data['args'][idx], list):
+          args[idx] = [Base.from_json(arg, arguments) for arg in data['args'][idx]]
         else:
           args[idx] = data['args'][idx]
           try:
@@ -72,6 +75,14 @@ class Base(object):
 
     return class_type(**args)
 
+class LinguaSequence(Base):
+  def __init__(self, children=[]):
+    super(LinguaSequence, self).__init__()
+    self.children = children
+
+  def to_btree(self, name=None, training=False):
+    return Sequence(children=[child.to_btree() if isinstance(child, Base) else child for child in self.children])
+
 class Groundable(Base):
   def __init__(self):
     self.id = None
@@ -79,6 +90,12 @@ class Groundable(Base):
   def set_id(self, idx):
     self.id = [ idx ] if isinstance(idx, str) else idx
 
+  def unset(self):
+    self.id = None
+
+  def count(self):
+    return len(self.id)
+    
   def get_id(self):
     return self.id
 
@@ -88,7 +105,11 @@ class Groundable(Base):
   def ground(self, state):
     if self.is_grounded():
       return
-    res = state.ask(self.to_query())
+    try:
+      res = state.ask(self.to_query())
+    except Exception as e:
+      self.set_id([])
+      return
     if Parser.is_iterable(res):
       res = Parser.logical_split(res)[1:]
     self.set_id(res)
@@ -96,7 +117,7 @@ class Groundable(Base):
   def is_grounded(self):
     return self.id is not None
     
-class Task(Base):
+class Task(Groundable):
   def __init__(self, name, arguments):
     self.method_arguments = arguments
 
@@ -145,6 +166,12 @@ class Task(Base):
     for key in self.method_arguments:
       self.method_arguments[key].ground(state)
 
+  def is_grounded(self):
+    for key in self.method_arguments:
+      if not self.method_arguments[key].is_grounded():
+        return False
+    return True
+
   def is_valid(self):
     for key in self.method_arguments:
       if not self.method_arguments[key]:
@@ -166,11 +193,17 @@ class Task(Base):
 
   def to_json(self, args):
     return {
-      'type': 'behaviour',
+      'type': 'class',
+      'class_name': 'Task',
+      'package': 'lingua.types',
       'method_name': self.task_name,
       'args': { 
-        'mapping': { 
-          key: self.method_arguments[key].to_json(args) for key in self.method_arguments 
+        'name': self.task_name,
+        'arguments': {
+          'class_name': 'dict',
+          'args': {
+            key: self.method_arguments[key].to_json(args) for key in self.method_arguments 
+          }
         }
       }
     }
@@ -266,12 +299,12 @@ class Conjunction(Groundable):
   def to_json(self, args):
     return {
       'type': 'class',
-      'class_name': 'Conjunction',
+      'class_name': self.__class__.__name__,
       'package': 'lingua.types',
       'args': {
         'tag': self.tag,
         'left': self.left.to_json(args),
-        'right': self.right.to_json(args),
+        'right': self.right.to_json(args)
       }
     }
 
@@ -300,6 +333,9 @@ class ForLoop(Base):
   def ground(self, state):
     self.body.ground(state)
 
+  def is_grounded(self):
+    return self.body.is_grounded()
+
   def is_valid(self):
     return self.duration and self.body
 
@@ -319,11 +355,13 @@ class ForLoop(Base):
 
   def to_json(self, args):
     return {
-      'type': 'decorator',
-      'package': 'lingua.decorators',
-      'class_name': 'RepeatForDuration',
-      'duration': self.duration.to_json(args),
-      'child': self.body.to_json(args)
+      'type': 'class',
+      'package': 'lingua.types',
+      'class_name': 'ForLoop',
+      'args': {
+        'duration': self.duration.to_json(args),
+        'body': self.body.to_json(args)
+      }
     }
 
 class InfiniteLoop(Base):
@@ -361,13 +399,16 @@ class InfiniteLoop(Base):
 
   def to_json(self, args):
     return {
-      'type': 'decorator',
-      'package': 'py_trees.decorators',
-      'class_name': 'SuccessIsRunning',
-      'child': self.body.to_json(args)
+      'type': 'class',
+      'package': 'lingua.types',
+      'class_name': 'InfiniteLoop',
+      'args': {
+        'class_name': 'SuccessIsRunning',
+        'body': self.body.to_json(args)
+      }
     }
 
-class Conditional(Base):
+class Conditional(Groundable):
   def __init__(self, condition, body, inverted=False):
     super(Conditional, self).__init__()
 
@@ -401,7 +442,10 @@ class Conditional(Base):
     ])
 
   def ground(self, state):
-    self.condition.ground(state)
+    try:
+      self.condition.ground(state)
+    except Exception as e:
+      pass
     self.body.ground(state)
 
   def is_valid(self):
@@ -423,6 +467,7 @@ class Conditional(Base):
   
   def to_json(self, args):
     return {
+      'type': 'class',
       'package': 'lingua.types',
       'class_name': self.__class__.__name__,
       'args': {
@@ -502,6 +547,17 @@ class Assertion(Groundable):
     print('(intersec {} {})'.format(self.child.to_query(), self.attribute.to_query()))
     return self.child.to_query()
 
+  def to_json(self, args):
+    return { 
+      'type': 'class', 
+      'package': 'lingua.types', 
+      'class_name': self.__class__.__name__,
+      'args': {
+        'child': self.child.to_json(args),
+        'attribute': self.attribute.to_json(args)
+      }
+    }
+
   def __str__(self):
     outstr = 'assert:'
 
@@ -537,11 +593,17 @@ class Object(Groundable):
     super(Object, self).set_id(idx)
     
     if self.limit:
-      self.limit(self.get_id())
+      super(Object, self).set_id(self.limit(self.get_id()))
+
+  def count(self):
+    return min(self.limit.count, super(Object, self).count())
 
   def get_id(self):
     idx = super(Object, self).get_id()
-    return self.limit(idx)
+    if self.limit:
+      return self.limit(idx)
+    else:
+      return idx
 
   def to_btree(self):
     return GroundObjects(load_value=self)
@@ -624,6 +686,8 @@ class Object(Groundable):
 
 class Anaphora(Object):
   def __init__(self, type_name, name, attributes=None, relation=None, limit=None):
+    if relation is not None:
+      raise Exception('Cannot attach relation to anaphora')
     super(Anaphora, self).__init__(type_name, name, attributes, relation, limit)
 
   def __str__(self):
@@ -685,12 +749,16 @@ class Attribute(Groundable):
   def to_query(self):
     return '({} {} ?)'.format(self.type_name, self.value)
 
-  # def to_json(self, args):
-  #   return {
-  #     'type': 'attribute',
-  #     'attr_type': self.type_name,
-  #     'value': self.value
-  #   }
+  def to_json(self, args):
+    return { 
+      'type': 'class', 
+      'package': 'lingua.types', 
+      'class_name': 'Attribute', 
+      'args': {
+        'type_name': self.type_name,
+        'value': self.value
+      }
+    }
   
   def __str__(self):
     return '[{}={}]'.format(self.type_name, self.value)
@@ -732,7 +800,14 @@ class Duration(Base):
     return '{} {}(s)'.format(self.time, self.units)
 
   def to_json(self, args):
-    return self.to_seconds()
+    return {
+      'package': 'lingua.types',
+      'class_name': self.__class__.__name__,
+      'args': {
+        'units': self.units,
+        'time': self.time
+      }
+    }
 
 class Limit(Base):
   def __init__(self, count):
@@ -775,7 +850,7 @@ class Only(Limit):
     return True
 
   def __call__(self, value):
-    if len(value) > self.count:
+    if value and len(value) > self.count:
       raise AmbigiousStatement('Ambigious Statement')
 
     return value
@@ -783,18 +858,30 @@ class Only(Limit):
   def __str__(self):
     return 'Only: {}'.format(self.count)
 
-class Affirmative(Base):
+class Affirmative(Groundable):
   def to_btree(self, name=None, training=False):
     return Leaf(name='noop', eval_fn=lambda l, v: True)
 
   def is_valid(self):
     return True
 
-class Negative(Base):
+  def ground(self, state):
+    pass
+
+  def is_grounded(self):
+    return True
+
+class Negative(Groundable):
   def to_btree(self, name=None, training=False):
     return Leaf(name='noop', eval_fn=lambda l, v: True)
 
   def is_valid(self):
+    return True
+
+  def ground(self, state):
+    pass
+
+  def is_grounded(self):
     return True
 
 from .decorators import RepeatForDuration

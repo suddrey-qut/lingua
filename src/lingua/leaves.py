@@ -4,7 +4,7 @@ from collections import Iterable
 from py_trees.common import Status
 from rv_trees.leaves import Leaf
 from rv_trees.leaves_ros import ActionLeaf, PublisherLeaf, ServiceLeaf
-
+from lingua_pddl.state import State
 from std_msgs.msg import String
 
 class Fail(Leaf):
@@ -60,6 +60,7 @@ class GetObjectPose(ServiceLeaf):
       name=name if name else 'Get Object Pose',
       service_name='/lingua/world/get_pose',
       load_fn=self.load_fn,
+      result_fn=self.result_fn,
       *args,
       **kwargs
     )
@@ -74,6 +75,10 @@ class GetObjectPose(ServiceLeaf):
       return value[0] if value else None
       
     return value
+
+  def result_fn(self):
+    result = self._default_result_fn()
+    return result.pose_stamped if result else None
 
 class Say(PublisherLeaf):
   def __init__(self, name='Say', topic_name='/speech/out', topic_class=String, *args, **kwargs):
@@ -114,13 +119,38 @@ class PollInput(Leaf):
       parent = parent.parent
     return parent
 
-class GroundObjects(ServiceLeaf):
+class Stop(Leaf):
+  def __init__(self, name='Stop', *args, **kwargs):
+    super(Stop, self).__init__(
+      name=name,
+      save=True,
+      result_fn=self.result_fn,
+      *args,
+      **kwargs
+    )
+
+  def result_fn(self):
+    parent = self.get_root()
+    for child in parent.children:
+      child.stop(Status.SUCCESS)
+    parent.remove_all_children()
+    parent.current_index = 0
+    parent.add_child(self)
+    return True
+    
+  def get_root(self):
+    parent = self.parent
+    while not isinstance(parent, Lingua):
+      parent = parent.parent
+    return parent
+
+class GroundObjects(Leaf):
   def __init__(self, name=None, *args, **kwargs):
     super(GroundObjects, self).__init__(
       name=name if name else 'Ground Objects',
-      service_name='/kb/ask',
       load_fn=self.load_fn,
       result_fn=self.result_fn,
+      save=True,
       *args,
       **kwargs
     )
@@ -136,20 +166,10 @@ class GroundObjects(ServiceLeaf):
   def result_fn(self):
     obj = self.loaded_data
     
-    if obj.is_grounded():
-      return obj.get_id()
-
-    result = self._default_result_fn(obj.to_query())
-
-    if not result or len(result.data) == 0:
-      return
-
-    try:
-      obj.set_id(result.data)
-    except:
-      return False
-    
-    return result.data
+    if not obj.is_grounded():
+      obj.ground(State())
+      
+    return obj.get_id()
 
 class Assert(GroundObjects):
   def __init__(self, name=None, *args, **kwargs):
@@ -163,10 +183,10 @@ class Assert(GroundObjects):
     item, attribute = self.loaded_data
 
     if not item.is_grounded():
-      item.ground(self._service_proxy)
+      item.ground(State())
 
     if not attribute.is_grounded():
-      attribute.ground(self._service_proxy)
+      attribute.ground(State())
 
     intersection = set(item.get_id()).intersection(attribute.get_id())
     
