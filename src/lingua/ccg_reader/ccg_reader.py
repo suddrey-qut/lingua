@@ -59,6 +59,7 @@ class XMLReader:
             raise Exception("Unknown node type: {}".format(node.get('nom') if node.tag == 'satop' else node.find('nom').get('name')))
 
         except Exception as e:
+            print(str(e))
             pass
         
         return None
@@ -246,8 +247,8 @@ class ObjectReader:
     def is_object(node):
         try:
             if node.tag == 'satop':
-                return node.get('nom').split(':')[1] in ['object', 'tool', 'dummy', 'room', 'location']
-            return node.find('nom').get('name').split(':')[1] in ['object', 'tool', 'dummy', 'room', 'location']
+                return node.get('nom').split(':')[1] in ['object', 'tool', 'dummy', 'room', 'location', 'animate-being']
+            return node.find('nom').get('name').split(':')[1] in ['object', 'tool', 'dummy', 'room', 'location', 'animate-being']
         except Exception as e:
             print(str(e))
         return False

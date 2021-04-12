@@ -444,6 +444,8 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
   <entry pos="Adj" word="boiling" class="state" />
   <entry pos="Adj" word="boiled" class="state" />
   <entry pos="Adj" word="hot" class="state" />
+  <entry pos="Adj" word="clean" class="state" />
+  <entry pos="Adj" word="dirty" class="state" />
   <entry pos="Adj" word="connected" class="state"/>
   <entry pos="Adj" word="disconnected" class="state"/>
   <entry pos="Adj" word="used" class="state"/>
@@ -489,6 +491,7 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
   <entry pos="Prep" word="of" class="preposition" />
   <entry pos="Prep" word="at" class="preposition" />
   <entry pos="Prep" word="on" class="preposition" />
+  <entry pos="Prep" word="top" class="preposition" />
   <entry pos="Prep" word="with" class="preposition" />
   <entry pos="Prep" word="off" class="preposition" />
   <entry pos="Prep" word="up" class="preposition" />
@@ -517,6 +520,7 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
   <entry pos="Prep" word="besides" stem="beside" class="preposition" />
   <entry pos="Prep" word="around" class="preposition" />
 
+  <entry pos="Prep" word="between" class="preposition" />
   <entry pos="Prep" word="along" class="preposition" />
 
   <!-- ========================== Verbs ============================ -->

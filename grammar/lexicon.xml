@@ -286,6 +286,20 @@ $Revision: 1.6 $, $Date: 2010/09/13 04:45:19 $
   &decorators;
 
   <family name="Conjunction" pos="Conj">
+    <entry name="conj">
+      <atomcat type="conj">
+        <fs id="2">
+          <feat attr="index">
+            <lf><nomvar name="X" /></lf>
+          </feat>
+        </fs>
+        <lf>
+          <satop nomvar="X:conj">
+            <prop name="[*DEFAULT*]" />
+          </satop>
+        </lf>
+      </atomcat>
+    </entry>
     <entry name="NP\NP/NP">
       <complexcat>
         <atomcat type="np">
