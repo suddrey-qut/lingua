@@ -23,7 +23,7 @@
     <node pkg="rqt_py_trees" type="rqt_py_trees" name="rqt_py_trees" />
   </group>
 
-  <node pkg="lingua" type="resolver" name="resolver" output="screen" />
+  <node pkg="lingua" type="resolver" name="resolver" output="screen" required="true" />
   <node pkg="lingua" type="speech" name="speech" />
 
   <node pkg="lingua" type="lingua" name="lingua" output="screen">

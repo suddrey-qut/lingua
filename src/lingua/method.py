@@ -153,8 +153,9 @@ class InstantiatedMethod(Method):
       return subtree
       
     children = []
-    
+    print(self.arguments)
     for args in self.zip_arguments(self.arguments):
+      print(args)
       branch = self.generate_tree(args, setup=True)
       children.append(branch)
     
@@ -209,7 +210,19 @@ class InstantiatedMethod(Method):
   def product_dict(self, **kwargs):
     keys = kwargs.keys()
     vals = kwargs.values()
+
+    temp = []
+    for val_id, val in enumerate(vals):
+      if isinstance(val, Groundable) and val.count() > 1:
+        for idx in val.get_id():
+          obj = Object(val.type_name, val.name, val.attributes, val.relation, val.limit)
+          obj.set_id(idx)
+          temp.append(obj)
+      vals[val_id] = temp
+    print(keys)
+    print(vals)
     for instance in itertools.product(*vals):
+      print('Instance: {}'.format(instance))
       yield dict(zip(keys, instance))
 
   def zip_arguments(self, arguments):
@@ -325,4 +338,4 @@ class InstantiatedMethod(Method):
     }
     
 from .trees import Subtree, Preconditions, LearnMethod
-from .types import Base, Conjunction, Groundable, Attribute
+from .types import Base, Conjunction, Groundable, Attribute, Object

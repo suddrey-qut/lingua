@@ -346,8 +346,12 @@ class LearnMethod(Sequence):
     def learn(leaf):
       if len(self.expanded) > 1:
           root = {
-              'type': 'sequence',
-              'children': [ node.to_json(self.parent.arguments) for node in self.expanded ]
+              "class_name": "LinguaSequence", 
+              "package": "lingua.types", 
+              "type": "class",
+              "args": {
+                'children': [ node.to_json(self.parent.arguments) for node in self.expanded ]
+              }
           }
       else:
           root = self.expanded[0].to_json(self.parent.arguments)

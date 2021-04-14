@@ -1,3 +1,4 @@
+import sys
 import re
 import copy
 import json
@@ -80,6 +81,16 @@ class LinguaSequence(Base):
     super(LinguaSequence, self).__init__()
     self.children = children
 
+    def to_json(self, args):
+      return {
+        'type': 'class',
+        'class_name': 'LinguaSequence',
+        'package': 'lingua.types',
+        'args': { 
+          'children': [ node.to_json(args) for node in self.children ]
+        }
+      }
+
   def to_btree(self, name=None, training=False):
     return Sequence(children=[child.to_btree() if isinstance(child, Base) else child for child in self.children])
 
@@ -106,7 +117,8 @@ class Groundable(Base):
     if self.is_grounded():
       return
     try:
-      res = state.ask(self.to_query())
+      query = self.to_query()
+      res = state.ask(query)
     except Exception as e:
       self.set_id([])
       return
@@ -115,7 +127,7 @@ class Groundable(Base):
     self.set_id(res)
 
   def is_grounded(self):
-    return self.id is not None
+    return self.id is not None and len(self.id)
     
 class Task(Groundable):
   def __init__(self, name, arguments):
@@ -478,7 +490,7 @@ class Conditional(Groundable):
 
 class Event(Conditional):
   def to_btree(self, name=None, training=False):
-    return SuccessIsRunning(Sequence(name if name else 'when', children=[
+    return SuccessIsFailure(Sequence(name if name else 'when', children=[
       self.condition.to_btree(), self.body.to_btree()
     ]))
 
@@ -554,7 +566,7 @@ class Assertion(Groundable):
       'class_name': self.__class__.__name__,
       'args': {
         'child': self.child.to_json(args),
-        'attribute': self.attribute.to_json(args)
+        'attribute': self.attribute.to_json({})
       }
     }
 
@@ -596,7 +608,7 @@ class Object(Groundable):
       super(Object, self).set_id(self.limit(self.get_id()))
 
   def count(self):
-    return min(self.limit.count, super(Object, self).count())
+    return min(self.limit.count if self.limit else sys.maxint, super(Object, self).count())
 
   def get_id(self):
     idx = super(Object, self).get_id()
@@ -629,7 +641,7 @@ class Object(Groundable):
   def to_json(self, args):
     for key in args:
       if args[key].get_id() == self.get_id():
-        return key
+        return '${{{}}}'.format(key)
     
     result = { 
       'type': 'class', 
@@ -718,6 +730,34 @@ class DummyObject(Object):
 
     return '(intersect {})'.format(' '.join(atoms))
 
+  def to_json(self, args):
+    for key in args:
+      if args[key].get_id() == self.get_id():
+        return '${{{}}}'.format(key)
+    
+    result = { 
+      'type': 'class', 
+      'package': 'lingua.types', 
+      'class_name': 'DummyObject', 
+      'args': {
+        'type_name': self.type_name,
+        'name': self.name
+      }
+    }
+
+    if self.attributes:
+      result['args']['attributes'] = []
+      for attr in self.attributes:
+        result['args']['attributes'].append(attr.to_json(args))
+    
+    if self.relation:
+      result['args']['relation'] = self.relation.to_json(args)
+
+    if self.limit:
+      result['args']['limit'] = self.limit.to_json(args)
+
+    return result
+
 class Modifier(Base):
   def __init__(self, type_name, value):
     super(Modifier, self).__init__()
@@ -727,11 +767,14 @@ class Modifier(Base):
 
   def to_json(self, args):
     return {
-    'type': 'modifier',
-    'type_name': self.type_name,
-    'value': self.value
+      'type': 'class', 
+      'package': 'lingua.types',
+      'args': {
+        'type_name': self.type_name,
+        'value': self.value
+      }
     }
-
+    
   def __str__(self):
     return 'not:[{}={}]'.format(self.type_name, self.value)
 
@@ -837,7 +880,7 @@ class Any(Limit):
     return True
 
   def __call__(self, value):
-    return random.sample(value, self.count)
+    return random.sample(value, min(len(value), self.count))
 
   def __str__(self):
     return 'Any: {}'.format(self.count)

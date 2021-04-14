@@ -2,5 +2,9 @@
   {
     "pattern": "\\(open (.*)\\)",
     "callback": "lingua.callbacks/gripper_open"
+  },
+  {
+    "pattern": "\\(on (.*) (.*)\\)",
+    "callback": "lingua.callbacks/on"
   }
 ]
