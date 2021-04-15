@@ -1,4 +1,4 @@
-<family name="is-verb" pos="VS">
+<family name="is-state" pos="VS">
   <entry name="s\np/jj">
     <complexcat>
       <atomcat type="s">
@@ -157,6 +157,57 @@
             <diamond mode="relation">
               <nomvar name="Y:sem-obj" />
             </diamond>
+          </diamond>
+        </satop>
+      </lf>
+    </complexcat>
+  </entry>
+</family>
+
+<family name="is-object" pos="VS">
+  <entry name="s/np\(np/n)">
+    <complexcat>
+      <atomcat type="s">
+        <fs inheritsFrom="3">
+          <feat attr="index">
+            <lf>
+              <nomvar name="E" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="\" mode="&lt;" />
+      <atomcat type="np">
+        <fs id="2">
+          <feat attr="case" val="nom"/>
+          <feat attr="num">
+            <featvar name="NUM" />
+          </feat>
+          <feat attr="index">
+            <lf>
+              <nomvar name="X" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="/" mode="&gt;" />
+      <atomcat type="np">
+        <fs id="3">
+          <feat attr="index">
+            <lf>
+              <nomvar name="M" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <lf>
+        <satop nomvar="E:assert">
+          <prop name="[*DEFAULT*]"/>
+          <diamond mode="arg0">
+            <nomvar name="X:sem-obj" />
+          </diamond>
+          <diamond mode="arg1">
+            <nomvar name="M:sem-obj" />
           </diamond>
         </satop>
       </lf>

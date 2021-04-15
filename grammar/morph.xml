@@ -82,6 +82,8 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
 
   <entry pos="Pro" word="it" stem="it" class="object" macros="@3rd @sg @sg-X"/>
 
+  <entry pos="Pro" word="this" stem="this" class="object" macros="@3rd @sg @sg-X"/>
+
   <!-- ========================== Nouns ============================ -->
   <entry pos="N" word="object" stem="object" class="object" macros="@sg @sg-X"/>
   <entry pos="N" word="objects" stem="object" class="object" macros="@pl @pl-X"/>
@@ -120,6 +122,7 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
 
   <entry pos="N" word="tray" class="container" macros="@sg @sg-X"/>
   <entry pos="N" word="gripper" class="tool" macros="@sg @sg-X"/>
+  <entry pos="N" word="fingers" stem="gripper" class="tool" macros="@sg @sg-X"/>
   <entry pos="N" word="hand" stem="gripper" class="tool" macros="@sg @sg-X"/>
 
   <entry pos="N" word="block" class="object" macros="@sg @sg-X"/>
