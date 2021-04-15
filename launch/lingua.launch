@@ -4,7 +4,7 @@
   <arg name="method_path" default="$(find lingua)/data/methods" />
 
   <arg name="grammar" value="$(find lingua)/grammar/grammar.xml" />
-  <arg name="handlers" value="$(find lingua)/data/world/handlers.json" />
+  <arg name="handlers" default="" />
 
   <arg name="objects_file" default="" />
   <arg name="types_file" default="" />

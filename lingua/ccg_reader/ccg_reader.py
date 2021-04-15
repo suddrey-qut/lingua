@@ -153,6 +153,12 @@ class ObjectReader:
 
     @staticmethod
     def get_object(node):
+        if ObjectReader.is_agent(node):
+            return Agent(
+              ObjectReader.get_attributes(node),
+              ObjectReader.get_relation(node)
+            )
+
         if ObjectReader.is_anaphora(node):
             return Anaphora(
                 ObjectReader.get_type_name(node),
@@ -191,9 +197,16 @@ class ObjectReader:
             if child.get('mode') == 'mod':
                 attributes.append(ModifierReader.read(child))
             if child.get('mode') == 'attr':
-                attributes.append(AttributeReader.read(child))
+                try:
+                  attributes.append(AttributeReader.read(child))
+                except:
+                  pass
 
         return attributes
+
+    @staticmethod
+    def is_agent(node):
+        return node.find('prop') is not None and node.find('prop').get('name') in ['agent']
 
     @staticmethod
     def is_anaphora(node):
@@ -211,6 +224,12 @@ class ObjectReader:
         for child in node.findall('diamond'):
             if child.get('mode') == 'relation':
                 return RelationReader.read(child)
+            
+            if child.get('mode') == 'attr':
+              for subchild in child.findall('diamond'):
+                if subchild.get('mode') == 'relation':
+                  return RelationReader.read(subchild)
+
         return None
 
     @staticmethod

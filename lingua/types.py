@@ -94,6 +94,24 @@ class LinguaSequence(Base):
   def to_btree(self, name=None, training=False):
     return Sequence(children=[child.to_btree() if isinstance(child, Base) else child for child in self.children])
 
+class LinguaInverter(Base):
+  def __init__(self, child):
+    super(LinguaInverter, self).__init__()
+    self.child = child
+
+    def to_json(self, args):
+      return {
+        'type': 'class',
+        'class_name': 'LinguaInverter',
+        'package': 'lingua.types',
+        'args': { 
+          'child': [ node.to_json(args) for node in self.children ]
+        }
+      }
+
+  def to_btree(self, name=None, training=False):
+    return Inverter(child=self.child.to_btree())
+
 class Groundable(Base):
   def __init__(self):
     self.id = None
@@ -628,7 +646,7 @@ class Object(Groundable):
 
   def to_query(self):
     if self.is_grounded():
-      return super(Object, self).to_query()
+      return super().to_query()
 
     atoms = ['(class_label {} ?)'.format(self.name)]
 
@@ -652,7 +670,7 @@ class Object(Groundable):
     result = { 
       'type': 'class', 
       'package': 'lingua.types', 
-      'class_name': 'Object', 
+      'class_name': str(self.__class__.__name__), 
       'args': {
         'type_name': self.type_name,
         'name': self.name
@@ -720,7 +738,7 @@ class DummyObject(Object):
 
   def to_query(self):
     if self.is_grounded():
-      return super(DummyObject, self).to_query()
+      return super().to_query()
 
     atoms = []
 
@@ -736,33 +754,22 @@ class DummyObject(Object):
 
     return '(intersect {})'.format(' '.join(atoms))
 
-  def to_json(self, args):
-    for key in args:
-      if args[key].get_id() == self.get_id():
-        return '${{{}}}'.format(key)
-    
-    result = { 
-      'type': 'class', 
-      'package': 'lingua.types', 
-      'class_name': 'DummyObject', 
-      'args': {
-        'type_name': self.type_name,
-        'name': self.name
-      }
-    }
+class Agent(Object):
+  def __init__(self, attributes=None, relation=None):
+    super(Agent, self).__init__('animate-being', 'agent', attributes, relation)
+    self.set_id('agent')
 
-    if self.attributes:
-      result['args']['attributes'] = []
-      for attr in self.attributes:
-        result['args']['attributes'].append(attr.to_json(args))
-    
-    if self.relation:
-      result['args']['relation'] = self.relation.to_json(args)
+  def set_id(self, idx):
+    pass
 
-    if self.limit:
-      result['args']['limit'] = self.limit.to_json(args)
+  def get_id(self):
+    return ['agent']
 
-    return result
+  def ground(self, state):
+    pass
+
+  def is_grounded(self):
+    return True
 
 class Modifier(Base):
   def __init__(self, type_name, value):
@@ -792,7 +799,7 @@ class Attribute(Groundable):
     self.value = value
 
   def ground(self, state):
-    res = state(json.dumps(Object(attributes=[self])))
+    res = state(json.dumps(Object('object', 'object', attributes=[self])))
     self.set_id(res.ids)
 
   def to_query(self):

@@ -67,11 +67,12 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
   <entry pos="Adverb" word="not"/>
 
   <!-- ======================== Pronouns =========================== -->
+  <entry pos="Pro" word="you" stem="agent" class="animate-being" macros="@2nd @sg @nom @sg-X"/>
+
   <entry pos="Pro" word="I" stem="pro1" class="animate-being" macros="@1st @sg @nom @sg-X"/>
   <entry pos="Pro" word="me" stem="pro1" class="animate-being" macros="@1st @sg @acc @sg-X"/>
   <entry pos="Pro" word="we" stem="pro1" class="animate-being" macros="@1st @pl @nom @pl-X"/>
   <entry pos="Pro" word="us" stem="pro1" class="animate-being" macros="@1st @pl @acc @pl-X"/>
-  <entry pos="Pro" word="you" stem="pro2" class="animate-being" macros="@2nd @sg @nom @sg-X"/>
   <entry pos="Pro" word="she" stem="pro3f" class="animate-being" macros="@3rd @sg @nom @sg-X"/>
   <entry pos="Pro" word="her" stem="pro3f" class="animate-being" macros="@3rd @sg @acc @sg-X"/>
   <entry pos="Pro" word="he" stem="pro3m" class="animate-being" macros="@3rd @sg @nom @sg-X"/>
@@ -529,7 +530,7 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
   <!-- ========================== Verbs ============================ -->
   <entry pos="VS" word="is" macros="@pres @3rd @sg"/>
   <entry pos="VS" word="'s" macros="@pres @3rd @sg"/>
-  <entry pos="VS" word="are" stem="is" macros="@pres @3rd @pl"/>
+  <entry pos="VS" word="are" stem="is" macros="@non-1st @pres" />
   <entry pos="VS" word="was" macros="@past @3rd @sg"/>
   <entry pos="VS" word="were" stem="was" macros="@past @3rd @pl"/>
   
@@ -562,6 +563,10 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
   <macro name="@non-3rd">
      <fs id="2" attr="pers" val="non-3rd"/>
   </macro>
+    <macro name="@non-1st">
+     <fs id="2" attr="pers" val="non-1st"/>
+  </macro>
+
 
   <macro name="@nom">
     <fs id="2" attr="case" val="nom"/>

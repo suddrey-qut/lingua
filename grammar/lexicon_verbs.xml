@@ -114,7 +114,7 @@
       </lf>
     </complexcat>
   </entry>
-  <entry name="s\np/(np\np)">
+  <entry name="s\np/pp">
     <complexcat>
       <atomcat type="s">
         <fs inheritsFrom="2">
@@ -156,6 +156,69 @@
             <nomvar name="X:sem-obj" />
             <diamond mode="relation">
               <nomvar name="Y:sem-obj" />
+            </diamond>
+          </diamond>
+        </satop>
+      </lf>
+    </complexcat>
+  </entry>
+  <entry name="s\np/(np\np)">
+    <complexcat>
+      <atomcat type="s">
+        <fs inheritsFrom="2">
+          <feat attr="index">
+            <lf>
+              <nomvar name="E" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="\" mode="&lt;" />
+      <atomcat type="np">
+        <fs id="2">
+          <feat attr="case" val="nom"/>
+          <feat attr="num">
+            <featvar name="NUM" />
+          </feat>
+          <feat attr="index">
+            <lf>
+              <nomvar name="X" />
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+      <slash dir="/" mode="&gt;" />
+      <complexcat>
+        <atomcat type="np">
+          <fs id="3">
+            <feat attr="index">
+              <lf>
+                <nomvar name="M" />
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="&lt;" />
+        <atomcat type="np">
+          <fs id="4">
+            <feat attr="index">
+              <lf>
+                <nomvar name="Y" />
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+      </complexcat>
+      <lf>
+        <satop nomvar="E:assert">
+          <prop name="[*DEFAULT*]"/>
+          <diamond mode="arg0">
+            <nomvar name="X:sem-obj" />
+          </diamond>
+          <diamond mode="arg1">
+            <nomvar name="T:dummy" />
+            <diamond mode="attr">
+              <nomvar name="M:state" />
             </diamond>
           </diamond>
         </satop>
