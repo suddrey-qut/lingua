@@ -595,6 +595,12 @@ class Object(Groundable):
     self.relation = relation
     self.limit = limit
     
+  def get_name(self):
+    return self.name
+
+  def setname(self, value):
+    self.name = value
+
   def get_type_name(self):
     return self.type_name
 

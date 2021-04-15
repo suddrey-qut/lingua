@@ -201,7 +201,7 @@
         </fs>
       </atomcat>
       <lf>
-        <satop nomvar="E:assert">
+        <satop nomvar="E:action">
           <prop name="[*DEFAULT*]"/>
           <diamond mode="arg0">
             <nomvar name="X:sem-obj" />

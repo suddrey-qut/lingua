@@ -1,4 +1,5 @@
 import json
+import rospy
 
 from collections import Iterable
 from py_trees.common import Status
@@ -6,6 +7,8 @@ from rv_trees.leaves import Leaf
 from rv_trees.leaves_ros import ActionLeaf, PublisherLeaf, ServiceLeaf
 from lingua_pddl.state import State
 from std_msgs.msg import String
+
+from geometry_msgs.msg import PoseStamped, PoseWithCovarianceStamped
 
 class Fail(Leaf):
   def __init__(self, name='Say', topic_name='/speech/out', topic_class=String, *args, **kwargs):
@@ -79,6 +82,38 @@ class GetObjectPose(ServiceLeaf):
   def result_fn(self):
     result = self._default_result_fn()
     return result.pose_stamped if result else None
+
+class SetObjectPoseAMCL(ServiceLeaf):
+  def __init__(self, name=None, overwrite=False, *args, **kwargs):
+    super(SetObjectPoseAMCL, self).__init__(
+      name=name if name else 'Get Object Pose',
+      service_name='/lingua/world/set_pose',
+      load_fn=self.load_fn,
+      *args,
+      **kwargs
+    )
+    self.overwrite = overwrite
+
+  def load_fn(self):
+    frame = self._service_class._request_class()
+    value = self._default_load_fn(False)
+    
+    ps_with_covariance = rospy.wait_for_message('/amcl_pose', PoseWithCovarianceStamped)
+    ps = PoseStamped(header=ps_with_covariance.header)
+    ps.pose.position = ps_with_covariance.pose.pose.position
+    ps.pose.orientation = ps_with_covariance.pose.pose.orientation
+
+    if not isinstance(value, Object):
+      return False
+
+    frame.object_id = value.get_id()[0] if value.get_id() and not self.overwrite else ''
+    frame.class_label = value.get_name()
+
+    frame.pose_stamped = ps
+    frame.overwrite = self.overwrite
+      
+    return frame
+
 
 class Say(PublisherLeaf):
   def __init__(self, name='Say', topic_name='/speech/out', topic_class=String, *args, **kwargs):
@@ -200,6 +235,6 @@ class Assert(GroundObjects):
 
     return value
 
-from .types import Groundable, DummyObject
+from .types import Groundable, DummyObject, Object
 from .trees import Lingua
 from .method import Method
