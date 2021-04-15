@@ -6,5 +6,10 @@
   {
     "pattern": "\\(on (.*) (.*)\\)",
     "callback": "lingua.callbacks/on"
+  },
+  {
+    "pattern": "\\(in (.*) (.*)\\)",
+    "callback": "lingua.callbacks/on"
   }
+
 ]
