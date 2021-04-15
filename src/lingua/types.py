@@ -105,7 +105,7 @@ class Groundable(Base):
     self.id = None
 
   def count(self):
-    return len(self.id)
+    return len(self.get_id())
     
   def get_id(self):
     return self.id

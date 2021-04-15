@@ -207,20 +207,29 @@ class InstantiatedMethod(Method):
           result.append(postcondition.replace('${' + key + '}', replacement))
     return result
 
-  def product_dict(self, **kwargs):
-    keys = kwargs.keys()
-    vals = kwargs.values()
+  def get_objects(self, groundable):
+    if isinstance(groundable, Object) and groundable.count() > 1:
+      result = []
+      for idx in groundable.get_id():
+        obj = Object(groundable.type_name, groundable.name, groundable.attributes, groundable.relation, groundable.limit)
+        obj.set_id(idx)
+        result.append(obj)
+      return result
+      
+    elif isinstance(groundable, Conjunction):
+      return self.get_objects(groundable.get_left()) + self.get_objects(groundable.get_right())
 
-    temp = []
+    return [ groundable ]
+        
+
+  def product_dict(self, **kwargs):
+    keys = list(kwargs.keys())
+    vals = list(kwargs.values())
+
+    
     for val_id, val in enumerate(vals):
-      if isinstance(val, Groundable) and val.count() > 1:
-        for idx in val.get_id():
-          obj = Object(val.type_name, val.name, val.attributes, val.relation, val.limit)
-          obj.set_id(idx)
-          temp.append(obj)
-      vals[val_id] = temp
-    print(keys)
-    print(vals)
+      vals[val_id] = self.get_objects(val)
+
     for instance in itertools.product(*vals):
       print('Instance: {}'.format(instance))
       yield dict(zip(keys, instance))
