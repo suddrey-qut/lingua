@@ -197,11 +197,8 @@ class ObjectReader:
             if child.get('mode') == 'mod':
                 attributes.append(ModifierReader.read(child))
             if child.get('mode') == 'attr':
-                try:
-                  attributes.append(AttributeReader.read(child))
-                except:
-                  pass
-
+                attributes.append(AttributeReader.read(child))
+                
         return attributes
 
     @staticmethod
@@ -225,10 +222,10 @@ class ObjectReader:
             if child.get('mode') == 'relation':
                 return RelationReader.read(child)
             
-            if child.get('mode') == 'attr':
-              for subchild in child.findall('diamond'):
-                if subchild.get('mode') == 'relation':
-                  return RelationReader.read(subchild)
+            # if child.get('mode') == 'attr':
+            #   for subchild in child.findall('diamond'):
+            #     if subchild.get('mode') == 'relation':
+            #       return RelationReader.read(subchild)
 
         return None
 
