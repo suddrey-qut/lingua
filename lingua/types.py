@@ -10,7 +10,7 @@ from py_trees.composites import *
 from py_trees.decorators import *
 from rv_trees.leaves import *
 
-from .errors import *
+from lingua.errors import *
 
 from lingua_pddl.parser import Parser
 
@@ -40,6 +40,12 @@ class Base(object):
 
   def is_iterable(self):
     return isinstance(self, Iterable)
+
+  def get_preconditions(self, args=None):
+    return []
+
+  def get_postconditions(self, args=None):
+    return []
 
   def __bool__(self):
     return bool(self.is_valid())
@@ -81,15 +87,15 @@ class LinguaSequence(Base):
     super(LinguaSequence, self).__init__()
     self.children = children
 
-    def to_json(self, args):
-      return {
-        'type': 'class',
-        'class_name': 'LinguaSequence',
-        'package': 'lingua.types',
-        'args': { 
-          'children': [ node.to_json(args) for node in self.children ]
-        }
+  def to_json(self, args):
+    return {
+      'type': 'class',
+      'class_name': 'LinguaSequence',
+      'package': 'lingua.types',
+      'args': { 
+        'children': [ node.to_json(args) for node in self.children ]
       }
+    }
 
   def to_btree(self, name=None, training=False):
     return Sequence(children=[child.to_btree() if isinstance(child, Base) else child for child in self.children])
@@ -183,6 +189,12 @@ class Task(Groundable):
 
   def set_argument_type(self, key, value):
     self.method_argument_types[key] = value
+
+  def get_preconditions(self):
+    return Method.methods[self.get_name()]._preconditions
+
+  def get_postconditions(self):
+    return Method.methods[self.get_name()]._postconditions
 
   def to_btree(self, name=None, training=False):
     return Subtree(
@@ -632,7 +644,7 @@ class Object(Groundable):
       super(Object, self).set_id(self.limit(self.get_id()))
 
   def count(self):
-    return min(self.limit.count if self.limit else sys.maxint, super(Object, self).count())
+    return min(self.limit.count if self.limit else float('inf'), super(Object, self).count())
 
   def get_id(self):
     idx = super(Object, self).get_id()
@@ -770,6 +782,9 @@ class Agent(Object):
 
   def is_grounded(self):
     return True
+
+  def to_query(self):
+    return 'agent'
 
 class Modifier(Base):
   def __init__(self, type_name, value):
@@ -940,6 +955,91 @@ class Negative(Groundable):
   def is_grounded(self):
     return True
 
-from .decorators import RepeatForDuration
-from .leaves import Assert, GroundObjects
-from .trees import Subtree
+class Condition(Groundable):
+  def __init__(self, predicate, arguments):
+    self.predicate = predicate
+    self.arguments = arguments
+
+  def to_btree(self, name=None, training=False):
+    return AssertCondition(load_value=self)
+
+  def to_json(self, args=None):
+    return {
+      'package': 'lingua.types',
+      'class_name': self.__class__.__name__,
+      'args': {
+        'predicate': self.predicate,
+        'arguments': {
+          'class_name': 'dict',
+          'args': {
+            key: self.arguments[key].to_json(args) for key in self.arguments
+          }
+        }
+      }
+    }
+
+  def is_grounded(self):
+    for key in self.arguments:
+      if not self.arguments[key].is_grounded():
+        return False
+    return True
+
+  def ground(self, state):
+    for key in self.arguments:
+      self.arguments[key].ground(state)
+
+  def to_query(self):
+    predicate = self.predicate
+    
+    for key in self.arguments:
+      predicate = predicate.replace('{}'.format(key), self.arguments[key].to_query())
+
+    return predicate
+
+  def test(self, state):
+    query = self.to_query()
+    result = state.ask(query)
+    return result
+
+  def __str__(self):
+    return self.to_query()
+
+from lingua.decorators import RepeatForDuration
+from lingua.leaves import Assert, GroundObjects, AssertCondition
+from lingua.trees import Subtree
+from lingua.method import Method
+
+if __name__ == '__main__':
+  from rv_trees.trees import BehaviourTree
+  import rospy
+  from lingua_pddl.state import State
+  rospy.init_node('test')
+
+  args = {'arg0': Object('room', 'lounge'), 'arg1': Agent()}
+
+  c = Base.from_json({
+      'type': 'class', 
+      'package': 'lingua.types',
+      'class_name': 'Condition',
+      'args': {
+        'predicate': '(at arg0 arg1)',
+        'arguments': {
+          'class_name': 'dict',
+          'args': {
+            'arg0': '${arg0}',
+            'arg1': '${arg1}',
+          }
+        }
+      }
+  }, arguments=args)
+  c.ground(State())
+
+  t = c.to_btree()
+
+  print(t)
+
+  print(c.to_json(args))
+
+  # bt = BehaviourTree('LinguaTemp', t)
+  # bt.run(push_to_start=False, hz=1, setup_timeout=2)
+

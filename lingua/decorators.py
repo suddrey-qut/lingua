@@ -22,13 +22,13 @@ class RepeatForDuration(Timeout):
         self.feedback_message = self.decorated.feedback_message + " [repeat until: {}]".format(self.finish_time)
         return Status.RUNNING
 
-class Conditional(Decorator):
-  def __init__(self,
-                 child,
-                 name=common.Name.AUTO_GENERATED,
-                 predicate=''):
-      super(Conditional, self).__init__(name=name, child=child)
-      self.predicate = predicate
+# class Conditional(Decorator):
+#   def __init__(self,
+#                  child,
+#                  name=common.Name.AUTO_GENERATED,
+#                  predicate=''):
+#       super(Conditional, self).__init__(name=name, child=child)
+#       self.predicate = predicate
 
-  def update(self):
-    return self.decorated.status
+#   def update(self):
+#     return self.decorated.status

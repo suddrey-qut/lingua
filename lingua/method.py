@@ -153,9 +153,8 @@ class InstantiatedMethod(Method):
       return subtree
       
     children = []
-    print(self.arguments)
+    
     for args in self.zip_arguments(self.arguments):
-      print(args)
       branch = self.generate_tree(args, setup=True)
       children.append(branch)
     
@@ -235,20 +234,6 @@ class InstantiatedMethod(Method):
       yield dict(zip(keys, instance))
 
   def zip_arguments(self, arguments):
-    objects = {}
-    # for key in arguments:
-
-    #   objects[key] = []
-
-    #   if not Parser.is_iterable(arguments[key].get_id()):
-    #     objects[key].append(argument[key])
-    #     continue
-      
-    #   object_ids = Parser.logical_split(arguments[key].get_id())[1:]
-      
-    #   for object_id in object_ids:
-    #     objects[key].append(DummyObject(arguments[key].get_type_name(), object_id, arguments[key].descriptor))
-    
     return list(self.product_dict(**arguments))
 
   def generate_tree(self, arguments, setup=False):
@@ -265,8 +250,8 @@ class InstantiatedMethod(Method):
 
     if self._preconditions:
       root = Sequence('Method', children=[
-        Preconditions(children=[
-          Base.from_json(precondition, arguments) for precondition in self._preconditions  
+        Preconditions('Preconditions', children=[
+          Base.from_json(precondition, arguments).to_btree() for precondition in self._preconditions  
         ]),
         root
       ])
@@ -274,7 +259,7 @@ class InstantiatedMethod(Method):
     if self._postconditions:
       root = Selector(self.get_name(), children=[
         Sequence('Postconditions', children=[
-          Base.from_json(postcondition, arguments) for postcondition in self._postconditions
+          Base.from_json(postcondition, arguments).to_btree() for postcondition in self._postconditions
         ]),
         root
       ])

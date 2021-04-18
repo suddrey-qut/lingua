@@ -15,9 +15,7 @@ from lingua_pddl.state import State
 from openccg_ros.srv import Parse
 from std_msgs.msg import String
 
-from .errors import *
-
-import yaml
+from lingua.errors import *
 
 class OneShotSelector(Composite):
   def __init__(self, name='Oneshot Sequence', children=None, *args, **kwargs):
@@ -345,22 +343,15 @@ class LearnMethod(Sequence):
 
     def learn(leaf):
       if len(self.expanded) > 1:
-          root = {
-              "class_name": "LinguaSequence", 
-              "package": "lingua.types", 
-              "type": "class",
-              "args": {
-                'children': [ node.to_json(self.parent.arguments) for node in self.expanded ]
-              }
-          }
+          root = LinguaSequence(children=self.expanded)
       else:
-          root = self.expanded[0].to_json(self.parent.arguments)
-
+          root = self.expanded[0]
+          
       learnt=Method(
           name=method.get_name(),
-          preconditions=[],
-          postconditions=[],
-          root=root
+          preconditions=root.get_preconditions(),
+          postconditions=root.get_postconditions(),
+          root=root.to_json(self.parent.arguments)
       )
 
       Method.add(learnt)
@@ -410,7 +401,7 @@ class LearnMethod(Sequence):
         ]))),
         Leaf(
           name='Learn',
-          result_fn=learn #type(leaf.loaded_data) != Terminal
+          result_fn=learn
         )
       ]
     )
@@ -523,6 +514,66 @@ class Preconditions(Sequence):
     print(result)
     return result
 
-from .method import Method
-from .leaves import Say, PollInput, GroundObjects, Planner
-from .types import Groundable, Terminal, Affirmative
+from lingua.method import Method
+from lingua.leaves import Say, PollInput, GroundObjects, Planner
+from lingua.types import Groundable, Terminal, Affirmative
+
+if __name__ == '__main__':
+  import json
+  from lingua_pddl.state import Snapshot
+
+  rospy.init_node('test')
+  
+  Method.set_path('/home/suddrey/gavin_tmp/src/lingua_pkgs/lingua_tests/data/panda/methods')
+  Method.load()
+
+  o1 = Object('tool', 'gripper', [], Limit(1))
+  o1.set_id('g1')
+
+  o2 = Object('object', 'block', [], Limit(1))
+  o2.set_id('o1')
+
+  args1 = {'arg0': o1}
+  args2 = {'arg0': o2}
+
+  t1 = Task('open(tool arg0)', args1)
+  t1_1 = Task('move_to(object arg0)', args2)
+  t2 = Task('close(tool arg0)', args1)
+  
+  t = LinguaSequence(children=[
+    t1, t1_1, t2
+  ])
+  
+  # print(json.dumps(t.to_json(args1), indent=4, sort_keys=False))
+
+  def collapse(tasks):
+    state = Snapshot(State(), [])
+
+    for task, args in tasks:
+      preconditions = task.get_preconditions()
+      postconditions = task.get_postconditions()
+
+      for precondition in preconditions:
+        expanded = Base.from_json(precondition, args)
+        state.update(expanded.to_query())
+
+      for postcondition in postconditions:
+        expanded = Base.from_json(postcondition, args)
+        state.update(expanded.to_query())
+
+    print(state)
+
+  preconditions = t1.get_preconditions()
+  postconditions = t1.get_postconditions()
+
+  collapse([[t1, args1], [t1_1, args2], [t2, args1]])
+
+
+  # expanded_pre = [Base.from_json(precondition, args1) for precondition in preconditions]
+  # expanded_post = [Base.from_json(precondition, args1) for precondition in preconditions]
+
+
+  # print([p.to_json(args1) for p in expanded_pre])
+  # print([p.to_json(args1) for p in expanded_post])
+  # print(json.dumps(t.get_preconditions(args), indent=4, sort_keys=False))
+

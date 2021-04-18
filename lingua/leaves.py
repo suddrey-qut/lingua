@@ -172,6 +172,29 @@ class GroundObjects(Leaf):
       
     return obj.get_id()
 
+class AssertCondition(Leaf):
+  def __init__(self, name=None, *args, **kwargs):
+    super(AssertCondition, self).__init__(
+      name=name if name else 'Assert Conditional',
+      load_fn=self.load_fn,
+      result_fn=self.result_fn,
+      save=True,
+      *args,
+      **kwargs
+    )
+
+  def load_fn(self):
+    value = self._default_load_fn(False)
+    
+    if not isinstance(value, Condition):
+      raise Exception('Expected input value to an argument Condition')
+
+    return value
+
+  def result_fn(self):
+    condition = self.loaded_data
+    return condition.test(State())
+      
 class Assert(GroundObjects):
   def __init__(self, name=None, *args, **kwargs):
     super(Assert, self).__init__(
@@ -201,6 +224,6 @@ class Assert(GroundObjects):
 
     return value
 
-from .types import Groundable, DummyObject, Object
-from .trees import Lingua
-from .method import Method
+from lingua.types import Groundable, DummyObject, Object, Condition
+from lingua.trees import Lingua
+from lingua.method import Method
