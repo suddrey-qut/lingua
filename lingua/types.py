@@ -658,7 +658,7 @@ class Object(Groundable):
 
   def to_query(self):
     if self.is_grounded():
-      return super().to_query()
+      return super(Object, self).to_query()
 
     atoms = ['(class_label {} ?)'.format(self.name)]
 
@@ -750,7 +750,7 @@ class DummyObject(Object):
 
   def to_query(self):
     if self.is_grounded():
-      return super().to_query()
+      return super(DummyObject, self).to_query()
 
     atoms = []
 

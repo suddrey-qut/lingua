@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import rospy
 import time
+import os
 
 from lingua.method import Method
 from lingua.trees import Lingua, OneShotSelector
@@ -28,10 +29,14 @@ if __name__ == '__main__':
     rospy.ServiceProxy('/kb/clear', Clear)('types')
     rospy.ServiceProxy('/kb/load', Load)('types', rospy.get_param('~types_file'))
 
-  if rospy.has_param('~method_path'):
-    Method.set_path(rospy.get_param('~method_path'))
-
+  path = rospy.get_param('~method_path')
+  
+  Method.set_path(os.path.join(path, 'primitives'))
   Method.load()
+
+  Method.set_path(os.path.join(path, 'methods'))
+  Method.load()
+  
   #Watchdog(), 
-  bt = BehaviourTree('Lingua', Selector(children=[Lingua()]))
+  bt = BehaviourTree('Lingua', Selector(children=[Watchdog(), Lingua()]))
   bt.run(push_to_start=False, hz=1, setup_timeout=2)

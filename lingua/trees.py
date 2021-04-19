@@ -349,8 +349,8 @@ class LearnMethod(Sequence):
           
       learnt=Method(
           name=method.get_name(),
-          preconditions=root.get_preconditions(),
-          postconditions=root.get_postconditions(),
+          preconditions=[],
+          postconditions=[],
           root=root.to_json(self.parent.arguments)
       )
 
