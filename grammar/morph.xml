@@ -33,6 +33,7 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
   <entry pos="Det" word="this"/>
   <entry pos="Det" word="that"/>
   <entry pos="Det" word="all"/>
+  <entry pos="Det" stem="all" word="every"/>
   <entry pos="Det" word="other"/>
   <entry pos="Det" word="both"/>
   <entry pos="Det" word="same"/>
@@ -339,7 +340,7 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
 <entry pos="N" word="sofa" class="object" macros="@sg @sg-X"/>
 <entry pos="N" word="soda" class="object" macros="@sg @sg-X"/>
 <entry pos="N" word="website" class="object" macros="@sg @sg-X"/>
-<entry pos="N" word="sure" class="object" macros="@sg @sg-X"/>
+<!-- <entry pos="N" word="sure" class="object" macros="@sg @sg-X"/> -->
 <entry pos="N" word="something" class="object" macros="@sg @sg-X"/>
 <entry pos="N" word="cupboard" class="object" macros="@sg @sg-X"/>
 <entry pos="N" word="cupboards" stem="cupboard" class="object" macros="@pl @pl-X"/>
@@ -472,6 +473,8 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
 
   <entry pos="Adv" word="slowly"/>
   <entry pos="Adv" word="quickly"/>
+
+  <entry pos="Adv" word="sure"/>
 
   <entry pos="Conditional" word="if" />
   <entry pos="Conditional" word="while" />

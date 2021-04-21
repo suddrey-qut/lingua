@@ -44,7 +44,7 @@ class XMLReader:
             if InfiniteLoopReader.is_repeat(node):
                 return InfiniteLoopReader.read(node)
 
-            if ObjectReader.is_object(node):    
+            if ObjectReader.is_object(node):
                 return ObjectReader.read(node)
 
             if AssertionReader.is_assertion(node):
@@ -59,11 +59,10 @@ class XMLReader:
             raise Exception("Unknown node type: {}".format(node.get('nom') if node.tag == 'satop' else node.find('nom').get('name')))
 
         except Exception as e:
-            print(str(e))
             pass
-        
+
         return None
-    
+
 class AttributeReader:
     @staticmethod
     def read(node):
@@ -86,7 +85,7 @@ class AttributeReader:
                 return ':adj' in node.get('nom')
             return ':adj' in node.find('nom').get('name')
         except Exception as e:
-            print(str(e))
+            pass
         return False
 
 class ModifierReader:
@@ -115,7 +114,7 @@ class ModifierReader:
                 return ':modifier' in node.get('nom')
             return ':modifier' in node.find('nom').get('name')
         except Exception as e:
-            print(str(e))
+            pass
         return False
 
 class RelationReader:
@@ -266,7 +265,7 @@ class ObjectReader:
                 return node.get('nom').split(':')[1] in ['object', 'tool', 'dummy', 'room', 'location', 'animate-being']
             return node.find('nom').get('name').split(':')[1] in ['object', 'tool', 'dummy', 'room', 'location', 'animate-being']
         except Exception as e:
-            print(str(e))
+            pass
         return False
 
 class TaskReader:
@@ -315,7 +314,7 @@ class TaskReader:
                 return ':action' in node.get('nom')
             return ':action' in node.find('nom').get('name')
         except Exception as e:
-            print(str(e))
+            pass
         return False
 
 class ConditionalReader:
@@ -337,7 +336,7 @@ class ConditionalReader:
                 return ':conditional' in node.get('nom') and node.find('prop').get('name') == 'if'
             return ':conditional' in node.find('nom').get('name') and node.find('prop').get('name') == 'if'
         except Exception as e:
-            print(str(e))
+            pass
         return False
 
     @staticmethod
@@ -379,7 +378,7 @@ class EventReader:
                 return ':conditional' in node.get('nom') and node.find('prop').get('name') == 'when'
             return ':conditional' in node.find('nom').get('name') and node.find('prop').get('name') == 'when'
         except Exception as e:
-            print(str(e))
+            pass
         return False
 
 class WhileLoopReader:
@@ -398,7 +397,7 @@ class WhileLoopReader:
                 return ':conditional' in node.get('nom') and node.find('prop').get('name') == 'while'
             return ':conditional' in node.find('nom').get('name') and node.find('prop').get('name') == 'while' 
         except Exception as e:
-           print(str(e))
+           pass
 
         return None
 
@@ -422,7 +421,7 @@ class ForLoopReader:
                 return ':loop' in node.get('nom') and node.find('prop').get('name') == 'for'
             return ':loop' in node.find('nom').get('name') and node.find('prop').get('name') == 'for' 
         except Exception as e:
-           print(str(e))
+           pass
 
         return None
 
@@ -440,7 +439,7 @@ class InfiniteLoopReader:
                 return ':loop' in node.get('nom') and node.find('prop').get('name') == 'repeatedly'
             return ':loop' in node.find('nom').get('name') and node.find('prop').get('name') == 'repeatedly' 
         except Exception as e:
-           print(str(e))
+           pass
 
         return None
 
@@ -467,7 +466,7 @@ class DurationReader:
                 return ':duration' in node.get('nom')
             return ':duration' in node.find('nom').get('name')
         except Exception as e:
-            print(str(e))
+            pass
         return False
 
 class ConjunctionReader:
@@ -502,7 +501,7 @@ class ConjunctionReader:
                 return ':conjunction' in node.get('nom')
             return ':conjunction' in node.find('nom').get('name')
         except Exception as e:
-            print(str(e))
+            pass
         return False
 
 class AssertionReader:
@@ -530,7 +529,7 @@ class AssertionReader:
                 return ':assert' in node.get('nom')
             return ':assert' in node.find('nom').get('name')
         except Exception as e:
-            print(str(e))
+            pass
         return False
 
 class QueryReader:
@@ -558,7 +557,7 @@ class QueryReader:
                 return ':query' in node.get('nom')
             return ':query' in node.find('nom').get('name')
         except Exception as e:
-            print(str(e))
+            pass
         return False
 
 class ExclamationReader:
@@ -569,7 +568,7 @@ class ExclamationReader:
                 return ':exclamation' in node.get('nom')
             return ':exclamation' in node.find('nom').get('name')
         except Exception as e:
-            print(str(e))
+            pass
         return False
 
     @staticmethod
@@ -590,5 +589,5 @@ class StopReader:
                 return ':stop' in node.get('nom')
             return ':stop' in node.find('nom').get('name')
         except Exception as e:
-            print(str(e))
+            pass
         return False

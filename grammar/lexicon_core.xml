@@ -460,6 +460,34 @@
       </lf>
     </atomcat>
   </entry>
+  <entry name="n/n">
+   <complexcat>
+        <atomcat type="n">
+          <fs inheritsFrom="2">
+            <feat attr="mod-index">
+              <lf>
+                <nomvar name="M"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash dir="/" mode="^" />
+        <atomcat type="n">
+          <fs id="2">
+            <feat attr="index">
+              <lf><nomvar name="X" /></lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <lf>
+          <satop nomvar="X:sem-obj">
+            <diamond mode="num">
+              <prop name="[*DEFAULT*]" />
+            </diamond>
+          </satop>
+        </lf>
+      </complexcat>
+  </entry>
 </family>
 
 <family name="Duration" pos="Time">

@@ -167,7 +167,6 @@ class InstantiatedMethod(Method):
           return False
       return True
     except Exception as e:
-      print(str(e))
       return False
 
   def is_complete(self, state):
@@ -177,7 +176,6 @@ class InstantiatedMethod(Method):
           return False
       return True
     except Exception as e:
-      print(str(e))
       return False
 
   def result(self, state):
