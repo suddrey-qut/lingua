@@ -16,6 +16,5 @@ class Watchdog(Sequence):
       SetCartesianImpedance(load_value=[3000.0, 3000.0, 3000.0, 300.0, 300.0, 300.0]),
       ServiceLeaf('Recover', '/arm/recover', save=False),
       ActuateGripper(),
-      MoveToNamedGripperPose(load_value='ready'),
-      ResetTask()
+      MoveToNamedGripperPose(load_value='ready')
     ])

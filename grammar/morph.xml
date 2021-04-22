@@ -65,7 +65,7 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
   <entry pos="ConjAdv" word="also" />
 
   <!-- ======================== Negation =========================== -->
-  <entry pos="Adverb" word="not"/>
+  <entry pos="Adv" word="not"/>
 
   <!-- ======================== Pronouns =========================== -->
   <entry pos="Pro" word="you" stem="agent" class="animate-being" macros="@2nd @sg @nom @sg-X"/>

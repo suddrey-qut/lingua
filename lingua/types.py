@@ -614,7 +614,7 @@ class Assertion(Groundable):
     return outstr
 
 class Object(Groundable):
-  def __init__(self, type_name, name, attributes=None, relation=None, limit=None):
+  def __init__(self, type_name, name, attributes=None, relation=None, limit=None, negative=False):
     super(Object, self).__init__()
 
     self.type_name = type_name
@@ -624,6 +624,8 @@ class Object(Groundable):
     
     self.relation = relation
     self.limit = limit
+
+    self.negative = negative
     
   def get_name(self):
     return self.name
@@ -648,10 +650,11 @@ class Object(Groundable):
 
   def get_id(self):
     idx = super(Object, self).get_id()
+
     if self.limit:
-      return self.limit(idx)
-    else:
-      return idx
+      idx = self.limit(idx)
+    
+    return idx
 
   def to_btree(self):
     return GroundObjects(load_value=self)
@@ -669,10 +672,15 @@ class Object(Groundable):
     if self.relation is not None:
       atoms.append(self.relation.to_query())
       
-    if len(atoms) == 1:
-      return atoms[0]
+    if len(atoms) != 1:
+      query = '(intersect {})'.format(' '.join(atoms))
+    else:
+      query = atoms[0]
 
-    return '(intersect {})'.format(' '.join(atoms))
+    if self.negative:
+      query = '(not {})'.format(query)
+
+    return query
 
   def to_json(self, args):
     for key in args:
@@ -699,6 +707,9 @@ class Object(Groundable):
 
     if self.limit:
       result['args']['limit'] = self.limit.to_json(args)
+
+    if self.negative:
+      result['args']['negative'] = True
 
     return result
 
@@ -733,7 +744,7 @@ class Object(Groundable):
     return outstr
 
 class Anaphora(Object):
-  def __init__(self, type_name, name, attributes=None, relation=None, limit=None):
+  def __init__(self, type_name, name, attributes=None, relation=None, limit=None, negative=False):
     if relation is not None:
       raise Exception('Cannot attach relation to anaphora')
     super(Anaphora, self).__init__(type_name, name, attributes, relation, limit)
@@ -742,8 +753,8 @@ class Anaphora(Object):
     return Object.__str__(self).replace('{}:{}'.format(self.type_name, self.name), 'anaphora:it')
 
 class DummyObject(Object):
-  def __init__(self, type_name='', name='', attributes=None, relation=None, limit=None, idx=None):
-    super(DummyObject, self).__init__(type_name, name, attributes, relation, limit)
+  def __init__(self, type_name='', name='', attributes=None, relation=None, limit=None, negative=False, idx=None):
+    super(DummyObject, self).__init__(type_name, name, attributes, relation, limit, negative)
     
     if idx is not None:
       self.set_id(idx)
@@ -761,10 +772,16 @@ class DummyObject(Object):
     if self.relation is not None:
       atoms.append(self.relation.to_query())
       
-    if len(atoms) == 1:
-      return atoms[0]
+    if len(atoms) != 1:
+      query = '(intersect {})'.format(' '.join(atoms))
+    else:
+      query = atoms[0]
 
-    return '(intersect {})'.format(' '.join(atoms))
+    if self.negative:
+      query = '(not {})'.format(query)
+
+    return query
+      
 
 class Agent(Object):
   def __init__(self, attributes=None, relation=None):
@@ -802,9 +819,12 @@ class Modifier(Base):
         'value': self.value
       }
     }
+
+  def to_query(self):
+    return '({} {})'.format(self.type_name, self.value.to_query())
     
   def __str__(self):
-    return 'not:[{}={}]'.format(self.type_name, self.value)
+    return ':{}[{}]'.format(self.type_name, self.value)
 
 class Attribute(Groundable):
   def __init__(self, type_name, value):

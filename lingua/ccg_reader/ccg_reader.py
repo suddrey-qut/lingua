@@ -98,7 +98,7 @@ class ModifierReader:
 
     @staticmethod
     def get_type(node):
-        return node.find('nom').get('name').split(':')[1]
+        return node.find('prop').get('name')
 
     @staticmethod
     def get_value(node):
@@ -173,7 +173,7 @@ class ObjectReader:
                 ObjectReader.get_name(node),
                 ObjectReader.get_attributes(node),
                 ObjectReader.get_relation(node),
-                ObjectReader.get_limit(node)
+                ObjectReader.get_limit(node),
             )
 
         return Object(
@@ -591,3 +591,4 @@ class StopReader:
         except Exception as e:
             pass
         return False
+

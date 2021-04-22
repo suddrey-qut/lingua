@@ -23,9 +23,7 @@ class Resolver(Problem):
               for grounding in groundings:
                   args = {}
                   for type_name, arg_id in method.get_arguments():
-                      obj = DummyObject(type_name, '')
-                      obj.set_id(grounding[arg_id])
-                      args[arg_id] = obj
+                      args[arg_id] = DummyObject(type_name, '', idx=grounding[arg_id])
 
                   instantiated = method.instantiate(args)
                   if instantiated.is_applicable(state) and not instantiated.is_complete(state):

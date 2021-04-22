@@ -163,7 +163,7 @@ class Lingua(OneShotSelector):
       if frame:
         self.input_stack.append(utterance)
         self.handle_anaphora(frame)
-
+        
         try:
           frame.ground(State())
         except Exception as e:
