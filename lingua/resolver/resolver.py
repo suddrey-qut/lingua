@@ -30,6 +30,10 @@ class Resolver(Problem):
                       actions.append(instantiated)
             except KeyError:
               pass
+            except Exception as e:
+              print(str(e))
+              pass
+
             
         return actions
 
@@ -88,9 +92,10 @@ def ground(state, arguments):
                 if not result:
                     continue
 
-                mapping[arg] = result
+                mapping[arg] = result if isinstance(result, list) else [result]
                 
             except Exception as e:
+                print(str(e))
                 pass
 
     return dict_product(mapping)

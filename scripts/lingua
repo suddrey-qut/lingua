@@ -38,5 +38,5 @@ if __name__ == '__main__':
   Method.load()
   
   #Watchdog(), 
-  bt = BehaviourTree('Lingua', Selector(children=[Watchdog(), Lingua()]))
+  bt = BehaviourTree('Lingua', Selector(children=[Lingua()]))
   bt.run(push_to_start=False, hz=1, setup_timeout=2)

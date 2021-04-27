@@ -127,8 +127,12 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
   <entry pos="N" word="fingers" stem="gripper" class="tool" macros="@sg @sg-X"/>
   <entry pos="N" word="hand" stem="gripper" class="tool" macros="@sg @sg-X"/>
 
+  <entry pos="N" word="brakes" class="tool" macros="@sg @sg-X"/>
+
   <entry pos="N" word="block" class="object" macros="@sg @sg-X"/>
   <entry pos="N" word="blocks" stem="block" class="object" macros="@pl @pl-X"/>
+
+  <entry pos="N" word="bell" class="object" macros="@sg @sg-X"/>
 
 <entry pos="N" word="coffee" class="object" macros="@sg @sg-X"/>
 <entry pos="N" word="coke" class="object" macros="@sg @sg-X"/>

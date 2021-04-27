@@ -508,9 +508,11 @@ class Preconditions(Sequence):
   def predicates(self):
     result = []
     for child in self.children:
-      if hasattr(child, 'predicate'):
-        print(child.predicate)
-        result.append(child.predicate)
+      if isinstance(child, AssertCondition):
+        condition = child.load_value
+        if not condition.is_grounded():
+          condition.ground(State())
+        result.append(condition.to_query())
     print(result)
     return result
 

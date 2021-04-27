@@ -201,7 +201,7 @@ class InstantiatedMethod(Method):
     for postcondition in map(lambda p: p['args']['predicate'], self._postconditions):
       for key in keys:
           replacement = self.arguments[key].get_id()[0]
-          result.append(postcondition.replace('${' + key + '}', replacement))
+          result.append(postcondition.replace(key, replacement))
     return result
 
   def get_objects(self, groundable):
