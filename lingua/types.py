@@ -445,7 +445,6 @@ class InfiniteLoop(Base):
       'package': 'lingua.types',
       'class_name': 'InfiniteLoop',
       'args': {
-        'class_name': 'SuccessIsRunning',
         'body': self.body.to_json(args)
       }
     }
