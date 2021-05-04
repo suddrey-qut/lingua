@@ -143,19 +143,19 @@ class InstantiatedMethod(Method):
     self.__dict__ = copy.deepcopy(method.__dict__)
     self.arguments = arguments if arguments is not None else {}
 
-  def to_tree(self):
+  def to_tree(self, training=False):
     is_iterable = self.ground and bool([key for key in self.arguments if (isinstance(self.arguments[key], Conjunction) or
       (isinstance(self.arguments[key], Groundable) and self.arguments[key].count() > 1))
     ])
     
     if not is_iterable:
-      subtree = self.generate_tree(self.arguments, setup=True)
+      subtree = self.generate_tree(self.arguments, setup=True, training=training)
       return subtree
       
     children = []
     
     for args in self.zip_arguments(self.arguments):
-      branch = self.generate_tree(args, setup=True)
+      branch = self.generate_tree(args, setup=True, training=training)
       children.append(branch)
     
     return Sequence(name='sequence:{}'.format(self.name), children=children)
@@ -234,7 +234,7 @@ class InstantiatedMethod(Method):
   def zip_arguments(self, arguments):
     return list(self.product_dict(**arguments))
 
-  def generate_tree(self, arguments, setup=False):
+  def generate_tree(self, arguments, setup=False, training=False):
     if (not self.root):
       root = LearnMethod(method=self)
       root.setup(0)
@@ -243,7 +243,7 @@ class InstantiatedMethod(Method):
     root = Base.from_json(self.root, arguments)
 
     if isinstance(root, Base):
-      root = root.to_btree()
+      root = root.to_btree(training=training)
     #root = self.generate_branch(self.root, arguments)
 
     if self._preconditions:

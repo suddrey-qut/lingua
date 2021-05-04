@@ -59,6 +59,7 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
   <entry pos="exclamation" stem="positive" word="yes" />
   
   <entry pos="Conj" word="then" stem="and" />
+  <entry pos="Conj" word="next" stem="and" />
 
   <entry pos="ConjAdv" word="then" />
   <entry pos="ConjAdv" word="," />

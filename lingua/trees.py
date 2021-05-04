@@ -261,12 +261,13 @@ class Lingua(OneShotSelector):
     return replace
 
 class Subtree(Sequence):
-  def __init__(self, name, method_name, arguments, mapping=None, *args, **kwargs):
+  def __init__(self, name, method_name, arguments, mapping=None, training=False, *args, **kwargs):
     super(Subtree, self).__init__(name, children=[], *args, **kwargs)
     self.method_name = method_name
     self.mapping = mapping if mapping else {}
     self.arguments = arguments
     self.own = []
+    self.training = training
 
   def setup(self, timeout):
     super(Subtree, self).setup(timeout)
@@ -311,7 +312,7 @@ class Subtree(Sequence):
             return
           
     
-    self.add_child(self.method.instantiate(args).to_tree())
+    self.add_child(self.method.instantiate(args).to_tree(self.training))
     super(Subtree, self).initialise()
     
   def terminate(self, new_status=Status.INVALID):

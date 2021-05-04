@@ -98,7 +98,7 @@ class LinguaSequence(Base):
     }
 
   def to_btree(self, name=None, training=False):
-    return Sequence(children=[child.to_btree() if isinstance(child, Base) else child for child in self.children])
+    return Sequence(children=[child.to_btree(training=training) if isinstance(child, Base) else child for child in self.children])
 
 class LinguaInverter(Base):
   def __init__(self, child):
@@ -116,7 +116,7 @@ class LinguaInverter(Base):
       }
 
   def to_btree(self, name=None, training=False):
-    return Inverter(child=self.child.to_btree())
+    return Inverter(child=self.child.to_btree(training=training))
 
 class Groundable(Base):
   def __init__(self):
@@ -201,7 +201,8 @@ class Task(Groundable):
       name=name if name else self.get_name(),
       method_name=self.get_name(),
       arguments=self.method_arguments,
-      mapping={key: key for key in self.get_argument_keys()}
+      mapping={key: key for key in self.get_argument_keys()},
+      training=training
     )
 
   def ground(self, state):
@@ -306,9 +307,9 @@ class Conjunction(Groundable):
 
   def to_btree(self, name=None, training=False):
     if self.get_type() == 'and':
-      return Sequence(name if name else 'and', children=[self.left.to_btree(), self.right.to_btree()])
+      return Sequence(name if name else 'and', children=[self.left.to_btree(training=training), self.right.to_btree(training=training)])
 
-    return Selector(name if name else 'or', children=[self.left.to_btree(), self.right.to_btree()])
+    return Selector(name if name else 'or', children=[self.left.to_btree(training=training), self.right.to_btree(training=training)])
 
   def __iter__(self):
     if not isinstance(self.left, Conjunction):
@@ -370,7 +371,7 @@ class ForLoop(Base):
     self.body = body
 
   def to_btree(self, name=None, training=False):
-    return RepeatForDuration(name='Repeat for {}'.format(self.duration), child=self.body.to_btree(), duration=self.duration.to_seconds())
+    return RepeatForDuration(name='Repeat for {}'.format(self.duration), child=self.body.to_btree(training=training), duration=self.duration.to_seconds())
 
   def ground(self, state):
     self.body.ground(state)
@@ -419,8 +420,8 @@ class InfiniteLoop(Base):
 
   def to_btree(self, name=None, training=False):
     if training:
-      return self.body.to_btree()
-    return SuccessIsRunning(name='Repeat', child=self.body.to_btree())
+      return self.body.to_btree(training=training)
+    return SuccessIsRunning(name='Repeat', child=self.body.to_btree(training=training))
 
   def ground(self, state):
     self.body.ground(state)
@@ -479,7 +480,7 @@ class Conditional(Groundable):
 
   def to_btree(self, name=None, training=False):
     return Selector(name=name if name else 'if', children=[
-      Inverter(self.condition.to_btree('condition')), self.body.to_btree('body')
+      Inverter(self.condition.to_btree('condition', training=training)), self.body.to_btree('body', training=training)
     ])
 
   def ground(self, state):
@@ -520,7 +521,7 @@ class Conditional(Groundable):
 class Event(Conditional):
   def to_btree(self, name=None, training=False):
     return SuccessIsFailure(Sequence(name if name else 'when', children=[
-      self.condition.to_btree(), self.body.to_btree()
+      self.condition.to_btree(training=training), self.body.to_btree(training=training)
     ]))
 
   def __str__(self):
@@ -538,7 +539,7 @@ class Event(Conditional):
 class WhileLoop(Conditional):
   def to_btree(self, name=None, training=False):
     return FailureIsSuccess(SuccessIsRunning(Sequence(name if name else 'while', children=[
-      self.condition.to_btree(), FailureIsSuccess(self.body.to_btree(), name='body')
+      self.condition.to_btree(training=training), FailureIsSuccess(self.body.to_btree(training=training), name='body')
     ])))
 
   def __str__(self):
