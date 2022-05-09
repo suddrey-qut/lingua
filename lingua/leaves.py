@@ -3,8 +3,8 @@ import rospy
 
 from collections import Iterable
 from py_trees.common import Status
-from rv_trees.leaves import Leaf
-from rv_trees.leaves_ros import ActionLeaf, PublisherLeaf, ServiceLeaf
+from ros_trees.leaves import Leaf
+from ros_trees.leaves_ros import ActionLeaf, PublisherLeaf, ServiceLeaf
 from lingua_pddl.state import State
 from std_msgs.msg import String
 

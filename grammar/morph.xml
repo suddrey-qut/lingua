@@ -460,8 +460,8 @@ $Revision: 1.8 $, $Date: 2010/09/13 04:37:19 $
   <entry pos="Adj" word="disconnected" class="state"/>
   <entry pos="Adj" word="used" class="state"/>
   <entry pos="Adj" word="disposable" class="state"/>
-  <entry pos="Adj" word="on" class="state"/>
-  <entry pos="Adj" word="off" class="state"/>
+  <!-- <entry pos="Adj" word="on" class="state"/>
+  <entry pos="Adj" word="off" class="state"/> -->
 
   <entry pos="Adj" word="left"/>
   <entry pos="Adj" word="right"/>

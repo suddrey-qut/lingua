@@ -186,7 +186,11 @@ class ObjectReader:
 
     @staticmethod
     def get_name(node):
-        return node.find('prop').get('name') if not ObjectReader.is_dummy(node) else '*'
+        name = node.find('prop').get('name') if not ObjectReader.is_dummy(node) else '*'
+        for child in node.findall('diamond'):
+          if child.get('mode') == 'compound':
+            name += '_{}'.format(ObjectReader.get_name(child))
+        return name
 
     @staticmethod
     def get_attributes(node):

@@ -1,6 +1,6 @@
 from py_trees.composites import Sequence
 
-from rv_trees.leaves_ros import ServiceLeaf
+from ros_trees.leaves_ros import ServiceLeaf
 
 from rv_leaves.branches.generic.task import ResetTask
 

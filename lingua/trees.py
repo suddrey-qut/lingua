@@ -4,7 +4,7 @@ import uuid
 from py_trees.composites import Sequence, Selector, Composite
 from py_trees.decorators import SuccessIsRunning
 from py_trees.common import Status
-from rv_trees.leaves import Leaf
+from ros_trees.leaves import Leaf
 from rv_leaves.leaves.generic.console import Print
 from rv_leaves.leaves.generic.noop import Noop
 

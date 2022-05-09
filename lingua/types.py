@@ -8,7 +8,7 @@ import math
 
 from py_trees.composites import *
 from py_trees.decorators import *
-from rv_trees.leaves import *
+from ros_trees.leaves import *
 
 from lingua.errors import *
 
@@ -729,13 +729,13 @@ class Object(Groundable):
         for line in str(attr).split('\n'):
           outstr += '\n  {}'.format(line)
 
-    if self.relation:
+    if not self.relation is None:
       outstr += '\n relation:'
       
       for line in str(self.relation).split('\n'):
         outstr += '\n  {}'.format(line)
 
-    if self.limit:
+    if not self.limit is None:
       outstr += '\n limit:'
       
       for line in str(self.limit).split('\n'):
@@ -1030,7 +1030,7 @@ from lingua.trees import Subtree
 from lingua.method import Method
 
 if __name__ == '__main__':
-  from rv_trees.trees import BehaviourTree
+  from ros_trees.trees import BehaviourTree
   import rospy
   from lingua_pddl.state import State
   rospy.init_node('test')
